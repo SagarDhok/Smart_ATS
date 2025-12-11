@@ -123,16 +123,20 @@ https://domain.com/signup/?token=UUID-TOKEN
 4. HR logs in normally at `/login`
 
 ### HR Capabilities:
-- Create job posts  
-- Edit/delete their own jobs  
-- View their own applications  
-- Filter/search applicants  
-- Update application status  
-- View parsed resume data  
+- Create job posts
+- Edit/delete their own jobs 
+- View their own applications
+- View match scores 
+- View parsed resume details
+- Update application status
+- Download resumes (PDF)
+ 
 
 ### Cannot: 
-- View other HR data  
-- Invite HR users  
+Invite HR users
+Access Admin dashboard
+Manage other HR accounts
+View jobs or applications created by other HRs
 
 ---
 
