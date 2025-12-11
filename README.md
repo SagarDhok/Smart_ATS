@@ -130,15 +130,13 @@ https://domain.com/signup/?token=UUID-TOKEN
 - Update application status  
 - View parsed resume data  
 
-### Cannot:
-- Download resumes (Admin only)  
+### Cannot: 
 - View other HR data  
 - Invite HR users  
 
 ---
 
 # Resume Parsing Pipeline
-
 ### Safe PDF Parsing (PyPDF2)
 - Max size: 10MB  
 - Max pages: 20  
@@ -158,12 +156,9 @@ https://domain.com/signup/?token=UUID-TOKEN
 ---
 
 # Scoring System
-
 Final Score =
 (Skills Match * 0.50)
-
 (Experience Score * 0.30)
-
 (Keyword Score * 0.20)
 
 
@@ -181,7 +176,6 @@ Output:
 ---
 
 # Admin Dashboard Features
-
 - Total jobs  
 - Total applications  
 - Applications by status  
@@ -190,10 +184,9 @@ Output:
 - Pagination  
 - Search  
 
----
+
 
 # Project Structure
-
 Smart-ATS/
 │
 ├── applications/
@@ -300,7 +293,7 @@ Sends:
 
 # Author
 
-**Sagar Devgan**  
+**Sagar Dhok**  
 Backend Developer — Python / Django  
 
 ---
