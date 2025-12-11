@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+{% load score_color %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/application_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="ats-wrapper">
+    
+    <aside class="ats-sidebar">
+        <div class="profile-card">
+            <div class="avatar-placeholder">
+                {{ app.full_name|make_list|first|upper }}
+            </div>
+            <h1 class="candidate-name">{{ app.full_name }}</h1>
+            <p class="job-role">{{ app.job.title }}</p>
+
+            <!-- ✅ ADMIN VIEW ONLY (NO STATUS DROPDOWN) -->
+            <div class="status-workflow">
+                <label class="section-label">Admin Mode</label>
+                <div style="padding:10px; background:#f3f4f6; border-radius:8px; font-size:14px; font-weight:600; color:#374151;">
+                    View Only Access
+                </div>
+            </div>
+
+            <div class="contact-info">
+                <div class="info-row">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ app.email }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ app.phone }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ app.applied_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ app.resume.url }}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> View Resume
+                </a>
+                <a href="{% url 'admin_download_resume' app.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="ats-main">
+
+        <div class="main-header">
+            <div>
+                <h2>Application Analysis</h2>
+            </div>
+            <div class="fit-badge badge-{{ app.fit_category|lower }} {{ app.match_score|score_color }}">
+                {{ app.fit_category }}
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card highlight">
+                <div class="stat-title">Total Match</div>
+                <div class="stat-value {{ app.match_score|score_color }}">
+                    {{ app.match_score }}%
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Skills Match</div>
+                <div class="stat-value">{{ app.skill_score }}%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Exp. Match</div>
+                <div class="stat-value">{{ app.experience_score }}%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Keywords</div>
+                <div class="stat-value">{{ app.keyword_score }}%</div>
+            </div>
+        </div>
+
+        <div class="content-section ai-insights">
+            <div class="section-header">
+                <h3><i class="fas fa-clipboard-list"></i> Summary</h3>
+            </div>
+
+            <div class="insight-box">
+                <h4>Executive Summary</h4>
+                <p>{{ app.summary }}</p>
+            </div>
+
+            <div class="insight-box mt-3">
+                <h4>Detailed Evaluation</h4>
+                <p>{{ app.evaluation }}</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h3>Skills Breakdown</h3>
+            <div class="table-responsive">
+                <table class="ats-table">
+                    <thead>
+                        <tr>
+                            <th>Required Skill</th>
+                            <th>Status</th>
+                            <th>Analysis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for skill in app.job.required_skills %}
+                        <tr>
+                            <td class="fw-bold">{{ skill }}</td>
+                            <td>
+                                {% if skill in app.matched_skills %}
+                                    <span class="status-pill success">
+                                        <i class="fas fa-check"></i> Found
+                                    </span>
+                                {% else %}
+                                    <span class="status-pill missing">
+                                        <i class="fas fa-times"></i> Missing
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="muted-text">
+                                {% if skill in app.matched_skills %}
+                                    Detected in resume/projects
+                                {% else %}
+                                    Not explicitly mentioned
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if app.parsed_projects %}
+        <div class="content-section">
+            <h3>Projects & Portfolio</h3>
+            <div class="projects-block">
+                {{ app.parsed_projects|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+{% endblock %}

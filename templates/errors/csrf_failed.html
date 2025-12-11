@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="page-container" style="max-width:450px; margin:auto;">
+
+    <div class="card">
+
+        <h1 style="margin-bottom:10px; color:#a86a00;">Session Expired</h1>
+
+        <p style="margin-bottom:20px; color:#444;">
+            This usually happens when you press back after submitting a form.
+        </p>
+
+        <a href="/login/" class="btn btn-outline" style="width:100%;">
+           Return to Login Page
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Job Details</h2>
+<hr>
+
+<h3>{{ job.title }}</h3>
+
+<p><strong>Description:</strong></p>
+<p>{{ job.description|linebreaks }}</p>
+
+<p><strong>Required Skills:</strong></p>
+<ul>
+    {% for skill in job.required_skills %}
+        <li>{{ skill }}</li>
+    {% endfor %}
+</ul>
+
+<p><strong>Experience:</strong> {{ job.min_experience }} - {{ job.max_experience }} years</p>
+<p><strong>Salary:</strong> {{ job.min_salary }} - {{ job.max_salary }}</p>
+<p><strong>Location:</strong> {{ job.location }}</p>
+<p><strong>Work Mode:</strong> {{ job.get_work_mode_display }}</p>
+<p><strong>Employment Type:</strong> {{ job.get_employment_type_display }}</p>
+<p><strong>Status:</strong> {{ job.status }}</p>
+<p><strong>Deadline:</strong> {{ job.deadline }}</p>
+<p><strong>Vacancies:</strong> {{ job.vacancies }}</p>
+
+<a href="{% url 'edit_job' job.slug %}" class="btn btn-warning">Edit Job</a>
+
+{% endblock %}

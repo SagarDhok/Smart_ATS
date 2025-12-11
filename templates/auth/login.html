@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+        <h1 class="auth-title">Login</h1>
+        <p class="auth-subtitle">Welcome back. Please enter your credentials.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            {% if error %}
+                <p class="auth-error">{{ error }}</p>
+            {% endif %}
+
+            <button class="btn btn-primary auth-btn">Login</button>
+
+            <div class="auth-links">
+                <a href="/forgot-password/">Forgot your password?</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+{% endblock %}

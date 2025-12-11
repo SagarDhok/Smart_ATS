@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/hrcrudjobs.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="hrjob-wrapper">
+    <div class="hrjob-card">
+
+        <h2 class="hrjob-title">Edit Job Posting</h2>
+
+        <form method="POST" class="hrjob-form">
+            {% csrf_token %}
+
+   {% for field in form %}
+    <div class="hrjob-field {% if field.field.required %}required{% endif %}">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+            <small class="text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% if field.errors %}
+            <div class="text-danger small mt-1">{{ field.errors }}</div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+            <div style="margin-top: 30px; display: flex; gap: 12px;">
+    
+    <!-- BUTTON 1: Update & Go Back to List -->
+    <button type="submit" name="action" value="save_list" class="hrjob-btn">
+        Update → List
+    </button>
+
+    <!-- BUTTON 2: Update & View Details -->
+    <button type="submit" name="action" value="save_detail" class="hrjob-btn" style="background:#047857;">
+        Update → Details
+    </button>
+
+
+</div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% load static %}
+
+<div id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <span>Smart ATS</span>
+        </div>
+        <button id="toggleSidebar" class="sidebar-toggle">≡</button>
+    </div>
+
+    <ul class="sidebar-menu">
+
+        {% if request.user.is_authenticated %}
+
+            <!-- Landing Page -->
+            <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
+
+            <!-- Dashboard -->
+          {% if request.user.role == "ADMIN" or request.user.role == "SUPERADMIN" %}
+    <li><a href="{% url 'admin_dashboard' %}">📊 <span>Dashboard</span></a></li>
+{% elif request.user.role == "HR" %}
+    <li><a href="{% url 'hr_dashboard' %}">📊 <span>Dashboard</span></a></li>
+{% endif %}
+
+
+            <!-- Profile -->
+            <li><a href="{% url 'profile' %}">👤 <span>Profile</span></a></li>
+
+            <!-- Logout -->
+            <li><a href="#" id="logoutConfirmBtn" class="logout">🚪 <span>Logout</span></a></li>
+
+        {% else %}
+
+            <!-- NOT LOGGED IN → ONLY Landing Page -->
+            <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
+
+        {% endif %}
+    </ul>
+</div>
+
+
+<!-- Logout Popup -->
+<div id="logoutPopup" class="logout-popup">
+    <div class="logout-box">
+        <p>Do you want to logout?</p>
+        <div class="logout-actions">
+            <button id="logoutYes" class="btn-yes">Yes</button>
+            <button id="logoutNo" class="btn-no">Cancel</button>
+        </div>
+    </div>
+</div>

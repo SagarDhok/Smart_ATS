@@ -1,0 +1,73 @@
+/* =========================================== */
+/* APPLICATION LIST + JOB APPLICATION TABLE */
+/* =========================================== */
+
+.table-link {
+    color: #1a73e8;
+    font-weight: 600;
+    text-decoration: none;
+}
+.table-link:hover {
+    color: #0b59c0;
+    text-decoration: underline;
+}
+
+.count-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+
+.apps-filter-bar {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+.apps-filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.apps-input {
+    padding: 12px 14px;
+    border: 1px solid #CBD5E0;
+    border-radius: 8px;
+    width: 280px;          /* 👈 clean width */
+}
+
+.apps-select {
+    padding: 12px 14px;
+    border: 1px solid #CBD5E0;
+    border-radius: 8px;
+    background: white;
+
+    width: 180px;          /* 👈 dropdown short */
+    max-width: 180px;
+}
+
+
+.apps-btn {
+    height: 44px;        /* same as input */
+    padding: 0 18px;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+
+
+@media (max-width: 600px) {
+    .apps-filter-form {
+        flex-direction: column;
+    }
+    .apps-input,
+    .apps-select {
+        width: 100%;
+    }
+}

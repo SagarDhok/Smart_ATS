@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+        <h1 class="auth-title">Update Password</h1>
+        <p class="auth-subtitle">Your temporary password must be replaced.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Old Password</label>
+            <input type="password" name="old_password" required>
+
+            <label>New Password</label>
+            <input type="password" name="new_password" required>
+
+            <label>Confirm Password</label>
+            <input type="password" name="confirm_password" required>
+
+            {% if error %}
+                <p class="auth-error">{{ error }}</p>
+            {% endif %}
+
+            <button class="btn btn-primary auth-btn">Update Password</button>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

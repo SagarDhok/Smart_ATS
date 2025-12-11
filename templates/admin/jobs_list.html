@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/jobs_list.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    
+    <h1>All Jobs</h1>
+
+  <!-- SEARCH BAR -->
+<div class="job-search-container">
+    <form method="GET">
+        <input type="text" name="search" class="job-input"
+               placeholder="Search job title..."
+               value="{{ search }}">
+        <button type="submit" class="btn btn-primary job-btn">Search</button>
+    </form>
+</div>
+
+
+    <!-- JOB TABLE -->
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Job Title</th>
+                <th>Created By</th>
+                <th>Applications</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for job in jobs_page %}
+            <tr>
+
+                <!-- Job Title -->
+                <td>
+                    <a href="{% url 'admin_job_detail' job.id %}" class="table-link">
+                        {{ job.title }}
+                    </a>
+                </td>
+
+                <!-- Created By -->
+                <td>
+                    {% if job.created_by %}
+                       {{ job.created_by.get_full_name|default:job.created_by.email }}
+
+
+                    {% else %}
+                        <span style="color:#888;">—</span>
+                    {% endif %}
+                </td>
+
+
+                <!-- Application Count -->
+                <td>
+                    <a href="{% url 'admin_job_applications' job.id %}" class="count-pill">
+                        {{ job.applications.count }}
+                    </a>
+                </td>
+
+                <td>{{ job.created_at|date:"Y-m-d H:i" }}</td>
+
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center;color:#777;padding:20px;">
+                    No jobs found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="pagination-controls">
+        {% if jobs_page.has_previous %}
+            <a href="?page={{ jobs_page.previous_page_number }}&search={{ search }}" class="btn btn-outline">Previous</a>
+        {% endif %}
+
+        <span class="page-info">
+            Page {{ jobs_page.number }} of {{ jobs_page.paginator.num_pages }}
+        </span>
+
+        {% if jobs_page.has_next %}
+            <a href="?page={{ jobs_page.next_page_number }}&search={{ search }}" class="btn btn-outline">Next</a>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

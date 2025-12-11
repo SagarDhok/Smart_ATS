@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        {% if error %}
+            <h1 class="auth-title" style="color:#dc3545;">Invalid Invite</h1>
+            <p class="auth-subtitle">{{ error }}</p>
+        {% else %}
+            <h1 class="auth-title">Complete Your Signup</h1>
+            <p class="auth-subtitle">
+                You were invited as an HR. Please fill the details below.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <p class="auth-info">Email: <strong>{{ email }}</strong></p>
+                <input type="hidden" name="token" value="{{ token }}">
+
+                <label>First Name</label>
+                <input type="text" name="first_name" required>
+
+                <label>Last Name</label>
+                <input type="text" name="last_name" required>
+
+                <label>Password</label>
+                <input type="password" name="password" required>
+
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" required>
+
+                <button class="btn btn-primary auth-btn">Create Account</button>
+            </form>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

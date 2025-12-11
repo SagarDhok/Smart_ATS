@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/apply.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="apply-wrapper">
+
+    <div class="apply-card">
+
+        <div class="apply-header">
+            <h4 class="apply-title">Apply for {{ job.title }}</h4>
+            <p class="apply-subtitle">Fill your details and upload your resume.</p>
+        </div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div style="color:red; margin-bottom:10px;">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="form-group">
+        <label>Full Name</label>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}
+            <p style="color:red;">{{ form.full_name.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+            <p style="color:red;">{{ form.email.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Phone</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+            <p style="color:red;">{{ form.phone.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Resume (PDF)</label>
+        {{ form.resume }}
+        {% if form.resume.errors %}
+            <p style="color:red;">{{ form.resume.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="apply-btn-main">Submit</button>
+</form>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

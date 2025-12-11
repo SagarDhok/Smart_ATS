@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/job_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="job-detail-wrapper">
+    <div class="jd-wrapper">
+
+        <!-- HERO HEADER -->
+        <div class="jd-hero">
+            <span class="jd-posted-label">{{ job.get_posted_label }}</span>
+
+            <h1 class="jd-title">{{ job.title }}</h1>
+
+            <div class="job-meta-grid">
+                <span><strong>Location:</strong> {{ job.location }}</span>
+                <span><strong>Experience:</strong> {{ job.min_experience|floatformat:0 }}–{{ job.max_experience|floatformat:0 }} yrs</span>
+                <span><strong>Work Mode:</strong> {{ job.get_work_mode_display }}</span>
+                <span><strong>Type:</strong> {{ job.get_employment_type_display }}</span>
+                <span><strong>Vacancies:</strong> {{ job.vacancies }}</span>
+
+                {% if job.min_salary and job.max_salary %}
+                <span><strong>Salary:</strong> ₹{{ job.min_salary }}–₹{{ job.max_salary }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="jd-main">
+            <h3 class="jd-heading">Job Description</h3>
+            <p class="jd-text">{{ job.description|linebreaks }}</p>
+
+            <h3 class="jd-heading">Required Skills</h3>
+            <div class="jd-skills">
+                {% for s in job.required_skills %}
+                    <span class="jd-skill">{{ s }}</span>
+                {% empty %}
+                    <span class="text-muted">No skills listed</span>
+                {% endfor %}
+            </div>
+
+            <div class="jd-apply-wrap">
+                <a href="{% url 'apply_job' job.slug %}" class="btn btn-primary jd-apply">
+                    Apply Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <h1>HR Dashboard</h1>
+
+    <div class="flex hrdash-row">
+
+        <!-- JOBS -->
+        <div class="card hrdash-card">
+            <h3>Total Jobs</h3>
+            <p class="big">{{ total_jobs }}</p>
+
+         
+
+         <a href="{% url 'hr_job_list' %}" class="btn btn-outline mt-3 view-jobs-btn">
+    View All Jobs 
+</a>
+
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div class="card hrdash-card">
+            <h3>Total Applications</h3>
+            <p class="big">{{ total_applications }}</p>
+
+            <p><span>Screening</span><span>{{ screening }}</span></p>
+            <p><span>Review</span><span>{{ review }}</span></p>
+            <p><span>Interview</span><span>{{ interview }}</span></p>
+            <p><span>Hired</span><span>{{ hired }}</span></p>
+            <p><span>Rejected</span><span>{{ rejected }}</span></p>
+
+            <a href="{% url 'hr_applications_list' %}" class="btn btn-outline mt-3">
+                View Applications 
+            </a>
+        </div>
+
+    </div>
+
+    <!-- CENTER BUTTON -->
+    <div class="hr-create-wrapper">
+        <a href="{% url 'hr_job_create' %}" class="btn btn-primary hr-create-btn">
+            Create New Job
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

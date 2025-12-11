@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="prf-wrapper">
+
+    <div class="prf-header">
+        <div class="prf-avatar">
+            {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+        </div>
+
+        <div class="prf-head-info">
+            <h2 class="prf-name">{{ user.first_name }} {{ user.last_name }}</h2>
+            <p class="prf-email">{{ user.email }}</p>
+        </div>
+    </div>
+
+    <div class="prf-card">
+
+        <h3 class="prf-section-title">Personal Information</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="prf-row">
+                <div class="prf-field">
+                    <label class="prf-label">First Name</label>
+                    <input type="text" name="first_name" class="prf-input" value="{{ user.first_name }}">
+                </div>
+
+                <div class="prf-field">
+                    <label class="prf-label">Last Name</label>
+                    <input type="text" name="last_name" class="prf-input" value="{{ user.last_name }}">
+                </div>
+            </div>
+
+            <div class="prf-row">
+                <div class="prf-field">
+                    <label class="prf-label">Email</label>
+                    <input type="email" class="prf-input prf-readonly" value="{{ user.email }}" readonly>
+                </div>
+
+                <div class="prf-field">
+                    <label class="prf-label">Role</label>
+                    <input type="text" class="prf-input prf-readonly" value="{{ user.role }}" readonly>
+                </div>
+            </div>
+
+
+            <button class="prf-save-btn">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="prf-card">
+        <h3 class="prf-section-title">Security</h3>
+        <a href="{% url 'force_password_reset' %}" class="prf-change-pass-btn">Change Password</a>
+    </div>
+
+</div>
+{% endblock %}

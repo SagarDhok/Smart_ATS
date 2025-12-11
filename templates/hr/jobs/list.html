@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/hrcrudjobs.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <!-- HEADER -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+        <h1>My Jobs</h1>
+
+        <a href="{% url 'hr_job_create' %}" class="btn btn-primary" style="width:auto;">
+            Create New Job
+        </a>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="apps-filter-bar">
+        <form method="GET" class="apps-filter-form">
+
+            <!-- Search -->
+            <input type="text"
+                name="search"
+                placeholder="Search job titles..."
+                value="{{ request.GET.search }}"
+                class="apps-input">
+
+            <!-- Location -->
+            <input type="text"
+                name="location"
+                placeholder="Location"
+                value="{{ request.GET.location }}"
+                class="apps-input"
+                style="width:180px;">
+
+            <!-- Work Mode -->
+            <select name="work_mode" class="apps-select">
+                <option value="">All Work Modes</option>
+                <option value="onsite" {% if request.GET.work_mode == "onsite" %}selected{% endif %}>On-site</option>
+                <option value="remote" {% if request.GET.work_mode == "remote" %}selected{% endif %}>Remote</option>
+                <option value="hybrid" {% if request.GET.work_mode == "hybrid" %}selected{% endif %}>Hybrid</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary apps-btn">
+                Search
+            </button>
+
+            <a href="{% url 'hr_job_list' %}" class="apps-clear-btn">
+                Clear
+            </a>
+
+        </form>
+    </div>
+
+    <!-- JOB TABLE -->
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Experience</th>
+                <th>Work Mode</th>
+                <th>Applications</th>
+                <th style="width:150px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>
+                    <a href="{% url 'hr_job_detail' job.id %}" class="table-link">
+                        {{ job.title }}
+                    </a>
+                </td>
+
+                <td>{{ job.location }}</td>
+
+                <td>{{ job.min_experience }} – {{ job.max_experience }} yrs</td>
+
+                <td class="text-capitalize">{{ job.work_mode }}</td>
+
+               <td>
+    <a href="{% url 'hr_job_applications' job.id %}" class="btn btn-outline mt-2">
+        {{ job.app_count }}
+    </a>
+</td>
+
+                <td>
+                    <div style="display:flex; gap:10px;">
+                        <a href="{% url 'hr_job_edit' job.id %}" class="btn-action btn-edit">Edit</a>
+
+                        <form action="{% url 'hr_job_delete' job.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn-action btn-delete"
+                                onclick="return confirm('Are you sure?');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; padding:20px; color:#777;">
+                    No jobs found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+{% if is_paginated %}
+    <div class="pagination-controls mt-3">
+        
+        {% if page_obj.has_previous %}
+        <a class="btn btn-outline"
+           href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&location={{ request.GET.location }}&work_mode={{ request.GET.work_mode }}">
+            Previous
+        </a>
+        {% endif %}
+
+        <span class="page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a class="btn btn-outline"
+           href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&location={{ request.GET.location }}&work_mode={{ request.GET.work_mode }}">
+            Next
+        </a>
+        {% endif %}
+
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

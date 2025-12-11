@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/hrcrudjobs.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="hrjob-wrapper">
+
+    <div class="hrjob-card">
+
+        <h2 class="hrjob-title">Create Job</h2>
+
+        <form method="POST" class="hrjob-form">
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="hrjob-field">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="hrjob-error">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button class="hrjob-btn">Create Job</button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

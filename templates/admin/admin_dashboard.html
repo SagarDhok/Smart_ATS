@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <h1>Admin Dashboard</h1>
+
+    <!-- TOP CARDS -->
+    <div class="flex">
+
+        <!-- HR Count -->
+        <div class="card">
+            <h3>Total HR</h3>
+            <p class="big">{{ hr_page.paginator.count }}</p>
+
+            <a href="{% url 'invite' %}" class="btn btn-primary">Invite HR</a>
+            <a href="{% url 'hr_management' %}" class="btn btn-outline mt-2">Manage HR</a>
+        </div>
+
+        <!-- Jobs -->
+        <div class="card">
+            <h3>Total Jobs</h3>
+            <p class="big">{{ total_jobs }}</p>
+            <p></p>
+            <p></p>
+
+            <a href="{% url 'admin_job_list' %}" class="btn btn-outline mt-2">View All Jobs</a>
+        </div>
+
+        <!-- Applications -->
+        <div class="card">
+            <h3>Total Applications</h3>
+            <p class="big">{{ total_applications }}</p>
+
+            <p>Screening: <span class="badge badge-warning">{{ screening }}</span></p>
+            <p>Review: <span class="badge badge-warning">{{ review }}</span></p>
+            <p>Interview: <span class="badge badge-warning">{{ interview }}</span></p>
+            <p>Hired: <span class="badge badge-success">{{ hired }}</span></p>
+            <p>Rejected: <span class="badge badge-danger">{{ rejected }}</span></p>
+
+            <a href="{% url 'admin_application_list' %}" class="btn btn-outline mt-2">
+                View Applications
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- HR USERS TABLE -->
+    <!-- ========================= -->
+    <section>
+        <h2 class="section-title">HR Users</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for hr in hr_page %}
+                <tr>
+                    <td>{{ hr.first_name }} {{ hr.last_name }}</td>
+                    <td>{{ hr.email }}</td>
+                    <td>{{ hr.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align:center; padding:20px; color:#777;">
+                        No HR users yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- HR Pagination -->
+        <div class="pagination-controls">
+
+            {% if hr_page.has_previous %}
+                <a href="?hr_page={{ hr_page.previous_page_number }}" class="btn btn-outline">
+                    Previous
+                </a>
+            {% else %}
+                <span class="btn btn-outline disabled">Previous</span>
+            {% endif %}
+
+            <span class="page-info">
+                Page {{ hr_page.number }} of {{ hr_page.paginator.num_pages }}
+            </span>
+
+            {% if hr_page.has_next %}
+                <a href="?hr_page={{ hr_page.next_page_number }}" class="btn btn-outline">
+                    Next
+                </a>
+            {% else %}
+                <span class="btn btn-outline disabled">Next</span>
+            {% endif %}
+
+        </div>
+    </section>
+
+    <!-- ========================= -->
+    <!-- PENDING INVITES TABLE -->
+    <!-- ========================= -->
+    <section>
+        <h2 class="section-title">Pending Invites</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Sent</th>
+                    <th>Expires</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for inv in pending_invites_page %}
+                <tr>
+                    <td>{{ inv.email }}</td>
+                    <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ inv.expires_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align:center; padding:20px; color:#777;">
+                        No pending invites.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pending Invites Pagination -->
+        <div class="pagination-controls mt-3">
+
+            {% if pending_invites_page.has_previous %}
+                <a href="?pending_page={{ pending_invites_page.previous_page_number }}" 
+                   class="btn btn-outline">Previous</a>
+            {% else %}
+                <span class="btn btn-outline disabled">Previous</span>
+            {% endif %}
+
+            <span class="page-info">
+                Page {{ pending_invites_page.number }} of {{ pending_invites_page.paginator.num_pages }}
+            </span>
+
+            {% if pending_invites_page.has_next %}
+                <a href="?pending_page={{ pending_invites_page.next_page_number }}" 
+                   class="btn btn-outline">Next</a>
+            {% else %}
+                <span class="btn btn-outline disabled">Next</span>
+            {% endif %}
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

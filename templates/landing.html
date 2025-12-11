@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="page-container">
+
+    <!-- HERO TITLE -->
+    <h1>Smart ATS — Applicant Tracking System</h1>
+
+    <p style="max-width:700px; margin-bottom:30px; color:#555;">
+        A modern, enterprise-grade ATS platform with Job Portal, HR Dashboard,
+        Admin Controls, Secure Invite System, and Automated Resume Screening.
+    </p>
+
+    <!-- CTA BUTTONS -->
+    <div style="margin-bottom:40px;">
+        <a href="/jobs/" class="btn btn-primary" style="margin-right:10px;">
+            🔍 View Jobs
+        </a>
+        <a href="/login/" class="btn btn-outline">
+            👤 HR / Admin Login
+        </a>
+    </div>
+
+    <hr class="mb-4">
+
+    <!-- FEATURES -->
+    <h2 class="section-title">Key Features</h2>
+
+    <div class="flex">
+
+        <div class="card">
+            <h3>Public Job Portal</h3>
+            <p>Browse active jobs without signing in.</p>
+        </div>
+
+        <div class="card">
+            <h3>HR Dashboard</h3>
+            <p>Create & manage jobs, track applications.</p>
+        </div>
+
+        <div class="card">
+            <h3>Admin Controls</h3>
+            <p>Manage HR accounts using secure invite system.</p>
+        </div>
+
+        <div class="card">
+            <h3>AI Screening</h3>
+            <p>Automatic match scoring from resumes.</p>
+        </div>
+
+    </div>
+
+    <hr class="mb-4 mt-5">
+
+    <!-- ROLES -->
+    <h2 class="section-title">Role-Based Access</h2>
+
+    <div class="flex">
+
+        <div class="card">
+            <h3>Admin</h3>
+            <p>Invite HRs, manage system-level data & analytics.</p>
+        </div>
+
+        <div class="card">
+            <h3>HR</h3>
+            <p>Post jobs and review applicant profiles.</p>
+        </div>
+
+        <div class="card">
+            <h3>Candidate</h3>
+            <p>Apply to jobs without creating an account.</p>
+        </div>
+
+    </div>
+
+    <hr class="mb-4 mt-5">
+
+    <!-- DEMO ACCESS -->
+    <h2 class="section-title">Demo Credentials</h2>
+
+    <div class="card" style="max-width:450px;">
+        <p><strong>Admin:</strong> admin@example.com</p>
+        <p><strong>Password:</strong> ********</p>
+
+        <div class="mt-3">
+            <p><strong>HR (Test Account):</strong></p>
+            <p>hr@example.com</p>
+            <p>Password: ********</p>
+        </div>
+    </div>
+
+    <p class="mt-5" style="color:#777; font-size:14px;">
+        © {{ year }} Smart ATS — Built with Django + MySQL
+    </p>
+
+</div>
+
+{% endblock %}

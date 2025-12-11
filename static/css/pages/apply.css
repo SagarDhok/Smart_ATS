@@ -1,0 +1,108 @@
+.apply-wrapper {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    /* Cleaner, lighter gradient for the background */
+    background: linear-gradient(135deg, var(--color-bg-light), #E2E8F0); 
+}
+
+/* MAIN CARD */
+.apply-card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--color-white);
+    padding: 42px 40px;
+    border-radius: 16px; /* Consistency */
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    animation: fadeUp 0.4s ease;
+}
+
+/* TITLE */
+.apply-title {
+    font-size: 20px; /* Slightly larger title */
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 6px;
+    color: var(--color-text-dark);
+}
+
+.apply-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-text-subtle);
+    margin-bottom: 32px;
+}
+
+/* FORM */
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600; /* Adjusted weight for readability */
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--color-text-dark);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px; /* Consistency */
+    border: 1px solid #CBD5E0;
+    background: var(--color-white); /* Cleaner white background */
+    font-size: 15px;
+}
+
+.form-group input:focus {
+    background: var(--color-white);
+    border-color: var(--color-primary); /* Blue focus */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+}
+
+/* FILE INPUT */
+.form-group input[type="file"] {
+    padding: 10px;
+    background: #F7FAFC; /* Slightly different background to hint at file drop area */
+    border-style: dashed;
+    border-color: #A0AEC0;
+}
+
+/* BUTTON */
+.apply-btn-main {
+    margin-top: 18px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px; /* Consistency */
+    border: none;
+    background: var(--color-primary); /* Primary Blue */
+    color: var(--color-white);
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 8px 18px rgba(66, 153, 225, 0.3); /* Blue shadow */
+}
+
+.apply-btn-main:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(66, 153, 225, 0.4);
+}
+
+/* ANIMATION (Keep as is) */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

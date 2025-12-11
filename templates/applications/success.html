@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/success.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card" style="text-align:center;">
+
+        <h1 class="auth-title" style="color:#28a745;">Application Submitted</h1>
+        <p class="auth-subtitle">Thank you! We will contact you if shortlisted.</p>
+
+        <a href="/jobs/" class="btn btn-primary auth-btn" style="margin-top:20px;">
+            Back to Jobs
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
