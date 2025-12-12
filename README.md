@@ -11,7 +11,7 @@ Includes **resume parsing, match scoring, HR invite workflow, token authenticati
 # 🚀 Smart ATS — Applicant Tracking System
 
 
-### ⭐ Public Job Portal
+### ⭐ Public Jobs List
 ![Jobs](screenshots/jobs.png)
 
 ### 📝 Job Detail Page
