@@ -1,169 +1,107 @@
-# 📌 Smart ATS — Applicant Tracking System  
-### Django + MySQL | Resume Parsing | Automated Scoring | Secure HR Invite System
+# 🚀 Smart ATS — Applicant Tracking System
 
-Smart ATS is a production-grade Applicant Tracking System designed with a real enterprise workflow.  
-It includes resume parsing, match scoring, secure HR invitation, and strict RBAC dashboards — similar to platforms like Greenhouse, Lever, and Workable.
 
----
+**Smart ATS** is a production-grade Applicant Tracking System built with Django. It features enterprise-level workflows inspired by platforms like Greenhouse, Lever, and Workable.
 
-# 🚀 Demo Accounts
+Key highlights:  
+- Resume parsing with PyPDF2  
+- Automated candidate scoring  
+- Strict Role-Based Access Control (RBAC)  
+- Secure HR invitation system  
+- Dedicated dashboards for Admin & HR  
 
-### **Admin**
-Email: admin@demo.com
-Password: admin@123
-Role: ADMIN
+Perfect for showcasing real-world Django backend architecture.
 
-markdown
-Copy code
+## 🚀 Demo Accounts (Run Locally)
 
-### **HR Recruiter**
-Email: rakijat182@crsay.com
-Password: hrrecuiter@123
-Role: HR
+### Admin
+- **Email**: `admin@demo.com`  
+- **Password**: `admin@123`
 
-yaml
-Copy code
+### HR Recruiter
+- **Email**: `rakijat182@crsay.com`  
+- **Password**: `hrrecuiter@123`
 
----
+> **Test Secure Invite Flow**: Log in as Admin → Invite HR → Use any email (or temp mail) to receive the tokenized signup link.
 
-# 🏗️ System Workflow Overview
+## 🏗️ System Workflow
 
-### **🔹 Superadmin → Admin**
-- Superadmin creates Admin users in Django Admin.
-- Admins cannot self-register.
+- **Superadmin** → Creates Admin (via Django Admin)  
+- **Admin** → Invites HR (secure token-only, no open signup)  
+- **HR** → Posts jobs, screens applicants  
+- **Candidates** → Apply without accounts
 
-### **🔹 Admin → HR (Invite-Only System)**
-- Admin sends tokenized email invite.  
-- HR signup is ONLY allowed through this secure link.  
-- HR cannot signup manually.
+## 🔥 Key Features
 
-### **🔹 HR → Recruitment Workflow**
-- Posts jobs, manages applicants, updates status.
+### Resume Parsing (PyPDF2)
+- Extracts: Name, Email, Phone, Skills, Experience, Projects, Education, Certifications
+- Safe handling: Max 5MB, PDF-only, detects corrupted/encrypted files
 
-### **🔹 Candidates**
-- Apply to jobs without creating an account.
+### Automated Scoring
+- **50%** Skills Match  
+- **30%** Experience Match  
+- **20%** JD Keywords  
+- Outputs: Score, Summary, Evaluation, Fit Category (Strong / Good / Average / Weak)
 
----
+### Role-Based Access Control
+| Role          | Key Capabilities                                   | Restrictions                          |
+|---------------|----------------------------------------------------|---------------------------------------|
+| **Superadmin**| Full system control (Django Admin)                | -                                     |
+| **Admin**     | Invite/manage HR, view all data & analytics       | Cannot post jobs or apply             |
+| **HR**        | Create/edit jobs, screen applicants               | Cannot download resumes or invite HR  |
+| **Candidate** | Apply to jobs                                      | No login required                     |
 
-# 🔥 Key Features
+### Secure HR Invitation System
+- UUID token-based signup
+- 48-hour token expiry
+- Delivered via email
 
-## ✅ Resume Parsing (PyPDF2)
-Extracts:
-- Name  
-- Email  
-- Phone  
-- Skills  
-- Experience  
-- Projects  
-- Education  
-- Certifications  
+### Other Features
+- Job postings with required skills, keywords, salary (LPA/Monthly/Negotiable)
+- Application status pipeline: Screening → Review → Interview → Hired → Rejected
+- Sanitized & secure PDF uploads
+- Duplicate application prevention
 
----
+## 🔒 Security Highlights
+- Rate-limited login (anti-bruteforce)
+- CSRF protection
+- Secure token workflows
+- Password strength validation
+- 15-minute password reset expiry
 
-## ✅ Automated Match Scoring
-Weight distribution:
-- **50% Skills Match**  
-- **30% Experience Match**  
-- **20% JD Keywords Match**
+## 🛠️ Tech Stack
+- **Backend**: Django
+- **Database**: MySQL
+- **Parsing**: PyPDF2
+- **Frontend**: HTML/CSS/JavaScript (Django templates)
+- **Email**: SMTP (Brevo recommended)
+- **Auth**: Email-based with token security
 
-Outputs:
-- Summary  
-- Evaluation  
-- Fit Category (Strong / Good /Average / Weak)
-
----
-
-## ✅ Role-Based Dashboards
-| Role | Capabilities |
-|------|--------------|
-| **Superadmin** | Full system control |
-| **Admin** | Manage HR users, view jobs & applications |
-| **HR Recruiter** | Job posting & screening |
-| **Candidate** | Apply to jobs |
-
----
-
-## ✅ Secure HR Invitation System
-- Token-based signup  
-- 48-hour expiry  
-- Email verification  
-- Prevents unauthorized HR signups  
-
----
-
-## ✅ Job Management
-- Create / Edit / Delete jobs  
-- Required skills  
-- JD keywords  
-- Salary formats: LPA / Monthly / Negotiable  
-- Education requirement  
-
----
-
-## ✅ Application Management
-- Parsed resume insights  
-- Resume preview  
-- Status workflow  
-  Screening → Review → Interview → Hired → Rejected  
-- Scoring dashboard  
-
----
-
-## ✅ PDF Security
-- PDF-only upload  
-- Max 5MB  
-- Sanitized filenames  
-- Handles corrupted PDFs safely  
-
----
-
-# 📊 Admin Dashboard Includes
-- Jobs count  
-- Applications analytics  
-- Status distribution  
-- HR account management  
-- Pending invite tracking  
-
----
-
-# 🗂️ Project Structure
+## 📂 Project Structure
 Smart-ATS/
 ├── applications/     # Parsing, scoring, models
-├── jobs/             # Job CRUD
-├── users/            # Auth, RBAC, invites
-├── templates/        # UI templates
-├── static/           # CSS/JS
+├── jobs/             # Job CRUD operations
+├── users/            # Authentication, RBAC, invite system
+├── templates/        # HTML templates
+├── static/           # CSS, JS, images
 ├── core/             # Settings, URLs
 ├── requirements.txt
 └── README.md
+text## ⚙️ Installation & Setup
 
-yaml
-Copy code
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SagarDhok/Smart_ATS.git
+   cd Smart_ATS/backend
 
----
-
-# ⚙️ Installation Guide
-
-### **1️⃣ Clone repository**
-```bash
-git clone https://github.com/SagarDhok/Smart_ATS.git
-cd smart-ats/backend
-2️⃣ Create virtual environment
-bash
-Copy code
-python -m venv env
-env\Scripts\activate
-3️⃣ Install dependencies
-bash
-Copy code
-pip install -r requirements.txt
-4️⃣ Configure environment (.env)
-ini
-Copy code
-SECRET_KEY=xxxx
+Create virtual environmentBashpython -m venv env
+source env/bin/activate        # Linux/Mac
+env\Scripts\activate           # Windows
+Install dependenciesBashpip install -r requirements.txt
+Create .env fileenvSECRET_KEY=your-secret-key-here
 DB_NAME=smart_ats
 DB_USER=root
-DB_PASSWORD=1234
+DB_PASSWORD=your-db-password
 DB_HOST=127.0.0.1
 DB_PORT=3306
 
@@ -172,55 +110,28 @@ EMAIL_HOST_PASSWORD=your-brevo-password
 
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
-5️⃣ Apply migrations
-bash
-Copy code
+Apply migrationsBashpython manage.py makemigrations
 python manage.py migrate
-6️⃣ Start development server
-bash
-Copy code
-python manage.py runserver
-👉 Open: http://127.0.0.1:8000
-
-🔐 Security Highlights
-Rate-limited login
-
-CSRF protection
-
-Secure HR token invites
-
-48-hour signup token expiry
-
-15-minute password reset expiry
-
-Sanitized PDF uploads
-
-Duplicate application prevention
-
-🧱 Tech Stack
-Django
-
-MySQL
-
-PyPDF2 (parsing)
-
-HTML / CSS / JS
-
-UUID Token Security
-
-Email Auth Login
+Start the serverBashpython manage.py runserverOpen → http://127.0.0.1:8000
 
 🧑‍💻 Author
 Sagar Dhok
-Backend Developer (Python / Django)
-
+Backend Developer — Python / Django
 🏁 Conclusion
-Smart ATS is a complete enterprise-style recruitment system with:
+Smart ATS is a complete enterprise-style recruitment platform demonstrating:
 
-✔ Role-based authentication
-✔ Secure HR onboarding
-✔ Resume parsing engine
-✔ Automated scoring
-✔ Full HR/Admin dashboards
+Secure RBAC & HR onboarding
+Resume parsing engine
+Automated candidate scoring
+Production-ready Django architecture
 
-An ideal backend engineering showcase project.
+![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
+![Django](https://img.shields.io/badge/Django-5.0-green?logo=django)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
+![PyPDF2](https://img.shields.io/badge/PyPDF2-3.0.1-orange)
+![HTML](https://img.shields.io/badge/HTML-5-E34F26?logo=html5&logoColor=white)
+![CSS](https://img.shields.io/badge/CSS-3-1572B6?logo=css3&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+Ideal for backend portfolios and interviews!
+Feel free to ⭐ the repo if you like it.
