@@ -119,7 +119,7 @@
             <span><strong>Vacancies:</strong> {{ job.vacancies }}</span>
 
             {% if job.min_salary and job.max_salary %}
-            <span><strong>Salary:</strong> ₹{{ job.min_salary }}–₹{{ job.max_salary }}</span>
+          <span><strong>Salary:</strong> {{ job.get_salary_display }}</span>
             {% endif %}
         </div>
 

@@ -31,7 +31,6 @@ class Application(models.Model):
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-
     resume = models.FileField(upload_to=resume_upload_path)
 
 
@@ -45,6 +44,8 @@ class Application(models.Model):
     parsed_education = models.TextField(blank=True, null=True)
     parsed_certifications = models.TextField(blank=True, null=True)
     parsed_keywords = models.JSONField(blank=True, null=True)
+
+
 
     match_score = models.FloatField(default=0)
     matched_skills = models.JSONField(default=list)

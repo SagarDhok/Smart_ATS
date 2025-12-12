@@ -219,3 +219,30 @@
         text-align: center;
     }
 }
+
+
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 42px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;       /* FIX */
+    height: 22px;      /* FIX */
+    cursor: pointer;
+    opacity: 0.7;
+    object-fit: contain; 
+}
+
+.password-toggle:hover {
+    opacity: 1;
+}

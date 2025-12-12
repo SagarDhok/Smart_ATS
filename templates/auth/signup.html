@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
 {% endblock %}
+
 {% block content %}
-
 <div class="auth-container">
-
     <div class="auth-card">
 
-        {% if error %}
+        {# SHOW FULL CARD ONLY IF INVITE INVALID #}
+        {% if invalid_invite %}
             <h1 class="auth-title" style="color:#dc3545;">Invalid Invite</h1>
-            <p class="auth-subtitle">{{ error }}</p>
+            <p class="auth-subtitle">{{ invalid_invite }}</p>
         {% else %}
+
             <h1 class="auth-title">Complete Your Signup</h1>
             <p class="auth-subtitle">
                 You were invited as an HR. Please fill the details below.
@@ -31,17 +33,28 @@
                 <input type="text" name="last_name" required>
 
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <div class="password-wrapper">
+ <div class="password-wrapper">
+    <input type="password" name="confirm_password" id="signupConfirmPassword" required>
+    <img src="{% static 'icons/show.png' %}" 
+         class="password-toggle"
+         onclick="togglePassword('signupConfirmPassword', this)">
+</div>
+
 
                 <label>Confirm Password</label>
-                <input type="password" name="confirm_password" required>
+                <div class="password-wrapper">
+    <input type="password" name="password" id="password" required>
+    <img src="{% static 'icons/show.png' %}" 
+         class="password-toggle"
+         onclick="togglePassword('password', this)">
+</div>
+
 
                 <button class="btn btn-primary auth-btn">Create Account</button>
             </form>
+
         {% endif %}
-
     </div>
-
 </div>
-
 {% endblock %}

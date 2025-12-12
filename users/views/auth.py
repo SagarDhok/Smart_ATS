@@ -12,8 +12,7 @@ from django.core.exceptions import ValidationError
 
 
 # ---------------- LOGIN ----------------
-from ratelimit.decorators import ratelimit
-
+from django_ratelimit.decorators import ratelimit
 @ratelimit(key='ip', rate='5/m', method='POST')
 def login_page(request):
 
@@ -37,9 +36,17 @@ def login_page(request):
 
         login(request, user)
 
+
+        # SUPERADMIN should skip password force logic always
+        if user.role == "SUPERUSER":
+            return redirect("admin_dashboard")
+
+
         # Force password reset
-        if user.must_change_password and user.role == "ADMIN":
+        if user.must_change_password and user.role == "ADMIN" and not user.is_superuser:
             return redirect("force_password_reset")
+
+       
 
         # Role-based redirect
         if user.role == "ADMIN":
@@ -91,69 +98,85 @@ from django.db import IntegrityError
 def signup_page(request):
     token = request.GET.get("token")
 
+    # ---------------------------------
+    # 1. INVALID OR MISSING TOKEN
+    # ---------------------------------
     if not token:
-        return render(request, "auth/signup.html", {"error": "Invalid signup link"})
+        return render(request, "auth/signup.html", {
+            "invalid_invite": "Invalid signup link"
+        })
 
     try:
         invite = Invite.objects.get(token=token, used=False)
     except Invite.DoesNotExist:
-        return render(request, "auth/signup.html", {"error": "Invalid or expired invite"})
+        return render(request, "auth/signup.html", {
+            "invalid_invite": "Invalid or expired invite"
+        })
 
+    # ---------------------------------
+    # 2. EXPIRED INVITE
+    # ---------------------------------
     if invite.is_expired():
-        messages.error(request, "Invite expired.")
-        return redirect("login")
+        invite.used = True
+        invite.save()
+        return render(request, "auth/signup.html", {
+            "invalid_invite": "This invite has expired"
+        })
 
+    # ---------------------------------
+    # 3. USER ALREADY EXISTS
+    # ---------------------------------
     if User.objects.filter(email=invite.email).exists():
         invite.used = True
         invite.save()
         messages.info(request, "Account already exists. Please login.")
         return redirect("login")
 
+    # ---------------------------------
+    # 4. FORM SUBMISSION
+    # ---------------------------------
     if request.method == "POST":
         f = request.POST
+        password = f.get("password")
+        confirm_password = f.get("confirm_password")
 
-        password = f["password"]
-        confirm_password = f["confirm_password"]
-
+        # PASSWORD MISMATCH
         if password != confirm_password:
-         return render(request, "auth/signup.html", {
-            "error": "Passwords do not match",
-            "email": invite.email
-        })
+            messages.warning(request, "Passwords do not match.")
+            return redirect(request.path + f"?token={token}")
 
-
+        # PASSWORD VALIDATION
         try:
-           validate_password(password)     
+            validate_password(password)
         except ValidationError as e:
-          return render(request, "auth/signup.html", {
-          "error": " ".join(e.messages),   # show Django’s message
-          "email": invite.email
-          })
-        
+            messages.warning(request, " ".join(e.messages))
+            return redirect(request.path + f"?token={token}")
+
+        # CREATE USER
         try:
             user = User.objects.create_user(
                 email=invite.email,
-                password=f["password"],
+                password=password,
                 first_name=f.get("first_name"),
                 last_name=f.get("last_name"),
                 role="HR",
                 is_active=True,
                 must_change_password=False
             )
-
         except IntegrityError:
             messages.error(request, "This email is already registered.")
             return redirect("login")
 
         invite.used = True
         invite.save()
-        
-        from django.contrib.auth import logout
-        logout(request)
 
+        logout(request)
         messages.success(request, "Account created successfully. Please login.")
         return redirect("login")
 
+    # ---------------------------------
+    # 5. INITIAL FORM LOAD
+    # ---------------------------------
     return render(request, "auth/signup.html", {
         "email": invite.email,
         "token": token
@@ -162,10 +185,6 @@ def signup_page(request):
 
 # ---------------- FORGOT PASSWORD ----------------
 from django.core.mail import send_mail
-from django.utils import timezone
-from datetime import timedelta
-from django.contrib import messages
-import uuid
 
 # ---------------- FORGOT PASSWORD ----------------
 def forgot_password_request(request):
@@ -270,6 +289,7 @@ from django.core.exceptions import ValidationError
 
 @login_required
 def force_password_reset(request):
+
     if request.method == "POST":
         old = request.POST.get("old_password")
         new = request.POST.get("new_password")

@@ -40,12 +40,10 @@
             <span>{{ job.location }}</span>
         </div>
 
-        {% if job.min_salary and job.max_salary %}
         <div class="job-info-item">
             <strong>Salary:</strong>
-            <span>₹{{ job.min_salary }} – ₹{{ job.max_salary }}</span>
+            <span>{{ job.get_salary_display }}</span>
         </div>
-        {% endif %}
     </div>
 
 
@@ -76,6 +74,11 @@
         {% endfor %}
     </div>
     {% endif %}
+
+      <div class="job-section">
+        <h3>Education</h3>
+       {{job.required_education|default:"Not specified" }}
+    </div>
 
     <!-- APPLICATIONS -->
     <div class="job-section">

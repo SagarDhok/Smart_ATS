@@ -4,26 +4,16 @@ import re
 # NORMALIZER (SAFE + CONSISTENT)
 # =====================================================================
 
+
 def normalize(text):
     if not text:
         return []
 
     if isinstance(text, list):
-        cleaned = []
-        for t in text:
-            t = t.strip().lower()
-            if t:
-                cleaned.append(" ".join(t.split()))
-        return cleaned
+        return [" ".join(t.lower().split()) for t in text if t.strip()]
 
     if isinstance(text, str):
-        parts = text.split(",")
-        cleaned = []
-        for p in parts:
-            p = p.strip().lower()
-            if p:
-                cleaned.append(" ".join(p.split()))
-        return cleaned
+        return [" ".join(p.lower().split()) for p in text.split(",") if p.strip()]
 
     return []
 
@@ -132,21 +122,23 @@ def generate_summary(parsed, score):
     skills = ", ".join(parsed.get("skills", [])[:6]) or "basic technical skills"
 
     return (
-        f"{name} has around {exp} years of experience and shows solid backend understanding. "
+        f"{name} has around {exp} years of experience. "
         f"The resume highlights skills including {skills}. "
         f"Overall match score is {score}%."
     )
 
+
 # =====================================================================
 # CANDIDATE EVALUATION (KEPT AS YOU WANTED)
 # =====================================================================
-
 def evaluate_candidate(score):
     if score >= 80:
-        return "Strong backend fundamentals. Suitable for junior to mid-level backend developer roles."
+        return "Strong technical alignment with the job requirements."
     if score >= 60:
-        return "Decent technical base. Needs improvement but can be trained for junior backend roles."
-    return "Weak technical alignment for backend roles. Candidate needs more foundational practice."
+        return "Good alignment with the job requirements. Trainable candidate."
+    if score >= 45:
+        return "Partial alignment. Candidate meets some requirements."
+    return "Weak alignment with the job requirements."
 
 # =====================================================================
 # FIT CATEGORY (REAL HR BUCKETS)

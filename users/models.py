@@ -21,8 +21,10 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("role", "ADMIN")
+        extra_fields.setdefault("role", "SUPERUSER")
+        extra_fields.setdefault("must_change_password", False)
         return self.create_user(email, password, **extra_fields)
+
 
 #I built a custom UserManager because I removed the username field and switched the authentication to be fully email-based.
 # Django’s default UserManager still expects a username, so it cannot create or validate users correctly with my custom user model.
@@ -38,12 +40,12 @@ class UserManager(BaseUserManager):
 # --------------------------
 class User(AbstractUser):
     username = None
-
     ROLE_CHOICES = [
-        ("SUPERADMIN", "Super Admin"),
+        ("SUPERUSER", "SuperUser"),
         ("ADMIN", "Admin"),
         ("HR", "HR Recruiter"),
     ]
+
 
  
 

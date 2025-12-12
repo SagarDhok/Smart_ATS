@@ -18,7 +18,13 @@
             <input type="email" name="email" required>
 
             <label>Password</label>
-            <input type="password" name="password" required>
+            <div class="password-wrapper">
+    <input type="password" name="password" id="password" required>
+    <img src="{% static 'icons/show.png' %}" 
+         class="password-toggle"
+         onclick="togglePassword('password', this)">
+</div>
+
 
             {% if error %}
                 <p class="auth-error">{{ error }}</p>

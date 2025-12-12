@@ -105,6 +105,21 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "{% url 'logout_user' %}";
     });
 });
+
+
+
+// GLOBAL PASSWORD SHOW/HIDE FUNCTION
+function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.src = "/static/icons/hide.png";   // hide icon
+    } else {
+        input.type = "password";
+        icon.src = "/static/icons/show.png";   // show icon
+    }
+}
 </script>
 
 </body>

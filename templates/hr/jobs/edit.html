@@ -12,40 +12,80 @@
 
         <h2 class="hrjob-title">Edit Job Posting</h2>
 
+        <!-- 🔥 FORM-LEVEL ERRORS (IMPORTANT) -->
+        {% if form.errors %}
+        <div style="background:#fee2e2; color:#991b1b; padding:12px; margin-bottom:18px; border-radius:6px;">
+            <strong>Fix these errors:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field }}:</strong> {{ errors|striptags }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
         <form method="POST" class="hrjob-form">
             {% csrf_token %}
 
-   {% for field in form %}
-    <div class="hrjob-field {% if field.field.required %}required{% endif %}">
-        {{ field.label_tag }}
-        {{ field }}
-        {% if field.help_text %}
-            <small class="text-muted">{{ field.help_text }}</small>
-        {% endif %}
-        {% if field.errors %}
-            <div class="text-danger small mt-1">{{ field.errors }}</div>
-        {% endif %}
-    </div>
-{% endfor %}
+            {% for field in form %}
+                <div class="hrjob-field {% if field.field.required %}required{% endif %}">
+                    {{ field.label_tag }}
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
 
             <div style="margin-top: 30px; display: flex; gap: 12px;">
-    
-    <!-- BUTTON 1: Update & Go Back to List -->
-    <button type="submit" name="action" value="save_list" class="hrjob-btn">
-        Update → List
-    </button>
 
-    <!-- BUTTON 2: Update & View Details -->
-    <button type="submit" name="action" value="save_detail" class="hrjob-btn" style="background:#047857;">
-        Update → Details
-    </button>
+                <!-- BUTTON 1: Update & Go Back to List -->
+                <button type="submit" name="action" value="save_list" class="hrjob-btn">
+                    Update → List
+                </button>
 
+                <!-- BUTTON 2: Update & View Details -->
+                <button type="submit" name="action" value="save_detail" class="hrjob-btn" style="background:#047857;">
+                    Update → Details
+                </button>
 
-</div>
+            </div>
 
         </form>
 
     </div>
 </div>
+
+<!-- SALARY PLACEHOLDER LOGIC -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const salaryType = document.getElementById("id_salary_type");
+    const minField = document.getElementById("id_min_salary");
+    const maxField = document.getElementById("id_max_salary");
+
+    function updatePlaceholders() {
+        if (!salaryType || !minField || !maxField) return;
+
+        if (salaryType.value === "yearly") {
+            minField.placeholder = "E.g. 4 (LPA)";
+            maxField.placeholder = "E.g. 8 (LPA)";
+        } else if (salaryType.value === "monthly") {
+            minField.placeholder = "E.g. 30000";
+            maxField.placeholder = "E.g. 60000";
+        } else {
+            minField.placeholder = "";
+            maxField.placeholder = "";
+        }
+    }
+
+    salaryType.addEventListener("change", updatePlaceholders);
+    updatePlaceholders(); // initialize
+});
+</script>
 
 {% endblock %}

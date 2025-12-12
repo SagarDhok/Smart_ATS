@@ -51,7 +51,7 @@ class PublicJobListView(ListView):
             max_salary_global=Max("max_salary")
         )
 
-        context["salary_min_global"] = salary_range["min_salary_global"] or 0
+        context["salary_min_global"] =   0 
         context["salary_max_global"] = salary_range["max_salary_global"] or 1000000
 
         return context

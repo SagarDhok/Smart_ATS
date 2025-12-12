@@ -140,14 +140,43 @@
             </div>
         </div>
 
+    <div class="content-section">
+    <h3>Projects & Portfolio</h3>
+    <div class="projects-block">
         {% if app.parsed_projects %}
-        <div class="content-section">
-            <h3>Projects & Portfolio</h3>
-            <div class="projects-block">
-                {{ app.parsed_projects|linebreaks }}
-            </div>
-        </div>
+            {{ app.parsed_projects|linebreaks }}
+        {% else %}
+            <p class="muted-text">No projects were identified in the resume.</p>
         {% endif %}
+    </div>
+</div>
+
+
+
+
+<div class="content-section">
+    <h3>Education</h3>
+    <div class="projects-block">
+        {% if app.parsed_education %}
+            {{ app.parsed_education|linebreaks }}
+        {% else %}
+            <p class="muted-text">No education details were detected in the resume.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="content-section">
+    <h3>Certifications</h3>
+    <div class="projects-block">
+        {% if app.parsed_certifications %}
+            {{ app.parsed_certifications|linebreaks }}
+        {% else %}
+            <p class="muted-text">No certifications found in the resume.</p>
+        {% endif %}
+    </div>
+</div>
+
+
 
     </main>
 </div>

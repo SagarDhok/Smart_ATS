@@ -22,9 +22,8 @@
                 <span><strong>Type:</strong> {{ job.get_employment_type_display }}</span>
                 <span><strong>Vacancies:</strong> {{ job.vacancies }}</span>
 
-                {% if job.min_salary and job.max_salary %}
-                <span><strong>Salary:</strong> ₹{{ job.min_salary }}–₹{{ job.max_salary }}</span>
-                {% endif %}
+               
+                <span><strong>Salary:</strong>  {{ job.get_salary_display }}</span>
             </div>
         </div>
 
@@ -41,6 +40,11 @@
                     <span class="text-muted">No skills listed</span>
                 {% endfor %}
             </div>
+
+              <div class="job-section">
+        <h3>Education</h3>
+       {{job.required_education|default:"Not specified" }}
+    </div>
 
             <div class="jd-apply-wrap">
                 <a href="{% url 'apply_job' job.slug %}" class="btn btn-primary jd-apply">

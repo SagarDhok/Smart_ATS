@@ -22,7 +22,7 @@ from django.core.paginator import Paginator
 
 @login_required
 def admin_dashboard(request):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         return redirect("login")
 
     # ============================
@@ -81,7 +81,7 @@ def admin_dashboard(request):
 # ==========================
 @login_required
 def hr_management(request):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         return redirect("login")
 
     search = request.GET.get("search", "").strip()
@@ -165,7 +165,7 @@ def activate_hr(request, user_id):
 # ==========================
 @login_required
 def invite_page(request):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         messages.error(request, "You are not authorized to access the invite page.")
         return redirect("login")
 
@@ -220,7 +220,7 @@ Smart ATS Admin
 # ==========================
 @login_required
 def admin_job_list(request):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     search = request.GET.get("search", "").strip()
@@ -244,7 +244,7 @@ def admin_job_list(request):
 
 @login_required
 def admin_job_detail(request, id):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     job = get_object_or_404(Job, id=id, is_deleted=False)
@@ -256,7 +256,7 @@ def admin_job_detail(request, id):
 # ==========================
 @login_required
 def admin_application_list(request):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     search = request.GET.get("search", "")
@@ -299,7 +299,7 @@ def admin_application_list(request):
 
 @login_required
 def admin_application_detail(request, pk):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
@@ -308,7 +308,7 @@ def admin_application_detail(request, pk):
 
 @login_required
 def admin_job_applications(request, id):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     job = get_object_or_404(Job, id=id, is_deleted=False)
@@ -330,7 +330,7 @@ from django.http import FileResponse
 
 @login_required
 def admin_resume_download(request, pk):
-    if request.user.role not in ["ADMIN", "SUPERADMIN"]:
+    if request.user.role not in ["ADMIN", "SuperUser"]:
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)

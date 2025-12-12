@@ -15,13 +15,28 @@
             {% csrf_token %}
 
             <label>Old Password</label>
-            <input type="password" name="old_password" required>
+            <div class="password-wrapper">
+                <input type="password" name="old_password" id="oldPassword" required>
+                <img src="{% static 'icons/show.png' %}" 
+                     class="password-toggle"
+                     onclick="togglePassword('oldPassword', this)">
+            </div>
 
             <label>New Password</label>
-            <input type="password" name="new_password" required>
+            <div class="password-wrapper">
+                <input type="password" name="new_password" id="newPassword" required>
+                <img src="{% static 'icons/show.png' %}" 
+                     class="password-toggle"
+                     onclick="togglePassword('newPassword', this)">
+            </div>
 
             <label>Confirm Password</label>
-            <input type="password" name="confirm_password" required>
+            <div class="password-wrapper">
+                <input type="password" name="confirm_password" id="confirmPassword" required>
+                <img src="{% static 'icons/show.png' %}" 
+                     class="password-toggle"
+                     onclick="togglePassword('confirmPassword', this)">
+            </div>
 
             {% if error %}
                 <p class="auth-error">{{ error }}</p>

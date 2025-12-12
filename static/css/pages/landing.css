@@ -1,0 +1,167 @@
+/* ROOT COLORS */
+:root {
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --border-light: #e5e7eb;
+    --primary: #2563eb;
+    --primary-dark: #1e4ed8;
+    --bg-light: #f9fafb;
+    --white: #ffffff;
+}
+
+/* PAGE BASE */
+.landing-container {
+    max-width: 1050px;
+    margin: auto;
+    padding: 50px 25px;
+}
+
+/* HEADINGS */
+.main-title {
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+}
+
+.subtitle {
+    max-width: 700px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-light);
+    margin-bottom: 30px;
+}
+
+/* BUTTONS */
+.cta-row .btn {
+    padding: 12px 26px;
+    font-size: 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    margin-right: 15px;
+    text-decoration: none;
+    display: inline-block;
+    transition: .2s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-outline {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    background: none;
+}
+
+.btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* DIVIDERS */
+.divider {
+    border: 0;
+    border-top: 2px solid var(--border-light);
+    width: 65px;
+    margin: 55px auto;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* FEATURE GRID */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 25px;
+}
+
+.feature-card {
+    background: var(--white);
+    padding: 26px;
+    border-radius: 14px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+    transition: .2s ease;
+    text-align: left;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.08);
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.feature-card p {
+    font-size: 15px;
+    color: var(--text-light);
+}
+
+/* ROLES */
+.role-grid {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.role-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 14px;
+    width: 300px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    text-align: center;
+}
+
+/* DEMO BOX */
+.demo-box {
+    display: flex;
+    gap: 30px;
+    padding: 28px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    justify-content: center;
+}
+
+.demo-divider {
+    width: 2px;
+    background: var(--border-light);
+}
+
+.demo-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 850px) {
+    .demo-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    .demo-divider { display: none; }
+}
