@@ -14,7 +14,6 @@ Includes **resume parsing, match scoring, HR invite workflow, token authenticati
 ### ⭐ Public Job Portal
 ![Jobs](screenshots/jobs.png)
 
-<<<<<<< HEAD
 ### 📝 Job Detail Page
 ![Job Detail](screenshots/job_detail.png)
 
@@ -306,20 +305,18 @@ macOS/Linux:
 source env/bin/activate
 
 3️⃣ Install Dependencies
->>>>>>> 11052a7a0d1f15c3228b5ec6969a8c89e0c2ff33
 pip install -r requirements.txt
 ```
 
-<<<<<<< HEAD
+
 ### ### 4️⃣ Create `.env` File
 ```ini
 SECRET_KEY=your-secret
-=======
+
 4️⃣ Create .env File
 Create a file named .env and paste:
 
 SECRET_KEY=your-secret-key
->>>>>>> 11052a7a0d1f15c3228b5ec6969a8c89e0c2ff33
 DB_NAME=smart_ats
 DB_USER=root
 DB_PASSWORD=1234
@@ -333,7 +330,6 @@ DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
-<<<<<<< HEAD
 ### 5️⃣ Run Migrations
 ```bash
 python manage.py migrate
@@ -345,7 +341,6 @@ python manage.py runserver
 ```
 Open → http://127.0.0.1:8000
 
----
 
 ## 👨‍💻 Developer
 
@@ -356,7 +351,7 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 - LinkedIn: [https://linkedin.com/in/sagardhok](https://linkedin.com/in/sagardhok)
 - Email : sdhok041@gmail.com
 ⭐ **Like this project? Star it on GitHub!**
-=======
+
 5️⃣ Apply Migrations
 python manage.py makemigrations
 python manage.py migrate
@@ -378,14 +373,5 @@ Resume parsing
 Automated scoring
 Production-ready Django architecture
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
-![Django](https://img.shields.io/badge/Django-5.0-green?logo=django)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
-![PyPDF2](https://img.shields.io/badge/PyPDF2-3.0.1-orange)
-![HTML](https://img.shields.io/badge/HTML-5-E34F26?logo=html5&logoColor=white)
-![CSS](https://img.shields.io/badge/CSS-3-1572B6?logo=css3&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-
 Ideal for backend portfolios and interviews!
 Feel free to ⭐ the repo if you like it.
->>>>>>> 11052a7a0d1f15c3228b5ec6969a8c89e0c2ff33
