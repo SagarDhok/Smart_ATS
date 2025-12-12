@@ -79,14 +79,20 @@ Perfect for showcasing real-world Django backend architecture.
 
 ## 📂 Project Structure
 Smart-ATS/
-├── applications/     # Parsing, scoring, models
-├── jobs/             # Job CRUD operations
-├── users/            # Authentication, RBAC, invite system
-├── templates/        # HTML templates
-├── static/           # CSS, JS, images
-├── core/             # Settings, URLs
+│
+├── applications/        # Parsing, scoring, models
+├── jobs/                # Job CRUD operations
+├── users/               # Authentication, RBAC, invite flow
+│
+├── templates/           # HTML UI templates
+├── static/              # CSS, JS, images
+│
+├── core/                # Settings, URLs
+│
 ├── requirements.txt
 └── README.md
+
+
 text## ⚙️ Installation & Setup
 
 1. **Clone the repository**
@@ -95,13 +101,18 @@ text## ⚙️ Installation & Setup
    cd Smart_ATS/backend
 
 Create virtual environmentBashpython -m venv env
-source env/bin/activate        # Linux/Mac
-env\Scripts\activate           # Windows
-Install dependenciesBashpip install -r requirements.txt
-Create .env fileenvSECRET_KEY=your-secret-key-here
+python -m venv env
+env\Scripts\activate      # Windows
+source env/bin/activate   # macOS/Linux
+
+Install dependenciesBash
+pip install -r requirements.txt
+
+Create .env file
+SECRET_KEY=your-secret-key
 DB_NAME=smart_ats
 DB_USER=root
-DB_PASSWORD=your-db-password
+DB_PASSWORD=1234
 DB_HOST=127.0.0.1
 DB_PORT=3306
 
@@ -110,9 +121,19 @@ EMAIL_HOST_PASSWORD=your-brevo-password
 
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
-Apply migrationsBashpython manage.py makemigrations
+
+EMAIL_HOST_USER=your-brevo-email
+EMAIL_HOST_PASSWORD=your-brevo-password
+
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+Apply migrations
+python manage.py makemigrations
 python manage.py migrate
-Start the serverBashpython manage.py runserverOpen → http://127.0.0.1:8000
+
+Start the server
+python manage.py runserverOpen → http://127.0.0.1:8000
 
 🧑‍💻 Author
 Sagar Dhok
