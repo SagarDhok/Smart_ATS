@@ -16,7 +16,7 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 # SECURITY
 SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret")  
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-ALLOWED_HOSTS = ["*"]   # Render automatically manages host
+ALLOWED_HOSTS = ["*"]   
 
 # APPS
 INSTALLED_APPS = [
@@ -71,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# DATABASE — SQLite (REQUIRED FOR RENDER FREE)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,19 +89,20 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "users.User"
 LOGIN_URL = 'login'
 
-# I18N
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# STATIC (Render)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = []     # Keep empty for Render
 
-# Whitenoise compression
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # MEDIA
 MEDIA_URL = '/media/'
@@ -144,4 +144,6 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+
 

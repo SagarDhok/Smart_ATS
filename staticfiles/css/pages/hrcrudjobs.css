@@ -1,0 +1,330 @@
+/* =============================== */
+/*   Create job UI                 */
+/* =============================== */
+
+.hrjob-wrapper {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px 16px; /* Mobile-safe */
+}
+
+.hrjob-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 35px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+}
+
+.hrjob-title {
+    font-size: 2rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #1a202c;
+}
+
+.hrjob-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hrjob-field label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 6px;
+}
+
+.hrjob-field input,
+.hrjob-field textarea,
+.hrjob-field select {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e0;
+    background: #f7fafc;
+}
+
+/* Buttons */
+.hrjob-btn {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.hrjob-btn:hover {
+    background: #1558b0;
+}
+
+/* ============================= */
+/*   Job List Styling            */
+/* ============================= */
+
+.table-link {
+    color: #1a73e8;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+.table-link:hover {
+    color: #0b59c0;
+    text-decoration: underline;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-edit {
+    border: 1px solid #e6b325;
+    background: #fff7dd;
+    color: #b08900;
+}
+.btn-edit:hover { background: #ffeab2; }
+
+.btn-delete {
+    border: 1px solid #ff6868;
+    background: #ffe5e5;
+    color: #c53030;
+}
+.btn-delete:hover { background: #ffd4d4; }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* Prevent overflow */
+}
+
+/* ============================= */
+/*   Filter Bar                  */
+/* ============================= */
+
+.apps-filter-bar {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom: 25px;
+}
+
+.apps-filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap; /* mid-screen fix */
+}
+
+.apps-input,
+.apps-select {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #CBD5E0;
+    width: 260px;
+    max-width: 100%;
+}
+
+.apps-select {
+    width: 160px;
+}
+
+.apps-btn,
+.apps-clear-btn {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.apps-clear-btn {
+    border: 2px solid #1A202C;
+    color: #1A202C;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+.apps-clear-btn:hover {
+    background: #F7FAFC;
+}
+
+/* TABLE RESPONSIVE FIX */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* =============================== */
+/*   HR Job Detail Page UI         */
+/* =============================== */
+
+.job-detail-wrapper {
+    animation: fade 0.3s ease;
+}
+
+.job-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap; /* responsive */
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.job-detail-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* prevents overflow */
+}
+
+.job-detail-location {
+    color: #4A5568;
+    margin-top: 4px;
+}
+
+/* Info Card */
+.job-info-card {
+    background: #fff;
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.job-info-item strong {
+    font-size: 14px;
+    color: #4A5568;
+}
+.job-info-item span {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Sections */
+.job-section {
+    margin-bottom: 35px;
+}
+
+.job-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.job-description-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #2D3748;
+}
+
+/* Skills */
+.job-skill-pill {
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-right: 6px;
+}
+
+/* Detail Buttons */
+.btn-detail {
+    padding: 10px 18px !important;
+    font-size: 15px !important;
+    border-radius: 8px;
+    font-weight: 600;
+    height: 42px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-detail-edit {
+    border: 1px solid #e6b325;
+    background: #fff7dd;
+    color: #b08900;
+}
+.btn-detail-edit:hover {
+    background: #ffeab2;
+}
+
+.btn-detail-delete {
+    border: 1px solid #ff6868;
+    background: #ffe5e5;
+    color: #c53030;
+}
+.btn-detail-delete:hover {
+    background: #ffd4d4;
+}
+
+/* =============================== */
+/*   Edit Job Form                */
+/* =============================== */
+
+.hrjob-field textarea {
+    min-height: 150px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.hrjob-field.required label::after {
+    content: " *";
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+/* =============================== */
+/*   RESPONSIVE BREAKPOINTS        */
+/* =============================== */
+
+@media (max-width: 900px) {
+    .hrjob-card {
+        padding: 28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hrjob-card {
+        padding: 22px;
+    }
+
+    .hrjob-title {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .apps-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .apps-input,
+    .apps-select,
+    .apps-btn,
+    .apps-clear-btn {
+        width: 100%;
+    }
+
+    .job-detail-header {
+        text-align: left;
+        flex-direction: column;
+    }
+
+    .job-detail-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* Animation */
+@keyframes fade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

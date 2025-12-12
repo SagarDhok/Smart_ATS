@@ -1,0 +1,93 @@
+/* =========================================== */
+/* JOB LIST PAGE */
+/* =========================================== */
+
+.job-search-container {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 25px;
+}
+
+.job-search-container form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap; /* 🔥 fixes mid-screen issues */
+}
+
+.job-input {
+    padding: 12px 14px;
+    border: 1px solid #CBD5E0;
+    border-radius: 8px;
+    width: 350px;
+    max-width: 100%;
+}
+
+.job-btn {
+    height: 44px;
+    padding: 0 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    white-space: nowrap; /* prevents breaking on small screens */
+}
+
+
+/* =========================================== */
+/* TABLE LINKS & COUNT PILL */
+/* =========================================== */
+
+.table-link {
+    color: #1a73e8;
+    font-weight: 600;
+    text-decoration: none;
+}
+.table-link:hover {
+    color: #0b59c0;
+    text-decoration: underline;
+}
+
+.count-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+
+/* =========================================== */
+/* TABLE RESPONSIVENESS (CRITICAL) */
+/* =========================================== */
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+
+/* =========================================== */
+/* RESPONSIVE BREAKPOINTS */
+/* =========================================== */
+
+@media (max-width: 600px) {
+
+    .job-search-container form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .job-input,
+    .job-btn {
+        width: 100%;
+    }
+}
+
+/* Tablet optimization (600–900px) */
+@media (max-width: 900px) {
+    .job-search-container form {
+        gap: 12px;
+    }
+}

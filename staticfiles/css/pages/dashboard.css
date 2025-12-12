@@ -1,0 +1,251 @@
+/* 📂 static\css\pages\dashboard.css */
+/* ================================ */
+
+/* Page Layout */
+.page-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: #1a202c;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+/* Flexible Cards Row */
+.flex {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+/* Card Styling */
+.card {
+    flex: 1;
+    min-width: 280px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: #4a5568;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.card .big {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #2c5282;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Buttons */
+.btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: #4299e1;
+    color: white;
+    border: 1px solid #4299e1;
+}
+
+.btn-primary:hover {
+    background-color: #3182ce;
+    border-color: #3182ce;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #4299e1;
+    border: 1px solid #a0aec0;
+}
+
+.btn-outline:hover {
+    background-color: #edf2f7;
+    color: #2c5282;
+    border-color: #4299e1;
+}
+
+.mt-2 { margin-top: 10px; }
+
+/* Badges */
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.badge-warning { background-color: #fefcbf; color: #975a16; }
+.badge-success { background-color: #9ae6b4; color: #276749; }
+.badge-danger  { background-color: #feb2b2; color: #9b2c2c; }
+
+/* Section Titles */
+section { margin-bottom: 40px; }
+
+.section-title {
+    font-size: 1.75rem;
+    color: #1a202c;
+    margin-bottom: 20px;
+    border-left: 5px solid #4299e1;
+    padding-left: 10px;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.table thead th {
+    background-color: #f7fafc;
+    color: #4a5568;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.table tbody tr:hover {
+    background-color: #f7fafc;
+}
+
+.table tbody tr td[colspan="3"] {
+    font-style: italic;
+    color: #a0aec0 !important;
+    text-align: center;
+    padding: 30px;
+}
+
+/* RESPONSIVE TABLE WRAPPER */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Prevent overflow */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination-controls .btn {
+    width: auto;
+    padding: 8px 16px;
+}
+
+.pagination-controls .btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.page-info {
+    font-size: 1rem;
+    color: #4a5568;
+}
+
+/* HR Dashboard Cards */
+.hrdash-row {
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hrdash-card {
+    max-width: 450px;
+    flex: 1;
+}
+
+.hr-create-wrapper {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.hr-create-btn {
+    width: auto !important;
+    padding: 12px 28px !important;
+    display: inline-block !important;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+/* =====================================
+   RESPONSIVE BREAKPOINTS
+   ===================================== */
+
+@media (max-width: 900px) {
+    .flex {
+        flex-direction: column;
+    }
+}
+
+/* Extra responsive polish for phones */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .card .big {
+        font-size: 2.8rem;
+    }
+
+    .pagination-controls {
+        gap: 10px;
+    }
+}
