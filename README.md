@@ -8,13 +8,8 @@
 A **production-style Applicant Tracking System (ATS)** built with **Django, MySQL, and Django REST Framework**.  
 Includes **resume parsing, match scoring, HR invite workflow, token authentication, structured logging, secure file handling**, and full role-based access.
 
----
-
-## 📸 Screenshots
-## 📸 Screenshots
-=======
 # 🚀 Smart ATS — Applicant Tracking System
->>>>>>> 11052a7a0d1f15c3228b5ec6969a8c89e0c2ff33
+
 
 ### ⭐ Public Job Portal
 ![Jobs](screenshots/jobs.png)
@@ -359,7 +354,7 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 
 - GitHub: [https://github.com/SagarDhok](https://github.com/SagarDhok)
 - LinkedIn: [https://linkedin.com/in/sagardhok](https://linkedin.com/in/sagardhok)
-
+- Email : sdhok041@gmail.com
 ⭐ **Like this project? Star it on GitHub!**
 =======
 5️⃣ Apply Migrations
