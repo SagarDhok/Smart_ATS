@@ -128,13 +128,12 @@ Outputs:
 
 # 🗂️ Project Structure
 Smart-ATS/
-│
-├── applications/ # Parsing, scoring, processing
-├── jobs/ # Job CRUD & views
-├── users/ # Auth, RBAC, Invite system
-├── templates/ # Frontend UI
-├── static/ # CSS & JS
-├── core/ # Settings, URLs
+├── applications/     # Parsing, scoring, models
+├── jobs/             # Job CRUD
+├── users/            # Auth, RBAC, invites
+├── templates/        # UI templates
+├── static/           # CSS/JS
+├── core/             # Settings, URLs
 ├── requirements.txt
 └── README.md
 
