@@ -102,6 +102,7 @@ text## ⚙️ Installation & Setup
 
 Create virtual environmentBashpython -m venv env
 python -m venv env
+
 env\Scripts\activate      # Windows
 source env/bin/activate   # macOS/Linux
 
@@ -138,6 +139,9 @@ python manage.py runserverOpen → http://127.0.0.1:8000
 🧑‍💻 Author
 Sagar Dhok
 Backend Developer — Python / Django
+
+
+
 🏁 Conclusion
 Smart ATS is a complete enterprise-style recruitment platform demonstrating:
 
