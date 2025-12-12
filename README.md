@@ -92,24 +92,28 @@ Smart-ATS/
 ├── requirements.txt
 └── README.md
 
+⚙️ Installation & Setup
+1️⃣ Clone Repository
+git clone https://github.com/SagarDhok/Smart_ATS.git
+cd Smart_ATS/backend
 
-text## ⚙️ Installation & Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/SagarDhok/Smart_ATS.git
-   cd Smart_ATS/backend
-
-Create virtual environmentBashpython -m venv env
+2️⃣ Create Virtual Environment
 python -m venv env
 
-env\Scripts\activate      # Windows
-source env/bin/activate   # macOS/Linux
 
-Install dependenciesBash
+Activate environment:
+Windows:
+env\Scripts\activate
+
+macOS/Linux:
+source env/bin/activate
+
+3️⃣ Install Dependencies
 pip install -r requirements.txt
 
-Create .env file
+4️⃣ Create .env File
+Create a file named .env and paste:
+
 SECRET_KEY=your-secret-key
 DB_NAME=smart_ats
 DB_USER=root
@@ -123,31 +127,25 @@ EMAIL_HOST_PASSWORD=your-brevo-password
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
 
-EMAIL_HOST_USER=your-brevo-email
-EMAIL_HOST_PASSWORD=your-brevo-password
-
-DEBUG=True
-ALLOWED_HOSTS=127.0.0.1,localhost
-
-Apply migrations
+5️⃣ Apply Migrations
 python manage.py makemigrations
 python manage.py migrate
 
-Start the server
-python manage.py runserverOpen → http://127.0.0.1:8000
+6️⃣ Start Server
+python manage.py runserver
+Visit:
+👉 http://127.0.0.1:8000
 
 🧑‍💻 Author
 Sagar Dhok
 Backend Developer — Python / Django
 
-
-
 🏁 Conclusion
-Smart ATS is a complete enterprise-style recruitment platform demonstrating:
-
-Secure RBAC & HR onboarding
-Resume parsing engine
-Automated candidate scoring
+Smart ATS is a complete enterprise-grade recruitment platform demonstrating:
+Secure RBAC system
+HR onboarding via token invites
+Resume parsing
+Automated scoring
 Production-ready Django architecture
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
