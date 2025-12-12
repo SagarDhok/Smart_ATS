@@ -21,6 +21,9 @@
     font-weight: 700;
 }
 
+/* =========================================== */
+/* FILTER BAR */
+/* =========================================== */
 
 .apps-filter-bar {
     background: #ffffff;
@@ -34,13 +37,15 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;             /* 👈 prevents awkward breaks */
 }
 
 .apps-input {
     padding: 12px 14px;
     border: 1px solid #CBD5E0;
     border-radius: 8px;
-    width: 280px;          /* 👈 clean width */
+    width: 280px;
+    max-width: 100%;             /* 👈 allows shrinking on mid screens */
 }
 
 .apps-select {
@@ -49,25 +54,50 @@
     border-radius: 8px;
     background: white;
 
-    width: 180px;          /* 👈 dropdown short */
-    max-width: 180px;
+    width: 180px;
+    max-width: 100%;             /* 👈 same fix */
 }
 
-
 .apps-btn {
-    height: 44px;        /* same as input */
+    height: 44px;
     padding: 0 18px;
     font-size: 1rem;
     border-radius: 8px;
+    white-space: nowrap;         /* keeps button text readable */
 }
 
+/* =========================================== */
+/* RESPONSIVENESS */
+/* =========================================== */
 
+/* Medium screens (tablets, 900px and below) */
+@media (max-width: 900px) {
+    .apps-input,
+    .apps-select {
+        width: 100%;             /* 👈 fills available width */
+    }
+}
+
+/* Small screens (mobiles, 600px and below) */
 @media (max-width: 600px) {
     .apps-filter-form {
         flex-direction: column;
+        align-items: stretch;
     }
+
     .apps-input,
-    .apps-select {
+    .apps-select,
+    .apps-btn {
         width: 100%;
     }
 }
+
+/* =========================================== */
+/* TABLE RESPONSIVENESS */
+/* =========================================== */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+

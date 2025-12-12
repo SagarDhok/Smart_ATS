@@ -1,97 +1,188 @@
-from rest_framework.decorators import api_view
+import logging
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView, CreateAPIView,
+    UpdateAPIView, DestroyAPIView
+)
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
+from users.models import User
 from jobs.models import Job
 from applications.models import Application
-from .serializers import JobSerializer, ApplicationSerializer, ResumeParseSerializer
 
+from .serializers import (
+    UserSerializer, JobSerializer,
+    ApplicationSerializer, PublicApplicationSerializer
+)
+
+from .permissions import IsHR
 from applications.parsing import parse_resume
-from applications.utils import compute_match_score
+from applications.utils import compute_match_score, generate_summary, evaluate_candidate, fit_category
 
 
-@api_view(["GET"])
-def api_jobs(request):
-    jobs = Job.objects.filter(is_deleted=False, status="active").order_by("-created_at")
-    serializer = JobSerializer(jobs, many=True)
-    return Response(serializer.data)
+logger = logging.getLogger(__name__)
 
 
-@api_view(["GET"])
-def api_job_detail(request, slug):
-    try:
-        job = Job.objects.get(slug=slug, is_deleted=False)
-    except Job.DoesNotExist:
-        return Response({"error": "Not found"}, status=404)
+# ============================================================
+# AUTH APIs
+# ============================================================
 
-    return Response(JobSerializer(job).data)
+class LoginAPI(APIView):
+    permission_classes = [AllowAny]
 
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
 
-@api_view(["POST"])
-def api_apply_job(request, slug):
-    try:
-        job = Job.objects.get(slug=slug, is_deleted=False)
-    except:
-        return Response({"error": "Job not found"}, status=404)
+        user = authenticate(request, email=email, password=password)
+        if not user:
+            logger.warning(f"API Login failed for email={email}")
+            return Response({"error": "Invalid credentials"}, status=400)
 
-    full_name = request.data.get("full_name")
-    email = request.data.get("email")
-    phone = request.data.get("phone")
-    resume = request.FILES.get("resume")
+        token, _ = Token.objects.get_or_create(user=user)
+        logger.info(f"API Login success for {email}")
 
-    if not resume:
-        return Response({"error": "Resume file is required"}, status=400)
-
-    app = Application.objects.create(
-        job=job,
-        full_name=full_name,
-        email=email,
-        phone=phone,
-        resume=resume
-    )
-
-    parsed = parse_resume(app.resume.path)
-    scoring = compute_match_score(parsed, job)
-
-    Application.objects.filter(id=app.id).update(
-        match_score=scoring["final_score"],
-        matched_skills=scoring["matched_skills"],
-        missing_skills=scoring["missing_skills"],
-        skill_score=scoring["skill_score"],
-        experience_score=scoring["experience_score"],
-        keyword_score=scoring["keyword_score"],
-    )
-
-    return Response({"message": "Application submitted", "score": scoring})
+        return Response({
+            "token": token.key,
+            "user": UserSerializer(user).data
+        })
 
 
-@api_view(["POST"])
-def api_parse_resume(request):
-    serializer = ResumeParseSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=400)
-
-    file = serializer.validated_data["resume"]
-
-    with open("/tmp/temp.pdf", "wb+") as dest:
-        for chunk in file.chunks():
-            dest.write(chunk)
-
-    parsed = parse_resume("/tmp/temp.pdf")
-    return Response(parsed)
+class LogoutAPI(APIView):
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({"message": "Logged out successfully"})
 
 
-@api_view(["POST"])
-def api_score(request):
-    parsed = request.data.get("parsed_data")
-    job_id = request.data.get("job_id")
+class MeAPI(APIView):
+    def get(self, request):
+        return Response(UserSerializer(request.user).data)
 
-    if not parsed or not job_id:
-        return Response({"error": "parsed_data and job_id required"}, status=400)
 
-    try:
-        job = Job.objects.get(id=job_id)
-    except:
-        return Response({"error": "Job not found"}, status=404)
+# ============================================================
+# PUBLIC JOB APIs
+# ============================================================
 
-    score = compute_match_score(parsed, job)
-    return Response({"score": score})
+class PublicJobListAPI(ListAPIView):
+    queryset = Job.objects.filter(is_deleted=False)
+    serializer_class = JobSerializer
+    permission_classes = [AllowAny]
+
+
+class PublicJobDetailAPI(RetrieveAPIView):
+    queryset = Job.objects.filter(is_deleted=False)
+    serializer_class = JobSerializer
+    permission_classes = [AllowAny]
+    lookup_field = "slug"
+
+
+# ============================================================
+# HR JOB APIs
+# ============================================================
+
+class HRJobCreateAPI(CreateAPIView):
+    serializer_class = JobSerializer
+    permission_classes = [IsHR]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+class HRJobUpdateAPI(UpdateAPIView):
+    queryset = Job.objects.filter(is_deleted=False)
+    serializer_class = JobSerializer
+    permission_classes = [IsHR]
+    lookup_field = "id"
+
+
+class HRJobDeleteAPI(DestroyAPIView):
+    queryset = Job.objects.filter(is_deleted=False)
+    serializer_class = JobSerializer
+    permission_classes = [IsHR]
+    lookup_field = "id"
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+
+
+# ============================================================
+# APPLY JOB API
+# ============================================================
+
+class ApplyJobAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, slug):
+        job = get_object_or_404(Job, slug=slug)
+
+        serializer = PublicApplicationSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
+        app = serializer.save(job=job)
+
+        parsed = parse_resume(app.resume.path, job)
+        scoring = compute_match_score(parsed, job)
+
+        # Scoring fields
+        app.match_score = scoring["final_score"]
+        app.skill_score = scoring["skill_score"]
+        app.experience_score = scoring["experience_score"]
+        app.keyword_score = scoring["keyword_score"]
+        app.summary = generate_summary(parsed, scoring["final_score"])
+        app.evaluation = evaluate_candidate(scoring["final_score"])
+        app.fit_category = fit_category(scoring["final_score"])
+        app.save()
+
+        return Response({"message": "Application submitted successfully"})
+
+
+# ============================================================
+# HR APPLICATION APIs
+# ============================================================
+
+class HRApplicationListAPI(ListAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsHR]
+
+    def get_queryset(self):
+        return Application.objects.filter(
+            job__created_by=self.request.user,
+            job__is_deleted=False
+        ).order_by("-applied_at")
+
+
+class HRApplicationDetailAPI(RetrieveAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsHR]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Application.objects.filter(
+            job__created_by=self.request.user
+        )
+
+
+class HRUpdateStatusAPI(APIView):
+    permission_classes = [IsHR]
+
+    def patch(self, request, id):
+        app = get_object_or_404(
+            Application, id=id, job__created_by=request.user
+        )
+
+        status_value = request.data.get("status")
+        valid = ["screening", "review", "interview", "hired", "rejected"]
+
+        if status_value not in valid:
+            return Response({"error": "Invalid status"}, status=400)
+
+        app.status = status_value
+        app.save()
+
+        return Response({"message": "Status updated"})

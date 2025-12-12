@@ -5,11 +5,11 @@
 
 /* --- 🔍 SEARCH BAR STYLES --- */
 .search_hr {
-    background: #ffffff; 
+    background: #ffffff;
     padding: 15px 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    margin-bottom: 25px; 
+    margin-bottom: 25px;
 }
 
 .search_hr form {
@@ -17,14 +17,15 @@
     gap: 10px;
     align-items: center;
     margin: 0;
+    flex-wrap: wrap; /* 🔥 ensures mid-screen responsiveness */
 }
 
 .search_hr .input-field {
     padding: 10px 15px;
     border: 1px solid #cbd5e0;
     border-radius: 8px;
-    width: 350px; 
-    max-width: 100%; 
+    width: 350px;
+    max-width: 100%;
     font-size: 1rem;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
@@ -33,10 +34,18 @@
     padding: 10px 20px;
     font-size: 1rem;
     height: 44px;
+    white-space: nowrap; /* prevent button text breaking */
 }
 
 
-/* --- TABLE ACTION & UTILITY STYLES --- */
+/* --- TABLE WRAPPER (FIX FOR MOBILE) --- */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+
+/* --- ACTION & UTILITY STYLES --- */
 .text-right {
     text-align: right !important;
 }
@@ -52,7 +61,7 @@
 }
 
 
-/* --- STATUS BADGES (FORCED COLORS) --- */
+/* --- STATUS BADGES --- */
 .badge-success {
     background: #9ae6b4 !important;
     color: #276749 !important;
@@ -75,6 +84,7 @@
     margin-top: 20px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap; /* 🔥 prevents overflow */
     gap: 10px;
 }
 
@@ -84,16 +94,25 @@
 }
 
 
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE BREAKPOINTS --- */
+
+/* 📱 Small Screens */
 @media (max-width: 600px) {
     .search_hr form {
         flex-direction: column;
-        gap: 10px;
+        width: 100%;
     }
 
     .search_hr .input-field,
     .search_hr .btn-primary {
         width: 100%;
         max-width: 100%;
+    }
+}
+
+/* 📲 Mid-size screens (tablets) */
+@media (max-width: 900px) {
+    .search_hr form {
+        gap: 12px;
     }
 }

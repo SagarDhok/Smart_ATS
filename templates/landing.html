@@ -2,136 +2,123 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/landing.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/landpage.css' %}">
 {% endblock %}
 
 {% block content %}
 
 <div class="landing-container">
 
-    <!-- HERO SECTION -->
-    <h1 class="main-title">Smart ATS — Applicant Tracking System</h1>
+    <section class="hero-section">
+        <h2 class="hero-title">Smart Application Tracking System</h2>
 
-    <p class="subtitle">
-        A complete recruitment workflow system built with Django & MySQL.  
-        Featuring resume parsing, automated scoring, secure HR invites,  
-        and role-based dashboards used in real ATS platforms.
-    </p>
+        <p class="hero-subtitle">
+            A modern, production-ready Applicant Tracking System featuring resume parsing,
+            smart match scoring, secure HR workflows, REST APIs, advanced logging,
+            and real ATS architecture used in enterprise hiring.
+        </p>
 
-    <div class="cta-row">
-        <a href="/jobs/" class="btn btn-primary">Browse Jobs</a>
-        <a href="/login/" class="btn btn-outline">HR / Admin Login</a>
-    </div>
-
-    <hr class="divider">
-
-    <!-- FEATURES -->
-    <h2 class="section-title">Core Capabilities</h2>
-
-    <div class="feature-grid">
-
-        <div class="feature-card">
-            <h3>Job Portal</h3>
-            <p>Public job listings with quick apply, no login required.</p>
+        <div class="hero-buttons">
+            <a href="/jobs/" class="btn btn-primary">⭐ Browse Jobs</a>
+            <a href="/login/" class="btn btn-outline">👤 HR / Admin Login</a>
         </div>
+    </section>
 
-        <div class="feature-card">
-            <h3>Resume Parsing</h3>
-            <p>Extracts skills, experience, projects & contact info from PDFs.</p>
+    <section class="section-block">
+        <h2 class="section-heading">Powerful Recruitment Features</h2>
+
+        <div class="feature-grid-modern">
+
+            <div class="feature-card-modern">
+                <h3>🔍 Resume Parsing Engine</h3>
+                <p>Extracts skills, experience, projects & contact details using a custom parser.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>📊 Intelligent Match Scoring</h3>
+                <p>Weights skills, experience & JD keywords to compute a smart match score.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>📝 Job Management</h3>
+                <p>Full CRUD + filters, salary ranges, modes & applicant counts.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>👥 HR Dashboard</h3>
+                <p>Track applicants, change status, preview resumes, analyze matches.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>🔐 Role-Based Access</h3>
+                <p>Superadmin → Admin → HR permission tree with secure workflows.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>⚙ REST API Layer</h3>
+                <p>Token Authentication for jobs, applications & HR automation.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>🛡 Rotating Log System</h3>
+                <p>Enterprise-grade logs (5MB rotation) for tracing & debugging.</p>
+            </div>
+
+            <div class="feature-card-modern">
+                <h3>📂 Secure File Handling</h3>
+                <p>PDF-only uploads, 5MB limit, corruption checks & safe extraction.</p>
+            </div>
+
         </div>
+    </section>
 
-        <div class="feature-card">
-            <h3>Match Scoring</h3>
-            <p>Automatic scoring based on skills, experience & JD keywords.</p>
+    <section class="section-block role-section">
+        <h2 class="section-heading">Role-Based Access Control</h2>
+
+        <div class="role-grid-modern">
+
+            <div class="role-card-modern">
+                <h3>👑 Superadmin</h3>
+                <p>Controls Admin accounts & high-level access.</p>
+            </div>
+
+            <div class="role-card-modern">
+                <h3>💼 Admin</h3>
+                <p>Manages HRs and monitors all job activity.</p>
+            </div>
+
+            <div class="role-card-modern">
+                <h3>🧑‍💻 HR Recruiter</h3>
+                <p>Creates jobs, screens candidates, updates statuses.</p>
+            </div>
+
+            <div class="role-card-modern">
+                <h3>✅ Candidate</h3>
+                <p>Applies without login; parsing happens automatically.</p>
+            </div>
+
         </div>
+    </section>
 
-        <div class="feature-card">
-            <h3>HR Dashboard</h3>
-            <p>Create & edit jobs, review applicants, track status.</p>
+    <section class="section-block">
+        <h2 class="section-heading">Demo Login Credentials</h2>
+
+        <div class="demo-box-modern">
+            <div>
+                <p class="demo-label">Admin Login</p>
+                <p class="demo-value">Email: <strong>admin@demo.com</strong></p>
+                <p class="demo-value">Password : <strong>admin@123</strong></p>
+            </div>
+
+            <div class="demo-divider"></div>
+
+            <div>
+                <p class="demo-label">HR Login</p>
+                <p class="demo-value">Email: <strong>rakijat182@crsay.com</strong></p>
+                <p class="demo-value">Password : <strong>hrrecuiter@123</strong></p>
+            </div>
         </div>
-
-        <div class="feature-card">
-            <h3>Admin Control</h3>
-            <p>Manage all HRs, jobs & applications with full oversight.</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>Secure Uploads</h3>
-            <p>Strict PDF-only, 5MB limit, sanitized storage & safe parsing.</p>
-        </div>
-
-    </div>
-
-    <hr class="divider">
-
-    <!-- ROLE ACCESS -->
-    <h2 class="section-title">Role-Based Access Hierarchy</h2>
-
-    <div class="role-grid">
-
-        <div class="role-card">
-            <h3>Superadmin</h3>
-            <p>System-level control. Creates Admin accounts via Django Admin.</p>
-        </div>
-
-        <div class="role-card">
-            <h3>Admin</h3>
-            <p>Manages HR users, oversees jobs & applications.</p>
-        </div>
-
-        <div class="role-card">
-            <h3>HR Recruiter</h3>
-            <p>Posts jobs, screens candidates, updates status.</p>
-        </div>
-
-        <div class="role-card">
-            <h3>Candidate</h3>
-            <p>Applies directly from the job portal without signup.</p>
-        </div>
-
-    </div>
-
-    <hr class="divider">
-
-    <!-- USER CREATION WORKFLOW -->
-    <h2 class="section-title">User Creation Workflow</h2>
-
-    <div class="workflow-box">
-
-        <div class="workflow-step">
-            <h3>Superadmin → Admin</h3>
-            <p>Admins cannot self-register. Only Superadmin can create them.</p>
-        </div>
-
-        <div class="workflow-arrow">→</div>
-
-        <div class="workflow-step">
-            <h3>Admin → HR (Invite System)</h3>
-            <p>HR accounts are created only via secure invite links with tokens.</p>
-        </div>
-
-    </div>
-
-    <hr class="divider">
-
-    <!-- DEMO CREDENTIALS -->
-    <h2 class="section-title">Demo Login Access</h2>
-
-    <div class="demo-box">
-        <div>
-            <p class="demo-label">Admin Login</p>
-            <p>Email: <strong>admin@demo.com</strong></p>
-            <p>Password: <strong>admin@123</strong></p>
-        </div>
-
-        <div class="demo-divider"></div>
-
-        <div>
-            <p class="demo-label">HR Login</p>
-            <p>Email: <strong>rakijat182@crsay.com</strong></p>
-            <p>Password: <strong>hrrecuiter@123</strong></p>
-        </div>
-    </div>
+    </section>
 
 </div>
 

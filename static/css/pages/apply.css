@@ -4,8 +4,7 @@
     justify-content: center;
     align-items: center;
     padding: 60px 20px;
-    /* Cleaner, lighter gradient for the background */
-    background: linear-gradient(135deg, var(--color-bg-light), #E2E8F0); 
+    background: linear-gradient(135deg, var(--color-bg-light), #E2E8F0);
 }
 
 /* MAIN CARD */
@@ -14,7 +13,7 @@
     max-width: 520px;
     background: var(--color-white);
     padding: 42px 40px;
-    border-radius: 16px; /* Consistency */
+    border-radius: 16px;
     border: 1px solid #E2E8F0;
     box-shadow: 0 12px 40px rgba(0,0,0,0.1);
     animation: fadeUp 0.4s ease;
@@ -22,7 +21,7 @@
 
 /* TITLE */
 .apply-title {
-    font-size: 20px; /* Slightly larger title */
+    font-size: 20px;
     font-weight: 800;
     text-align: center;
     margin-bottom: 6px;
@@ -43,7 +42,7 @@
 
 .form-group label {
     display: block;
-    font-weight: 600; /* Adjusted weight for readability */
+    font-weight: 600;
     font-size: 14px;
     margin-bottom: 8px;
     color: var(--color-text-dark);
@@ -52,15 +51,15 @@
 .form-group input {
     width: 100%;
     padding: 14px 16px;
-    border-radius: 10px; /* Consistency */
+    border-radius: 10px;
     border: 1px solid #CBD5E0;
-    background: var(--color-white); /* Cleaner white background */
+    background: var(--color-white);
     font-size: 15px;
 }
 
 .form-group input:focus {
     background: var(--color-white);
-    border-color: var(--color-primary); /* Blue focus */
+    border-color: var(--color-primary);
     outline: none;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
 }
@@ -68,7 +67,7 @@
 /* FILE INPUT */
 .form-group input[type="file"] {
     padding: 10px;
-    background: #F7FAFC; /* Slightly different background to hint at file drop area */
+    background: #F7FAFC;
     border-style: dashed;
     border-color: #A0AEC0;
 }
@@ -78,15 +77,15 @@
     margin-top: 18px;
     width: 100%;
     padding: 15px;
-    border-radius: 12px; /* Consistency */
+    border-radius: 12px;
     border: none;
-    background: var(--color-primary); /* Primary Blue */
+    background: var(--color-primary);
     color: var(--color-white);
     font-size: 17px;
     font-weight: 800;
     cursor: pointer;
     transition: 0.25s ease;
-    box-shadow: 0 8px 18px rgba(66, 153, 225, 0.3); /* Blue shadow */
+    box-shadow: 0 8px 18px rgba(66, 153, 225, 0.3);
 }
 
 .apply-btn-main:hover {
@@ -95,7 +94,7 @@
     box-shadow: 0 12px 26px rgba(66, 153, 225, 0.4);
 }
 
-/* ANIMATION (Keep as is) */
+/* ANIMATION */
 @keyframes fadeUp {
     from {
         opacity: 0;
@@ -104,5 +103,20 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* RESPONSIVE TWEAKS */
+@media (max-width: 480px) {
+    .apply-card {
+        padding: 32px 22px;   /* More comfortable on small screens */
+    }
+
+    .apply-title {
+        font-size: 18px;
+    }
+
+    .apply-btn-main {
+        font-size: 16px;
     }
 }

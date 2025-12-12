@@ -5,7 +5,7 @@
 .hrjob-wrapper {
     max-width: 700px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 20px 16px; /* Mobile-safe */
 }
 
 .hrjob-card {
@@ -22,7 +22,11 @@
     color: #1a202c;
 }
 
-.hrjob-form { display: flex; flex-direction: column; gap: 20px; }
+.hrjob-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
 .hrjob-field label {
     font-size: 1rem;
@@ -40,7 +44,7 @@
     background: #f7fafc;
 }
 
-
+/* Buttons */
 .hrjob-btn {
     background: #1a73e8;
     color: white;
@@ -61,14 +65,12 @@
 /*   Job List Styling            */
 /* ============================= */
 
-/* Job title link — SINGLE global style */
 .table-link {
     color: #1a73e8;
     font-weight: 600;
     text-decoration: none;
     transition: 0.2s ease;
 }
-
 .table-link:hover {
     color: #0b59c0;
     text-decoration: underline;
@@ -81,7 +83,6 @@
     font-weight: 600;
 }
 
-/* Edit */
 .btn-edit {
     border: 1px solid #e6b325;
     background: #fff7dd;
@@ -89,7 +90,6 @@
 }
 .btn-edit:hover { background: #ffeab2; }
 
-/* Delete */
 .btn-delete {
     border: 1px solid #ff6868;
     background: #ffe5e5;
@@ -97,12 +97,11 @@
 }
 .btn-delete:hover { background: #ffd4d4; }
 
-/* Flex for buttons */
 .action-buttons {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap; /* Prevent overflow */
 }
-
 
 /* ============================= */
 /*   Filter Bar                  */
@@ -120,6 +119,7 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap; /* mid-screen fix */
 }
 
 .apps-input,
@@ -127,12 +127,16 @@
     padding: 12px 14px;
     border-radius: 8px;
     border: 1px solid #CBD5E0;
+    width: 260px;
+    max-width: 100%;
 }
 
-.apps-input { width: 260px; }
-.apps-select { width: 160px; }
+.apps-select {
+    width: 160px;
+}
 
-.apps-btn {
+.apps-btn,
+.apps-clear-btn {
     height: 44px;
     padding: 0 18px;
     border-radius: 8px;
@@ -140,19 +144,21 @@
 }
 
 .apps-clear-btn {
-    height: 44px;
-    padding: 0 18px;
-    border-radius: 8px;
     border: 2px solid #1A202C;
-    font-weight: 600;
+    color: #1A202C;
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #1A202C;
 }
-.apps-clear-btn:hover { background: #F7FAFC; }
+.apps-clear-btn:hover {
+    background: #F7FAFC;
+}
 
-
+/* TABLE RESPONSIVE FIX */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
 
 /* =============================== */
 /*   HR Job Detail Page UI         */
@@ -166,17 +172,20 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-wrap: wrap; /* responsive */
+    gap: 12px;
     margin-bottom: 25px;
-}
-
-.job-detail-location {
-    color: #4A5568;
-    margin-top: 4px;
 }
 
 .job-detail-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap; /* prevents overflow */
+}
+
+.job-detail-location {
+    color: #4A5568;
+    margin-top: 4px;
 }
 
 /* Info Card */
@@ -195,7 +204,6 @@
 .job-info-item strong {
     font-size: 14px;
     color: #4A5568;
-    display: block;
 }
 .job-info-item span {
     font-size: 16px;
@@ -219,31 +227,25 @@
     color: #2D3748;
 }
 
-/* Skill Pills */
+/* Skills */
 .job-skill-pill {
     padding: 6px 12px;
     border-radius: 8px;
     margin-right: 6px;
 }
 
-
-/* =============================== */
-/*   Detail Page Buttons (Bigger)  */
-/* =============================== */
-
+/* Detail Buttons */
 .btn-detail {
     padding: 10px 18px !important;
     font-size: 15px !important;
     border-radius: 8px;
     font-weight: 600;
-    cursor: pointer;
+    height: 42px;
     display: inline-flex;
-    align-items: center;
     justify-content: center;
-    height: 42px;               /* ensures both buttons match perfectly */
+    align-items: center;
 }
 
-/* Edit */
 .btn-detail-edit {
     border: 1px solid #e6b325;
     background: #fff7dd;
@@ -253,7 +255,6 @@
     background: #ffeab2;
 }
 
-/* Delete */
 .btn-detail-delete {
     border: 1px solid #ff6868;
     background: #ffe5e5;
@@ -263,51 +264,9 @@
     background: #ffd4d4;
 }
 
-
-/* =================================== */
-/*   EDIT JOB FORM – Clean & Modern    */
-/*   Fully working – No Django tags    */
-/* =================================== */
-
-.hrjob-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.hrjob-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.hrjob-field label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 8px;
-    letter-spacing: 0.2px;
-}
-
-.hrjob-field input,
-.hrjob-field textarea,
-.hrjob-field select {
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 1.5px solid #cbd5e0;
-    background: #f7fafc;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.hrjob-field input:focus,
-.hrjob-field textarea:focus,
-.hrjob-field select:focus {
-    outline: none;
-    border-color: #1a73e8;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15);
-}
+/* =============================== */
+/*   Edit Job Form                */
+/* =============================== */
 
 .hrjob-field textarea {
     min-height: 150px;
@@ -315,9 +274,57 @@
     font-family: inherit;
 }
 
-/* Required field red asterisk – works without Django */
 .hrjob-field.required label::after {
     content: " *";
     color: #e53e3e;
     font-weight: bold;
+}
+
+/* =============================== */
+/*   RESPONSIVE BREAKPOINTS        */
+/* =============================== */
+
+@media (max-width: 900px) {
+    .hrjob-card {
+        padding: 28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hrjob-card {
+        padding: 22px;
+    }
+
+    .hrjob-title {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .apps-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .apps-input,
+    .apps-select,
+    .apps-btn,
+    .apps-clear-btn {
+        width: 100%;
+    }
+
+    .job-detail-header {
+        text-align: left;
+        flex-direction: column;
+    }
+
+    .job-detail-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* Animation */
+@keyframes fade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

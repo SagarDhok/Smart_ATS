@@ -68,12 +68,12 @@ SKILL_DB = {
 }
 
 
-# =====================================================================
-# PDF Extraction
-# =====================================================================
-
+# ================================================================
+# PDF Extraction (LOGGING REQUIRED HERE)
+# ================================================================
 def extract_text_from_pdf(file_path):
     if not os.path.exists(file_path):
+        logger.error(f"PDF extraction failed — file not found: {file_path}")
         return ""
 
     text = ""
@@ -84,7 +84,8 @@ def extract_text_from_pdf(file_path):
             if reader.is_encrypted:
                 try:
                     reader.decrypt("")
-                except:
+                except Exception as e:
+                    logger.error(f"Encrypted PDF could not be decrypted: {file_path} | error={e}")
                     return ""
 
             for i in range(min(20, len(reader.pages))):
@@ -92,19 +93,20 @@ def extract_text_from_pdf(file_path):
                     page_text = reader.pages[i].extract_text()
                     if page_text:
                         text += page_text + "\n"
-                except:
+                except Exception as e:
+                    logger.warning(f"Failed to extract page {i} from {file_path} | error={e}")
                     continue
 
-    except:
+    except Exception as e:
+        logger.error(f"PDF extraction crashed for {file_path} | error={e}")
         return ""
 
     return text.lower().strip()
 
 
-# =====================================================================
-# NAME EXTRACTION
-# =====================================================================
-
+# ================================================================
+# EXTRACTION FUNCTIONS (NO LOGGING REQUIRED)
+# ================================================================
 def extract_name(text):
     lines = text.split("\n")
     BLOCK = ["developer", "engineer", "skills", "experience", "projects", "email", "phone"]
@@ -113,19 +115,12 @@ def extract_name(text):
         line = raw.strip()
         if not line or "@" in line or re.search(r"\d", line):
             continue
-
         if any(w in line.lower() for w in BLOCK):
             continue
-
         if re.match(r"^[A-Za-z ]+$", line) and 2 <= len(line.split()) <= 4:
             return line.title()
-
     return None
 
-
-# =====================================================================
-# EMAIL & PHONE
-# =====================================================================
 
 def extract_email(text):
     m = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
@@ -137,18 +132,12 @@ def extract_phone(text):
     return m.group(0) if m else None
 
 
-# =====================================================================
-# EXPERIENCE (YEARS + MONTHS SUPPORT)
-# =====================================================================
-
 def extract_experience(text):
-    # YEARS
     patterns = [
         r"(\d+)\+?\s*years",
         r"(\d+)\s*yrs",
         r"(\d+)\s*yr",
     ]
-
     for p in patterns:
         m = re.search(p, text)
         if m:
@@ -156,7 +145,6 @@ def extract_experience(text):
             if 0 < y <= 40:
                 return y
 
-    # MONTHS → Convert to years
     m = re.search(r"(\d+)\s*months?", text)
     if m:
         months = int(m.group(1))
@@ -165,10 +153,6 @@ def extract_experience(text):
 
     return 0
 
-
-# =====================================================================
-# SKILL MATCHING (NOW EXACT + SYNONYM SUPPORT)
-# =====================================================================
 
 def extract_skills(text):
     found = set()
@@ -181,10 +165,6 @@ def extract_skills(text):
     return list(found)
 
 
-# =====================================================================
-# KEYWORDS (JD BASED)
-# =====================================================================
-
 def extract_keywords(text, jd_keywords):
     jd = normalize(jd_keywords)
     found = []
@@ -193,10 +173,6 @@ def extract_keywords(text, jd_keywords):
             found.append(w)
     return list(set(found))
 
-
-# =====================================================================
-# PROJECTS
-# =====================================================================
 
 def extract_projects(text):
     lines = text.split("\n")
@@ -214,7 +190,6 @@ def extract_projects(text):
         if capturing:
             if any(s in lower for s in STOP):
                 break
-
             cleaned = line.strip("•*-⭐ ").strip()
             if cleaned:
                 block.append(cleaned)
@@ -222,19 +197,11 @@ def extract_projects(text):
     return "\n".join(block) if block else None
 
 
-# =====================================================================
-# MASTER PARSER
-# =====================================================================
-
-
-
-
 def extract_education(text):
     lines = text.split("\n")
     block = []
     capturing = False
     KEYWORDS = ["education", "academic", "qualification"]
-
     STOP = ["experience", "work", "skills", "projects", "certification"]
 
     for line in lines:
@@ -247,7 +214,6 @@ def extract_education(text):
         if capturing:
             if any(s in lower for s in STOP):
                 break
-
             cleaned = line.strip("•*-⭐ ").strip()
             if cleaned:
                 block.append(cleaned)
@@ -260,7 +226,6 @@ def extract_certifications(text):
     block = []
     capturing = False
     KEYWORDS = ["certification", "certifications", "courses", "training"]
-
     STOP = ["education", "experience", "projects", "skills"]
 
     for line in lines:
@@ -273,7 +238,6 @@ def extract_certifications(text):
         if capturing:
             if any(s in lower for s in STOP):
                 break
-
             cleaned = line.strip("•*-⭐ ").strip()
             if cleaned:
                 block.append(cleaned)
@@ -281,9 +245,16 @@ def extract_certifications(text):
     return "\n".join(block) if block else None
 
 
+# ================================================================
+# MASTER PARSER (LOGGING REQUIRED ONLY FOR CRASH)
+# ================================================================
 def parse_resume(file_path, job=None):
-    text = extract_text_from_pdf(file_path) or ""
-    text = text.lower()
+    try:
+        text = extract_text_from_pdf(file_path) or ""
+        text = text.lower()
+    except Exception as e:
+        logger.error(f"Resume parsing crashed for file: {file_path} | error={e}")
+        return {}
 
     return {
         "name": extract_name(text),
@@ -297,5 +268,3 @@ def parse_resume(file_path, job=None):
         "certifications": extract_certifications(text),
         "raw_text": text
     }
-
-

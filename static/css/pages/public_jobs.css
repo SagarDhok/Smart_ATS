@@ -1,5 +1,5 @@
 /* ================= JOB CARDS ================= */
-/* ... (Job Card styles kept the same) ... */
+
 .job-card,
 .card {
     padding: 20px;
@@ -8,6 +8,8 @@
     border: 1px solid #e5e5e5;
     box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     transition: 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .job-card:hover,
@@ -48,16 +50,19 @@
 .job-card-actions {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap; /* 🔥 FIX: prevents action buttons from overflowing */
 }
 
 .job-card-actions .btn {
-    width: auto; 
-    padding: 8px 15px; 
+    width: auto;
+    padding: 8px 15px;
     font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 
-/* ================= FINAL FILTER NAVBAR (BULLETPROOF) ================= */
+/* ================= FILTER NAVBAR ================= */
+
 .job-filter-bar {
     background: var(--color-white);
     padding: 18px 20px;
@@ -68,21 +73,21 @@
 
 .job-filter-inner {
     display: grid;
-    /* Grid structure remains the same for the filter bar */
+
     grid-template-columns:
-        1.5fr /* Search */
-        1.2fr /* Location */
-        1.2fr /* Work Mode */
-        1.2fr /* Job Type */
-        2.5fr /* Salary Filter - Expanded for slider visibility */
-        auto /* Search Button */
-        auto; /* Clear Button */
+        1.5fr
+        1.2fr
+        1.2fr
+        1.2fr
+        2.5fr
+        auto
+        auto;
+
     gap: 12px;
     align-items: center;
 }
 
 .job-filter-input {
-    /* Existing style for inputs */
     height: 44px;
     padding: 0 14px;
     border-radius: 10px;
@@ -95,43 +100,26 @@
 
 .job-filter-select {
     height: 44px;
-    padding: 0 38px 0 14px; 
+    padding: 0 38px 0 14px;
     border-radius: 10px;
     border: 1px solid #CBD5E0;
     font-size: 14px;
     background-color: var(--color-white);
     width: 100%;
-    box-sizing: border-box;
     cursor: pointer;
-
-    /* KILL ALL DEFAULT BROWSER ARROWS */
     -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
 
-    /* SINGLE, FIXED CUSTOM ARROW */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%231A202C' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 12px 12px;
 }
 
-/* REMOVE EDGE / IE ARROW (Keep as is) */
-.job-filter-select::-ms-expand {
-    display: none;
-}
-
-/* NO ICON JUMP ON CLICK - FINAL FIX */
 .job-filter-select:focus {
     outline: none;
-    background-color: var(--color-white);
-    border-color: var(--color-primary); 
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
-
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%231A202C' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px 12px;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(66,153,225,0.3);
 }
 
 .job-filter-btn {
@@ -139,12 +127,11 @@
     padding: 0 20px;
     border-radius: 10px;
     border: none;
-    background: var(--color-primary); 
+    background: var(--color-primary);
     color: var(--color-white);
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s ease;
 }
 
 .job-filter-btn:hover {
@@ -155,16 +142,14 @@
     height: 44px;
     padding: 0 18px;
     border-radius: 10px;
-    border: 2px solid var(--color-text-dark); 
+    border: 2px solid var(--color-text-dark);
     background: var(--color-white);
     font-weight: 700;
     color: var(--color-text-dark);
-    text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    transition: background 0.2s ease;
 }
 
 .job-filter-clear:hover {
@@ -172,48 +157,42 @@
 }
 
 
-/* --- SALARY FILTER FIX: Stacked Vertical (as requested) --- */
+/* ================= SALARY FILTER ================= */
+
 .salary-filter {
-    /* Stacking Min and Max salary rows vertically */
-    display: flex; 
-    flex-direction: column; /* Key change: Stack the children vertically */
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    gap: 0px; /* Reduced gap between rows */
+    gap: 0px;
     margin: 0;
-    padding: 0; 
+    padding: 20px 0 0 0;
     position: relative;
-    padding-top: 20px; /* Space for the header */
 }
 
 .salary-filter-header {
-    /* Position the header absolutely at the top center */
-    position: absolute; 
-    top: 0px; /* Moved slightly higher */
+    position: absolute;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    
     font-size: 13px;
     font-weight: 700;
     text-align: center;
-    width: 100%; 
-    margin-bottom: 0;
+    width: 100%;
 }
 
-/* The two slider rows are now stacked */
 .salary-row {
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     gap: 8px;
-    flex-grow: 1; 
-    width: 100%; /* Take full width of the filter cell */
-    padding: 3px 0; /* Reduced vertical padding */
+    width: 100%;
+    padding: 3px 0;
 }
 
 .salary-label {
-    font-size: 13px; 
-    font-weight: 500; 
+    font-size: 13px;
+    font-weight: 500;
     white-space: nowrap;
-    width: 60px; /* Fixed width for alignment */
+    width: 60px;
     text-align: right;
 }
 
@@ -222,74 +201,80 @@
     margin: 0;
 }
 
-/* Slider thumb styles (kept the same) */
+/* Slider Thumbs */
 .salary-filter input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    appearance: none;
     width: 16px;
     height: 16px;
+    background: var(--color-primary-dark);
     border-radius: 50%;
-    background: var(--color-primary-dark); 
     cursor: pointer;
-    margin-top: -5px; 
 }
 
 .salary-filter input[type="range"]::-moz-range-thumb {
     width: 16px;
     height: 16px;
+    background: var(--color-primary-dark);
     border-radius: 50%;
-    background: var(--color-primary-dark); 
     cursor: pointer;
 }
 
 
-/* ✅ RESPONSIVE – MOBILE SAFE */
-/* On desktop, this is already stacked vertically now, so the 900px breakpoint can remain the same */
+/* ================= RESPONSIVE ================= */
+
+/* Medium Screens */
 @media (max-width: 1100px) {
     .job-filter-inner {
-        /* On medium screens, let the salary filter span two input columns */
         grid-template-columns: 1fr 1fr 1fr 1fr 2fr auto auto;
     }
 }
 
+/* Tablet Screens */
 @media (max-width: 900px) {
     .job-filter-inner {
-        /* Tablet view: 2 columns */
         grid-template-columns: 1fr 1fr;
     }
-    /* Salary filter takes full row */
-    .salary-filter {
-        grid-column: 1 / 3;
-    }
-    .salary-filter-header {
-        position: absolute;
-        width: 100%;
-    }
-    .salary-row {
-        min-width: 100%; 
-    }
-    .job-filter-btn {
-        grid-column: 1 / 2; 
-    }
-    .job-filter-clear {
-        grid-column: 2 / 3; 
-    }
+
+    .salary-filter { grid-column: 1 / 3; }
+    .job-filter-btn { grid-column: 1 / 2; }
+    .job-filter-clear { grid-column: 2 / 3; }
 }
 
+/* MOBILE */
 @media (max-width: 480px) {
+
+    .job-filter-bar {
+        padding: 15px;
+    }
+
     .job-filter-inner {
-        /* Mobile view: 1 column */
         grid-template-columns: 1fr;
     }
-    .salary-filter {
-        grid-column: auto;
-    }
-    .job-filter-btn { 
-        grid-column: auto;
-    }
+
+    .salary-filter,
+    .job-filter-btn,
     .job-filter-clear {
         grid-column: auto;
+        width: 100%;
+    }
+
+    .job-card,
+    .card {
+        padding: 16px;
+    }
+
+    .job-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .job-card-actions .btn {
+        width: 100%; /* Stack buttons */
     }
 }
 
-
+/* Ultra Small Phones */
+@media (max-width: 360px) {
+    .job-card { padding: 14px; }
+    .job-filter-bar { padding: 12px; }
+    .job-meta-grid { font-size: 13px; }
+}

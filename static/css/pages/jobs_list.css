@@ -14,6 +14,7 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap; /* 🔥 fixes mid-screen issues */
 }
 
 .job-input {
@@ -26,11 +27,15 @@
 
 .job-btn {
     height: 44px;
+    padding: 0 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    white-space: nowrap; /* prevents breaking on small screens */
 }
 
 
 /* =========================================== */
-/* TABLE LINKS & COUNT PILL (shared style) */
+/* TABLE LINKS & COUNT PILL */
 /* =========================================== */
 
 .table-link {
@@ -52,3 +57,37 @@
     font-weight: 700;
 }
 
+
+/* =========================================== */
+/* TABLE RESPONSIVENESS (CRITICAL) */
+/* =========================================== */
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+
+/* =========================================== */
+/* RESPONSIVE BREAKPOINTS */
+/* =========================================== */
+
+@media (max-width: 600px) {
+
+    .job-search-container form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .job-input,
+    .job-btn {
+        width: 100%;
+    }
+}
+
+/* Tablet optimization (600–900px) */
+@media (max-width: 900px) {
+    .job-search-container form {
+        gap: 12px;
+    }
+}

@@ -12,7 +12,9 @@
     overflow: hidden;
 }
 
-/* Hero */
+/* -------------------------------
+   HERO SECTION
+-------------------------------- */
 .jd-hero {
     background: var(--color-bg-light);
     padding: 50px 45px;
@@ -42,7 +44,9 @@
     line-height: 1.15;
 }
 
-/* Meta Grid - Clean & Modern */
+/* -------------------------------
+   META GRID
+-------------------------------- */
 .job-meta-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -66,7 +70,9 @@
     margin-top: 4px;
 }
 
-/* Main Content */
+/* -------------------------------
+   MAIN CONTENT
+-------------------------------- */
 .jd-main {
     padding: 45px;
 }
@@ -110,7 +116,9 @@
     border-color: var(--color-primary);
 }
 
-/* Apply Button */
+/* -------------------------------
+   APPLY BUTTON
+-------------------------------- */
 .jd-apply-wrap {
     text-align: center;
     padding: 40px 0 20px;
@@ -126,6 +134,7 @@
     border: 1px solid var(--color-primary);
     color: white;
     transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .jd-apply:hover {
@@ -135,11 +144,64 @@
     box-shadow: 0 10px 25px rgba(66,153,225,0.35);
 }
 
-/* Mobile */
+/* -------------------------------
+   RESPONSIVE BREAKPOINTS
+-------------------------------- */
+
+/* Tablet */
 @media (max-width: 768px) {
     .job-detail-wrapper { padding: 20px 15px; }
-    .jd-hero, .jd-main { padding: 35px 25px; }
+
+    .jd-hero, 
+    .jd-main { padding: 35px 25px; }
+
     .jd-title { font-size: 2.1rem; }
-    .job-meta-grid { grid-template-columns: 1fr; gap: 16px; }
-    .jd-apply { padding: 16px 50px; font-size: 1.2rem; }
+
+    .job-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .jd-apply {
+        padding: 16px 45px;
+        font-size: 1.15rem;
+    }
+}
+
+/* Mobile (Extra Refinement) */
+@media (max-width: 480px) {
+    .jd-hero { padding: 28px 20px; }
+
+    .jd-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .jd-main { padding: 25px 18px; }
+
+    .jd-heading {
+        font-size: 1.4rem;
+        margin: 30px 0 15px;
+    }
+
+    .jd-text { font-size: 1rem; }
+
+    .jd-skill {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+
+    .jd-apply {
+        width: 100%;            /* Prevents overflow */
+        padding: 14px 0;
+        font-size: 1.1rem;
+        border-radius: 10px;
+    }
+}
+
+/* Ultra-small devices */
+@media (max-width: 360px) {
+    .jd-title { font-size: 1.6rem; }
+    .jd-heading { font-size: 1.3rem; }
+    .jd-main { padding: 20px 14px; }
 }

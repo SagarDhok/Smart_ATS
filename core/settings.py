@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'jobs',
     'rest_framework',
     'api',
+    'rest_framework.authtoken',
+
 
 ] 
 
@@ -162,3 +164,83 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 CSRF_FAILURE_VIEW = "core.views.custom_csrf_failure"
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+
+#!logs
+import os
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+
+# Create logs folder if not exists
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'standard': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        # ---------------------------
+        # Console (for development)
+        # ---------------------------
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+
+        # ---------------------------
+        # APP LOG — Rotating
+        # ---------------------------
+        'app_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, "app.log"),
+            'maxBytes': 5 * 1024 * 1024,  # 5 MB
+            'backupCount': 3,            # keeps 3 older logs
+            'formatter': 'standard',
+        },
+
+        # ---------------------------
+        # ERROR LOG — Rotating
+        # ---------------------------
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, "error.log"),
+            'maxBytes': 5 * 1024 * 1024,  # 5 MB
+            'backupCount': 3,
+            'formatter': 'standard',
+        },
+    },
+
+    'loggers': {
+        # Logs from Django internals
+        'django': {
+            'handlers': ['console', 'app_file', 'error_file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+
+        # Logs from your own app code
+        '': {
+            'handlers': ['console', 'app_file', 'error_file'],
+            'level': 'INFO',
+        },
+    }
+}

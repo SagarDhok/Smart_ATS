@@ -1,7 +1,7 @@
 /* 📂 static\css\pages\dashboard.css */
-/* ==================================== */
+/* ================================ */
 
-/* Page container and general layout */
+/* Page Layout */
 .page-container {
     padding: 20px;
     max-width: 1400px;
@@ -10,32 +10,32 @@
 
 h1 {
     margin-bottom: 30px;
-    color: #1a202c; /* Darker heading color */
+    color: #1a202c;
     font-size: 2.5rem;
     font-weight: 700;
 }
 
-/* Flex container for the top cards (TOP CARDS) */
+/* Flexible Cards Row */
 .flex {
     display: flex;
     gap: 20px;
     margin-bottom: 40px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
 }
 
 /* Card Styling */
 .card {
-    flex: 1; /* Distribute space equally */
-    min-width: 280px; /* Ensure a decent minimum width */
+    flex: 1;
+    min-width: 280px;
     background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Soft, modern shadow */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 25px;
     transition: transform 0.3s ease-in-out;
 }
 
 .card:hover {
-    transform: translateY(-3px); /* Subtle lift on hover */
+    transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
@@ -48,16 +48,14 @@ h1 {
     margin-bottom: 15px;
 }
 
-/* Big number style */
 .card .big {
     font-size: 3.5rem;
     font-weight: 700;
-    color: #2c5282; /* Primary color for key metrics */
+    color: #2c5282;
     margin-bottom: 10px;
     line-height: 1;
 }
 
-/* Smaller text in cards (like Active/Closed Jobs or Application stages) */
 .card p {
     font-size: 1rem;
     color: #4a5568;
@@ -68,7 +66,7 @@ h1 {
 
 /* Buttons */
 .btn {
-    display: block; /* Make buttons full width in the card */
+    display: block;
     width: 100%;
     text-align: center;
     padding: 10px 15px;
@@ -81,7 +79,7 @@ h1 {
 }
 
 .btn-primary {
-    background-color: #4299e1; /* Blue */
+    background-color: #4299e1;
     color: white;
     border: 1px solid #4299e1;
 }
@@ -94,7 +92,7 @@ h1 {
 .btn-outline {
     background-color: transparent;
     color: #4299e1;
-    border: 1px solid #a0aec0; /* Light gray border for outline */
+    border: 1px solid #a0aec0;
 }
 
 .btn-outline:hover {
@@ -103,37 +101,21 @@ h1 {
     border-color: #4299e1;
 }
 
-.mt-2 {
-    margin-top: 10px;
-}
+.mt-2 { margin-top: 10px; }
 
-/* Badges for application status */
+/* Badges */
 .badge {
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: 600;
     font-size: 0.85rem;
 }
+.badge-warning { background-color: #fefcbf; color: #975a16; }
+.badge-success { background-color: #9ae6b4; color: #276749; }
+.badge-danger  { background-color: #feb2b2; color: #9b2c2c; }
 
-.badge-warning {
-    background-color: #fefcbf; /* Light Yellow */
-    color: #975a16; /* Dark Brown */
-}
-
-.badge-success {
-    background-color: #9ae6b4; /* Light Green */
-    color: #276749; /* Dark Green */
-}
-
-.badge-danger {
-    background-color: #feb2b2; /* Light Red */
-    color: #9b2c2c; /* Dark Red */
-}
-
-/* Sections and Tables */
-section {
-    margin-bottom: 40px;
-}
+/* Section Titles */
+section { margin-bottom: 40px; }
 
 .section-title {
     font-size: 1.75rem;
@@ -143,12 +125,13 @@ section {
     padding-left: 10px;
 }
 
+/* Tables */
 .table {
     width: 100%;
     border-collapse: collapse;
     background-color: #ffffff;
     border-radius: 8px;
-    overflow: hidden; /* To keep the border-radius on the corners */
+    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -159,7 +142,7 @@ section {
 }
 
 .table thead th {
-    background-color: #f7fafc; /* Very light gray header */
+    background-color: #f7fafc;
     color: #4a5568;
     font-weight: 600;
     text-transform: uppercase;
@@ -167,10 +150,9 @@ section {
 }
 
 .table tbody tr:hover {
-    background-color: #f7fafc; /* Subtle hover effect on rows */
+    background-color: #f7fafc;
 }
 
-/* Empty state styling */
 .table tbody tr td[colspan="3"] {
     font-style: italic;
     color: #a0aec0 !important;
@@ -178,36 +160,24 @@ section {
     padding: 30px;
 }
 
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 900px) {
-    .flex {
-        flex-direction: column;
-    }
-    .card {
-        min-width: 100%;
-    }
+/* RESPONSIVE TABLE WRAPPER */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
 }
 
-
-
-/* ================================ */
-/* Pagination Controls (Dashboard)  */
-/* ================================ */
-
+/* Pagination */
 .pagination-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    flex-wrap: wrap; /* Prevent overflow */
+    gap: 15px;
     margin-top: 20px;
 }
 
 .pagination-controls .btn {
-    width: auto;  /* Button full-width not needed here */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    width: auto;
     padding: 8px 16px;
 }
 
@@ -221,16 +191,11 @@ section {
     color: #4a5568;
 }
 
-/* ============================================
-   HR Dashboard — Narrow Card Overrides (SAFE)
-   ============================================ */
-/* ================================
-   HR Dashboard Clean Layout
-   ================================ */
-
+/* HR Dashboard Cards */
 .hrdash-row {
     gap: 40px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .hrdash-card {
@@ -238,7 +203,6 @@ section {
     flex: 1;
 }
 
-/* CREATE JOB button */
 .hr-create-wrapper {
     text-align: center;
     margin-top: 35px;
@@ -252,5 +216,36 @@ section {
     font-size: 15px;
 }
 
+/* =====================================
+   RESPONSIVE BREAKPOINTS
+   ===================================== */
 
+@media (max-width: 900px) {
+    .flex {
+        flex-direction: column;
+    }
+}
 
+/* Extra responsive polish for phones */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .card .big {
+        font-size: 2.8rem;
+    }
+
+    .pagination-controls {
+        gap: 10px;
+    }
+}

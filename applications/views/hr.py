@@ -5,7 +5,10 @@ from django.http import FileResponse
 from applications.models import Application
 from jobs.models import Job
 from django.db.models import Q
+import logging
+import os
 
+logger = logging.getLogger(__name__)
 
 
 # ------------------------------
@@ -22,12 +25,18 @@ def app_queryset_for(user):
 
 
 # ------------------------------
-# LIST VIEW
+# LIST VIEW (HR)
 # ------------------------------
 class HRApplicationListView(LoginRequiredMixin, ListView):
     template_name = "hr/applications/list.html"
     context_object_name = "apps_page"
     paginate_by = 10
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != "HR":
+            logger.warning(f"Unauthorized HR application list access attempt by {request.user.email}")
+            return redirect("login")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
@@ -54,14 +63,9 @@ class HRApplicationListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
         user = self.request.user
 
-        # Counts for status dropdown
-        base_qs = Application.objects.filter(
-            job__created_by=user,
-            job__is_deleted=False
-        )
+        base_qs = Application.objects.filter(job__created_by=user, job__is_deleted=False)
 
         ctx["counts"] = {
             "screening": base_qs.filter(status="screening").count(),
@@ -73,9 +77,7 @@ class HRApplicationListView(LoginRequiredMixin, ListView):
 
         ctx["search"] = self.request.GET.get("search", "")
         ctx["status_filter"] = self.request.GET.get("status", "")
-
         return ctx
-
 
 
 # ------------------------------
@@ -85,12 +87,17 @@ class HRApplicationDetailView(LoginRequiredMixin, DetailView):
     template_name = "hr/applications/detail.html"
     context_object_name = "app"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != "HR":
+            logger.warning(f"Unauthorized HR application detail access attempt by {request.user.email}")
+            return redirect("login")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return app_queryset_for(self.request.user)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
         app = ctx["app"]
 
         if isinstance(app.job.required_skills, str):
@@ -101,14 +108,21 @@ class HRApplicationDetailView(LoginRequiredMixin, DetailView):
         ctx["app"] = app
         return ctx
 
+
 # ------------------------------
-# STATUS UPDATE VIEW
+# STATUS UPDATE VIEW (HR)
 # ------------------------------
 class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
     model = Application
     fields = ["status"]
     template_name = "hr/applications/status_update.html"
     context_object_name = "app"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != "HR":
+            logger.warning(f"Unauthorized HR status update attempt by {request.user.email}")
+            return redirect("login")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return app_queryset_for(self.request.user)
@@ -123,13 +137,17 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
 # ------------------------------
 def preview_resume(request, pk):
     app = get_object_or_404(
-        Application,
-        pk=pk,
+        Application, pk=pk,
         job__created_by=request.user,
         job__is_deleted=False
     )
 
     file_path = app.resume.path
+
+    if not os.path.exists(file_path):
+        logger.error(f"Resume preview failed (file missing): {app.email}, path={file_path}")
+        return redirect("hr_application_detail", pk=pk)
+
     response = FileResponse(open(file_path, "rb"), content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{app.resume.name}"'
     return response
@@ -140,13 +158,17 @@ def preview_resume(request, pk):
 # ------------------------------
 def download_resume(request, pk):
     app = get_object_or_404(
-        Application,
-        pk=pk,
+        Application, pk=pk,
         job__created_by=request.user,
         job__is_deleted=False
     )
 
     file_path = app.resume.path
+
+    if not os.path.exists(file_path):
+        logger.error(f"Resume download failed (file missing): {app.email}, path={file_path}")
+        return redirect("hr_application_detail", pk=pk)
+
     response = FileResponse(open(file_path, "rb"), as_attachment=True)
     response["Content-Disposition"] = f'attachment; filename="{app.resume.name}"'
     return response

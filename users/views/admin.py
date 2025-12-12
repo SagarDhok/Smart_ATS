@@ -11,49 +11,40 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse, FileResponse
+import logging
+import os
+
+# ---------------- LOGGING ----------------
+logger = logging.getLogger(__name__)
 
 
-
-# ==========================
-#    ADMIN DASHBOARD
-# ==========================
-
-
-
+# =================================================================
+#                           ADMIN DASHBOARD
+# =================================================================
 @login_required
 def admin_dashboard(request):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized admin dashboard access attempt by {request.user.email}")
         return redirect("login")
 
-    # ============================
-    # HR USERS PAGINATION (10 PER PAGE)
-    # ============================
+    # HR USERS PAGINATION
     hr_qs = User.objects.filter(role="HR", is_active=True).order_by("-created_at")
     hr_paginator = Paginator(hr_qs, 10)
-    hr_page_number = request.GET.get("hr_page")
-    hr_page = hr_paginator.get_page(hr_page_number)
+    hr_page = hr_paginator.get_page(request.GET.get("hr_page"))
 
-    # ============================
-    # PENDING INVITES PAGINATION (10 PER PAGE)
-    # ============================
+    # PENDING INVITES PAGINATION
     pending_invites_qs = Invite.objects.filter(
-        used=False,
-        expires_at__gt=timezone.now()
+        used=False, expires_at__gt=timezone.now()
     ).order_by("-created_at")
-
     pending_invites_paginator = Paginator(pending_invites_qs, 10)
-    pending_invites_page_number = request.GET.get("pending_page")
-    pending_invites_page = pending_invites_paginator.get_page(pending_invites_page_number)
+    pending_invites_page = pending_invites_paginator.get_page(request.GET.get("pending_page"))
 
-    # ============================
     # JOB STATS
-    # ============================
     total_jobs = Job.objects.filter(is_deleted=False).count()
 
-
-    # ============================
     # APPLICATION STATS
-    # ============================
     total_applications = Application.objects.filter(job__is_deleted=False).count()
     screening = Application.objects.filter(status="screening", job__is_deleted=False).count()
     review = Application.objects.filter(status="review", job__is_deleted=False).count()
@@ -64,9 +55,7 @@ def admin_dashboard(request):
     return render(request, "admin/admin_dashboard.html", {
         "hr_page": hr_page,
         "pending_invites_page": pending_invites_page,
-
         "total_jobs": total_jobs,
-
         "total_applications": total_applications,
         "screening": screening,
         "review": review,
@@ -76,12 +65,13 @@ def admin_dashboard(request):
     })
 
 
-# ==========================
-#    HR MANAGEMENT PAGE
-# ==========================
+# =================================================================
+#                         HR MANAGEMENT PAGE
+# =================================================================
 @login_required
 def hr_management(request):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized HR management access attempt by {request.user.email}")
         return redirect("login")
 
     search = request.GET.get("search", "").strip()
@@ -95,8 +85,7 @@ def hr_management(request):
         )
 
     paginator = Paginator(hr_users, 10)
-    page_number = request.GET.get("page")
-    hr_page = paginator.get_page(page_number)
+    hr_page = paginator.get_page(request.GET.get("page"))
 
     return render(request, "admin/hr_management.html", {
         "hr_page": hr_page,
@@ -104,75 +93,57 @@ def hr_management(request):
     })
 
 
-# ==========================
-#     ACTIVATE / SUSPEND HR
-# ==========================
-
-# “Initially I used the standard POST-redirect-GET pattern with pagination and filters, but that created multiple browser history entries because each action triggered a full page navigation. That naturally broke the back button UX.
-
-# To fix this correctly, I converted the suspend/activate endpoints into POST-only JSON APIs secured with CSRF, and triggered them using fetch from the template. The UI then soft-reloads without adding a history entry, so pagination, filters, and browser navigation remain intact.
-
-# This keeps the system server-rendered but avoids unnecessary navigation for state-changing actions.”
-
-
-# “Why can’t pure Django redirects fix the back button issue?”
-
-# Your reply:
-
-# “Because each successful GET after redirect creates a new history entry at the browser level, and history behavior is controlled by the browser, not the server. So as long as we navigate using full requests, back navigation can’t be collapsed into one step. Only preventing navigation altogether using async requests avoids that.”
-
-
-# Since Django’s CSRF protection relies on cookies and headers, I extracted the csrftoken from the cookie and explicitly passed it in the X-CSRFToken header with credentials: same-origin to ensure the cookie is sent.”
-
-
-
-
-# ✅ For project submission & interviews → leave pagination history as it is (normal behavior)“Because pagination uses normal anchor navigation, and browsers preserve exact navigation order. If we want linear back behavior, we must override it using history.replaceState or location.replace on the frontend. Backend alone cannot control browser history.” ye sahi hai 
-
-
-# “My core hands-on experience is in backend with Django, but to improve the user experience and avoid unnecessary full-page reloads, I implemented AJAX for state-changing actions like suspend and activate.
-
-# As for pagination history, that is normal browser navigation behavior because pagination uses anchor-based routing. Controlling how the back button behaves is a frontend concern using history.replaceState or location.replace. Since it wasn’t a functional bug and preserving deep links is important, I intentionally kept the default behavior.”
-    
-#     “My core hands-on experience is in backend with Django, but to improve the user experience and avoid unnecessary full-page reloads, I implemented AJAX for state-changing actions like suspend and activate.
-
-# As for pagination history, that is normal browser navigation behavior because pagination uses anchor-based routing. Controlling how the back button behaves is a frontend concern using history.replaceState or location.replace. Since it wasn’t a functional bug and preserving deep links is important, I intentionally kept the default behavior.”
-
-# This version makes you sound:
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-
+# =================================================================
+#                ACTIVATE / SUSPEND HR (AJAX JSON API)
+# =================================================================
 @login_required
 @require_POST
 def suspend_hr(request, user_id):
+    if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized HR suspend attempt by {request.user.email}")
+        raise PermissionDenied()
+
     hr = get_object_or_404(User, id=user_id, role="HR")
     hr.is_active = False
     hr.save()
+
+    logger.info(f"HR suspended: id={hr.id}, email={hr.email}, by={request.user.email}")
+
     return JsonResponse({"status": "suspended"})
 
 
 @login_required
 @require_POST
 def activate_hr(request, user_id):
+    if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized HR activate attempt by {request.user.email}")
+        raise PermissionDenied()
+
     hr = get_object_or_404(User, id=user_id, role="HR")
     hr.is_active = True
     hr.save()
+
+    logger.info(f"HR activated: id={hr.id}, email={hr.email}, by={request.user.email}")
+
     return JsonResponse({"status": "activated"})
 
 
-# ==========================
-#      INVITE HR PAGE
-# ==========================
+# =================================================================
+#                            INVITE HR PAGE
+# =================================================================
 @login_required
 def invite_page(request):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized invite page access by {request.user.email}")
         messages.error(request, "You are not authorized to access the invite page.")
         return redirect("login")
 
     if request.method == "POST":
         email = request.POST.get("email")
 
+        # Duplicate active invite prevention
         if Invite.objects.filter(email=email, used=False, expires_at__gt=timezone.now()).exists():
+            logger.warning(f"Duplicate invite attempt for {email}")
             messages.warning(request, f"Invite already sent to {email} and is still active.")
             return redirect("invite")
 
@@ -188,53 +159,54 @@ def invite_page(request):
 
         signup_link = request.build_absolute_uri(f"/signup/?token={token}")
 
-
-        send_mail(
-            subject="Your ATS Signup Link",
-            message=f"""
+        try:
+            send_mail(
+                subject="Your ATS Signup Link",
+                message=f"""
 Hello,
 
 You have been invited to join the Smart ATS platform as an HR user.
-Please use the link below to complete your account setup:
 
 {signup_link}
 
-This link is valid for 48 hours and can be used only once.
+Valid for 48 hours.
 
 Regards,
 Smart ATS Admin
 """,
-            from_email=None,
-            recipient_list=[email],
-            fail_silently=False,
-        )
+                from_email=None,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            logger.error(f"Invite email failed for {email}: {e}")
+            messages.error(request, "Failed to send invite email. Try again.")
+            return redirect("invite")
 
+        logger.info(f"Invite sent to {email} by {request.user.email}")
         messages.success(request, f"Invite sent successfully to {email}")
         return redirect("invite")
 
     return render(request, "hr/invite.html")
 
 
-# ==========================
-#     JOB MANAGEMENT
-# ==========================
+# =================================================================
+#                       JOB MANAGEMENT
+# =================================================================
 @login_required
 def admin_job_list(request):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
         raise PermissionDenied()
 
     search = request.GET.get("search", "").strip()
-
     jobs_qs = Job.objects.filter(is_deleted=False).order_by("-created_at")
 
-    # 🔍 SEARCH by job title
     if search:
         jobs_qs = jobs_qs.filter(title__icontains=search)
 
-    # 📄 PAGINATION — 10 per page
     paginator = Paginator(jobs_qs, 10)
-    page_number = request.GET.get("page")
-    jobs_page = paginator.get_page(page_number)
+    jobs_page = paginator.get_page(request.GET.get("page"))
 
     return render(request, "admin/jobs_list.html", {
         "jobs_page": jobs_page,
@@ -245,18 +217,20 @@ def admin_job_list(request):
 @login_required
 def admin_job_detail(request, id):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
         raise PermissionDenied()
 
     job = get_object_or_404(Job, id=id, is_deleted=False)
     return render(request, "admin/job_detail.html", {"job": job})
 
 
-# ==========================
-#   APPLICATION MANAGEMENT
-# ==========================
+# =================================================================
+#                    APPLICATION MANAGEMENT
+# =================================================================
 @login_required
 def admin_application_list(request):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized application list access by {request.user.email}")
         raise PermissionDenied()
 
     search = request.GET.get("search", "")
@@ -264,18 +238,16 @@ def admin_application_list(request):
 
     applications = Application.objects.select_related("job").filter(job__is_deleted=False)
 
-    # SEARCH
     if search:
         applications = applications.filter(
             Q(full_name__icontains=search) |
             Q(email__icontains=search)
         )
 
-    # STATUS FILTER
     if status_filter:
         applications = applications.filter(status=status_filter)
 
-    # COUNTS FOR DROPDOWN
+    # COUNTS
     all_counts = Application.objects.filter(job__is_deleted=False)
     counts = {
         "screening": all_counts.filter(status="screening").count(),
@@ -285,7 +257,6 @@ def admin_application_list(request):
         "rejected": all_counts.filter(status="rejected").count(),
     }
 
-    # PAGINATION
     paginator = Paginator(applications.order_by("-applied_at"), 15)
     apps_page = paginator.get_page(request.GET.get("page", 1))
 
@@ -300,6 +271,7 @@ def admin_application_list(request):
 @login_required
 def admin_application_detail(request, pk):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized application detail access by {request.user.email}")
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
@@ -309,6 +281,7 @@ def admin_application_detail(request, pk):
 @login_required
 def admin_job_applications(request, id):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized job applications access by {request.user.email}")
         raise PermissionDenied()
 
     job = get_object_or_404(Job, id=id, is_deleted=False)
@@ -320,22 +293,21 @@ def admin_job_applications(request, id):
     })
 
 
-# ==========================
-#       DOWNLOAD RESUME
-# ==========================
-import os
-from django.http import FileResponse
-
-
-
+# =================================================================
+#                        DOWNLOAD RESUME
+# =================================================================
 @login_required
 def admin_resume_download(request, pk):
     if request.user.role not in ["ADMIN", "SuperUser"]:
+        logger.warning(f"Unauthorized resume download attempt by {request.user.email}")
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
 
     if not os.path.exists(app.resume.path):
+        logger.error(
+            f"Resume file missing on disk: applicant={app.email}, file={app.resume.path}"
+        )
         messages.error(request, "Resume file not found on server.")
         return redirect("admin_application_detail", pk=pk)
 
