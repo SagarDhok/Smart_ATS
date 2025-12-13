@@ -1,6 +1,6 @@
 {% load static %}
 
-<div id="sidebar" class="sidebar">
+<aside id="sidebar" class="sidebar">
 
     <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -10,35 +10,24 @@
     </div>
 
     <ul class="sidebar-menu">
-
         {% if request.user.is_authenticated %}
 
-            <!-- Landing Page -->
             <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
 
-            <!-- Dashboard -->
-          {% if request.user.role == "ADMIN" or request.user.role == "SUPERADMIN" %}
-    <li><a href="{% url 'admin_dashboard' %}">📊 <span>Dashboard</span></a></li>
-{% elif request.user.role == "HR" %}
-    <li><a href="{% url 'hr_dashboard' %}">📊 <span>Dashboard</span></a></li>
-{% endif %}
+            {% if request.user.role == "ADMIN" or request.user.role == "SUPERADMIN" %}
+                <li><a href="{% url 'admin_dashboard' %}">📊 <span>Dashboard</span></a></li>
+            {% elif request.user.role == "HR" %}
+                <li><a href="{% url 'hr_dashboard' %}">📊 <span>Dashboard</span></a></li>
+            {% endif %}
 
-
-            <!-- Profile -->
             <li><a href="{% url 'profile' %}">👤 <span>Profile</span></a></li>
-
-            <!-- Logout -->
             <li><a href="#" id="logoutConfirmBtn" class="logout">🚪 <span>Logout</span></a></li>
 
         {% else %}
-
-            <!-- NOT LOGGED IN → ONLY Landing Page -->
             <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
-
         {% endif %}
     </ul>
-</div>
-
+</aside>
 
 <!-- Logout Popup -->
 <div id="logoutPopup" class="logout-popup">

@@ -39,7 +39,7 @@
         {% endfor %}
     </div>
 {% endif %}
-
+    <div class="sidebar-overlay"></div>
     {% include "components/sidebar.html" %}
 
 <!-- MAIN CONTENT -->
@@ -48,81 +48,51 @@
 </div>
 
 {% block extra_js %}{% endblock %}
-
 <script>
-/* CLOSE MESSAGE ALERT */
-document.querySelectorAll('.alert-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const box = btn.closest('.alert');
-        box.classList.add('hide');
-        box.addEventListener('transitionend', () => box.remove());
-    });
-});
-
-/* SIDEBAR STATE USING LOCAL STORAGE */
 document.addEventListener("DOMContentLoaded", () => {
     const menu = document.getElementById("sidebar");
     const toggle = document.getElementById("toggleSidebar");
     const content = document.querySelector(".page-content");
+    const overlay = document.querySelector(".sidebar-overlay");
 
     if (!menu || !toggle) return;
 
-    // Load saved state
-    const savedState = localStorage.getItem("sidebar_open");
-    if (savedState === "true") {
+    const isDesktop = () => window.innerWidth > 768;
+
+    // Restore state (desktop only)
+    if (localStorage.getItem("sidebar_open") === "true" && isDesktop()) {
         menu.classList.add("open");
         content.classList.add("shift");
     }
 
-    // Enable animation AFTER load
-    setTimeout(() => document.body.classList.add("sidebar-ready"), 10);
+    setTimeout(() => {
+        document.body.classList.add("sidebar-ready");
+    }, 10);
 
-    // Toggle sidebar
     toggle.addEventListener("click", () => {
-        menu.classList.toggle("open");
-        content.classList.toggle("shift");
+        const isOpen = menu.classList.toggle("open");
 
-        const isOpen = menu.classList.contains("open");
+        if (isDesktop()) {
+            content.classList.toggle("shift");
+        } else {
+            overlay.classList.toggle("active", isOpen);
+            document.body.classList.toggle("no-scroll", isOpen);
+        }
+
         localStorage.setItem("sidebar_open", isOpen);
     });
-});
 
-/* LOGOUT CONFIRMATION */
-document.addEventListener("DOMContentLoaded", () => {
-    const logoutBtn = document.getElementById("logoutConfirmBtn");
-    const popup = document.getElementById("logoutPopup");
-    const yesBtn = document.getElementById("logoutYes");
-    const noBtn = document.getElementById("logoutNo");
-
-    if (!logoutBtn) return;
-
-    logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        popup.style.display = "flex";
-    });
-
-    noBtn.addEventListener("click", () => popup.style.display = "none");
-
-    yesBtn.addEventListener("click", () => {
-        window.location.href = "{% url 'logout_user' %}";
+    overlay.addEventListener("click", () => {
+        menu.classList.remove("open");
+        content.classList.remove("shift");
+        overlay.classList.remove("active");
+        document.body.classList.remove("no-scroll");
+        localStorage.setItem("sidebar_open", false);
     });
 });
-
-
-
-// GLOBAL PASSWORD SHOW/HIDE FUNCTION
-function togglePassword(fieldId, icon) {
-    const input = document.getElementById(fieldId);
-
-    if (input.type === "password") {
-        input.type = "text";
-        icon.src = "/static/icons/hide.png";   // hide icon
-    } else {
-        input.type = "password";
-        icon.src = "/static/icons/show.png";   // show icon
-    }
-}
 </script>
+
+
 
 </body>
 </html>
