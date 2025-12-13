@@ -157,6 +157,9 @@ PATCH /api/applications/<id>/status/
 | Email System | SMTP (Brevo) |
 | Frontend | Django Templates + CSS |
 
+Database: SQLite (deployed), MySQL (development & learning)
+
+
 ---
 
 ## 📂 Project Structure
