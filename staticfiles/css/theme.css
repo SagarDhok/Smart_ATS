@@ -1,7 +1,4 @@
-/* ===============================
-    GLOBAL THEME — ENTERPRISE ATS
-    (All shared components only)
-================================*/
+
 
 /* --- THEME COLORS (CSS Variables) --- */
 :root {
@@ -392,4 +389,46 @@ img {
     }
 }
 
+/* Sidebar overlay */
+.sidebar-overlay {
+    display: none;
+}
 
+@media (max-width: 768px) {
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 1000;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    body.no-scroll {
+        overflow: hidden;
+    }
+}
+
+
+
+/* LOGOUT POPUP FIX */
+.logout-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.logout-box {
+    background: #fff;
+    padding: 24px 28px;
+    border-radius: 12px;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+}

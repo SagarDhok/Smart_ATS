@@ -1,117 +1,75 @@
-/* ============================
-   FIX INITIAL FLICKER
-============================= */
+/* ===================================================
+   SIDEBAR — FINAL ENTERPRISE VERSION
+=================================================== */
 
-/* Disable animations BEFORE page fully loads */
+/* Flicker fix */
 .sidebar {
-    transition: none !important;
+    transition: none;
 }
-
-/* Enable animations AFTER body gets .sidebar-ready */
 body.sidebar-ready .sidebar {
-    transition: width 0.25s ease !important;
+    transition: width 0.25s ease, transform 0.3s ease;
 }
 
-/* ============================
-   SIDEBAR – ENTERPRISE LEVEL
-============================= */
-
+/* ---------------- DESKTOP ---------------- */
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
     width: 70px;
     background: #ffffff;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
     border-right: 1px solid #e5e7eb;
     overflow: hidden;
-    z-index: 999;
+    z-index: 1001;
 }
 
-/* Expanded mode */
 .sidebar.open {
     width: 230px;
 }
 
 /* Header */
 .sidebar-header {
+    height: 56px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 10px;
+    padding: 0 14px;
 }
 
-/* ============================
-   SMART ATS TEXT LOGO
-============================= */
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
+/* Logo */
 .sidebar-logo span {
+    opacity: 0;
     font-size: 20px;
     font-weight: 700;
     color: #1a73e8;
-    opacity: 0;
     transition: opacity 0.25s ease;
 }
 
-/* Show logo text only when expanded */
 .sidebar.open .sidebar-logo span {
     opacity: 1;
 }
 
-/* ============================
-   TOGGLE BUTTON
-============================= */
-
-.sidebar-toggle {
-    border: none;
-    background: none;
-    font-size: 24px;
-    color: #1a202c;
-    cursor: pointer;
-    transition: transform 0.25s ease;
-    min-width: 34px;
-    text-align: center;
-}
-
-.sidebar.open .sidebar-toggle {
-    transform: rotate(90deg);
-}
-
-/* ============================
-   MENU LIST
-============================= */
-
+/* Menu */
 .sidebar-menu {
     list-style: none;
-    margin-top: 20px;
-    padding: 0;
+    padding: 8px 0;
 }
 
 .sidebar-menu li a {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 16px;
+    padding: 12px 18px;
     text-decoration: none;
     color: #1a202c;
-    font-size: 16px;
-    transition: background 0.2s ease;
+    font-size: 15px;
 }
 
 .sidebar-menu li a:hover {
     background: #f3f4f6;
 }
 
-/* Hide labels when collapsed */
 .sidebar-menu li a span {
     opacity: 0;
-    white-space: nowrap;
     transition: opacity 0.25s ease;
 }
 
@@ -119,110 +77,71 @@ body.sidebar-ready .sidebar {
     opacity: 1;
 }
 
-/* Logout red color */
-.logout {
-    color: #e53935 !important;
-}
-
-/* ============================
-   PAGE CONTENT SHIFT
-============================= */
-
+/* Page shift (desktop only) */
 .page-content {
     margin-left: 70px;
-    transition: margin-left 0.25s ease;
+    transition: margin-left 0.3s ease;
 }
 
-.sidebar.open + .page-content {
+.page-content.shift {
     margin-left: 230px;
 }
 
-/* ============================
-   MOBILE RESPONSIVE
-============================= */
+/* Toggle button */
+.sidebar-toggle {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: none;
+    font-size: 22px;
+    background: #ffffff;
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
 
+/* ---------------- MOBILE DRAWER ---------------- */
 @media (max-width: 768px) {
+
     .sidebar {
-        width: 70px;   /* still visible even if collapsed */
-        transform: none;  /* DO NOT hide! */
+        width: 78vw;
+        max-width: 280px;
+        transform: translateX(-100%);
     }
 
     .sidebar.open {
-        width: 230px;
+        transform: translateX(0);
     }
 
-    .page-content {
-        margin-left: 70px;
-    }
-}
-
-
-/* Overlay */
-.logout-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-/* Popup Box */
-.logout-box {
-    background: white;
-    padding: 20px 25px;
-    border-radius: 10px;
-    text-align: center;
-    width: 280px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    font-size: 16px;
-}
-
-.logout-actions {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.btn-yes, .btn-no {
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    border-radius: 6px;
-}
-
-/* Yes button */
-.btn-yes {
-    background: #e53935;
-    color: white;
-}
-
-/* Cancel button */
-.btn-no {
-    background: #e0e0e0;
-}
-
-
-
-/* ======================================
-   PAGE SHIFT WHEN SIDEBAR EXPANDS
-   ====================================== */
-
-
-
-/* Smooth page shift */
 .page-content {
-    margin-left: 70px;  /* collapsed width */
-    transition: margin-left 0.3s ease; /* smooth transition */
+    padding-top: 0;
 }
 
-/* When sidebar opens */
-.sidebar.open + .page-content,
-.page-content.shift {
-    margin-left: 230px; /* expanded width */
+@media (max-width: 768px) {
+    .page-content {
+        padding-top: 72px;
+    }
+}
+
+
+
+    .page-content,
+    .page-content.shift {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .sidebar-logo span {
+        opacity: 1;
+    }
+}
+
+/* Desktop safety reset */
+@media (min-width: 769px) {
+    .sidebar {
+        transform: none !important;
+    }
 }
