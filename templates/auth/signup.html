@@ -9,7 +9,6 @@
 <div class="auth-container">
     <div class="auth-card">
 
-        {# SHOW FULL CARD ONLY IF INVITE INVALID #}
         {% if invalid_invite %}
             <h1 class="auth-title" style="color:#dc3545;">Invalid Invite</h1>
             <p class="auth-subtitle">{{ invalid_invite }}</p>
@@ -23,7 +22,10 @@
             <form method="post">
                 {% csrf_token %}
 
-                <p class="auth-info">Email: <strong>{{ email }}</strong></p>
+                <p class="auth-info">
+                    Email: <strong>{{ email }}</strong>
+                </p>
+
                 <input type="hidden" name="token" value="{{ token }}">
 
                 <label>First Name</label>
@@ -34,24 +36,23 @@
 
                 <label>Password</label>
                 <div class="password-wrapper">
- <div class="password-wrapper">
-    <input type="password" name="confirm_password" id="signupConfirmPassword" required>
-    <img src="{% static 'icons/show.png' %}" 
-         class="password-toggle"
-         onclick="togglePassword('signupConfirmPassword', this)">
-</div>
-
+                    <input type="password" name="password" id="password" required>
+                    <img src="{% static 'icons/show.png' %}"
+                         class="password-toggle"
+                         onclick="togglePassword('password', this)">
+                </div>
 
                 <label>Confirm Password</label>
                 <div class="password-wrapper">
-    <input type="password" name="password" id="password" required>
-    <img src="{% static 'icons/show.png' %}" 
-         class="password-toggle"
-         onclick="togglePassword('password', this)">
-</div>
+                    <input type="password" name="confirm_password" id="signupConfirmPassword" required>
+                    <img src="{% static 'icons/show.png' %}"
+                         class="password-toggle"
+                         onclick="togglePassword('signupConfirmPassword', this)">
+                </div>
 
-
-                <button class="btn btn-primary auth-btn">Create Account</button>
+                <button class="btn btn-primary auth-btn">
+                    Create Account
+                </button>
             </form>
 
         {% endif %}

@@ -1,26 +1,23 @@
-/* ============================
-   FIX INITIAL FLICKER
-============================= */
-.sidebar {
-    transition: none !important;
-}
+/* ===================================================
+   SIDEBAR — FINAL ENTERPRISE VERSION
+=================================================== */
 
+/* Flicker fix */
+.sidebar {
+    transition: none;
+}
 body.sidebar-ready .sidebar {
-    transition: width 0.25s ease;
+    transition: width 0.25s ease, transform 0.3s ease;
 }
 
-/* ============================
-   SIDEBAR – DESKTOP
-============================= */
-.sidebar-overlay { z-index: 1000; }
-
+/* ---------------- DESKTOP ---------------- */
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
     width: 70px;
     background: #ffffff;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
     border-right: 1px solid #e5e7eb;
     overflow: hidden;
     z-index: 1001;
@@ -32,57 +29,39 @@ body.sidebar-ready .sidebar {
 
 /* Header */
 .sidebar-header {
+    height: 56px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px;
+    padding: 0 14px;
 }
 
 /* Logo */
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-}
-
 .sidebar-logo span {
     opacity: 0;
-    transition: opacity 0.25s ease;
     font-size: 20px;
     font-weight: 700;
     color: #1a73e8;
+    transition: opacity 0.25s ease;
 }
 
 .sidebar.open .sidebar-logo span {
     opacity: 1;
 }
 
-/* Toggle */
-.sidebar-toggle {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.sidebar.open .sidebar-toggle {
-    transform: rotate(90deg);
-}
-
 /* Menu */
 .sidebar-menu {
     list-style: none;
-    margin-top: 20px;
-    padding: 0;
+    padding: 8px 0;
 }
 
 .sidebar-menu li a {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 16px;
-    color: #1a202c;
+    padding: 12px 18px;
     text-decoration: none;
+    color: #1a202c;
+    font-size: 15px;
 }
 
 .sidebar-menu li a:hover {
@@ -98,37 +77,38 @@ body.sidebar-ready .sidebar {
     opacity: 1;
 }
 
-/* Logout */
-.logout {
-    color: #e53935 !important;
-}
-
-/* ============================
-   PAGE SHIFT (DESKTOP ONLY)
-============================= */
-
+/* Page shift (desktop only) */
 .page-content {
     margin-left: 70px;
     transition: margin-left 0.3s ease;
 }
 
-.sidebar.open + .page-content,
 .page-content.shift {
     margin-left: 230px;
 }
 
-/* ===============================
-   MOBILE SIDEBAR – DRAWER MODE
-================================ */
+/* Toggle button */
+.sidebar-toggle {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: none;
+    font-size: 22px;
+    background: #ffffff;
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
 
+/* ---------------- MOBILE DRAWER ---------------- */
 @media (max-width: 768px) {
 
-    body.sidebar-ready .sidebar {
-        transition: transform 0.3s ease !important;
-    }
-
     .sidebar {
-        width: 240px;
+        width: 78vw;
+        max-width: 280px;
         transform: translateX(-100%);
     }
 
@@ -136,9 +116,32 @@ body.sidebar-ready .sidebar {
         transform: translateX(0);
     }
 
+.page-content {
+    padding-top: 0;
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding-top: 72px;
+    }
+}
+
+
+
     .page-content,
     .page-content.shift {
-        margin-left: 0 !important;
+        margin-left: 0;
         width: 100%;
+    }
+
+    .sidebar-logo span {
+        opacity: 1;
+    }
+}
+
+/* Desktop safety reset */
+@media (min-width: 769px) {
+    .sidebar {
+        transform: none !important;
     }
 }

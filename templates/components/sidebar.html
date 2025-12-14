@@ -1,35 +1,61 @@
 {% load static %}
 
+<!-- GLOBAL SIDEBAR TOGGLE (OUTSIDE SIDEBAR) -->
+<button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
 <aside id="sidebar" class="sidebar">
 
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <span>Smart ATS</span>
         </div>
-        <button id="toggleSidebar" class="sidebar-toggle">≡</button>
     </div>
 
     <ul class="sidebar-menu">
         {% if request.user.is_authenticated %}
 
-            <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
+            <li>
+                <a href="{% url 'landing_page' %}">
+                    🏠 <span>Home</span>
+                </a>
+            </li>
 
             {% if request.user.role == "ADMIN" or request.user.role == "SUPERADMIN" %}
-                <li><a href="{% url 'admin_dashboard' %}">📊 <span>Dashboard</span></a></li>
+                <li>
+                    <a href="{% url 'admin_dashboard' %}">
+                        📊 <span>Dashboard</span>
+                    </a>
+                </li>
             {% elif request.user.role == "HR" %}
-                <li><a href="{% url 'hr_dashboard' %}">📊 <span>Dashboard</span></a></li>
+                <li>
+                    <a href="{% url 'hr_dashboard' %}">
+                        📊 <span>Dashboard</span>
+                    </a>
+                </li>
             {% endif %}
 
-            <li><a href="{% url 'profile' %}">👤 <span>Profile</span></a></li>
-            <li><a href="#" id="logoutConfirmBtn" class="logout">🚪 <span>Logout</span></a></li>
+            <li>
+                <a href="{% url 'profile' %}">
+                    👤 <span>Profile</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="javascript:void(0)" id="logoutConfirmBtn" class="logout">
+                    🚪 <span>Logout</span>
+                </a>
+            </li>
 
         {% else %}
-            <li><a href="{% url 'landing_page' %}">🏠 <span>Home</span></a></li>
+            <li>
+                <a href="{% url 'landing_page' %}">
+                    🏠 <span>Home</span>
+                </a>
+            </li>
         {% endif %}
     </ul>
 </aside>
 
-<!-- Logout Popup -->
+<!-- LOGOUT POPUP -->
 <div id="logoutPopup" class="logout-popup">
     <div class="logout-box">
         <p>Do you want to logout?</p>

@@ -5,11 +5,13 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)
 ![DRF](https://img.shields.io/badge/DRF-3.14-red.svg)
 
-A **production-style Applicant Tracking System (ATS)** built with **Django, MySQL, and Django REST Framework**.  
-Includes **resume parsing, match scoring, HR invite workflow, token authentication, structured logging, secure file handling**, and full role-based access.
+A **production-grade Applicant Tracking System (ATS)** built with **Django, MySQL, and Django REST Framework**. Implements enterprise-style hiring workflows inspired by platforms like Greenhouse, Lever, and Workable.
 
-# 🚀 Smart ATS — Applicant Tracking System
+**Smart ATS** includes resume parsing, automated candidate scoring, strict Role-Based Access Control (RBAC), secure HR invitation system, and dedicated dashboards for Admin & HR.
 
+
+
+## 📸 UI Screenshots (Dashboard & Workflows)
 
 ### ⭐ Public Jobs List
 ![Jobs](screenshots/jobs.png)
@@ -32,10 +34,10 @@ Includes **resume parsing, match scoring, HR invite workflow, token authenticati
 ### 🔍 Parsed Resume + Match Scoring
 ![Parser](screenshots/parser.png)
 
-### 🛠️ HR Jobs list
+### 🛠️ HR Jobs List
 ![HR Jobs](screenshots/hr_jobs.png)
 
----
+
 
 ## 🔐 Demo Login Credentials (Local)
 
@@ -51,9 +53,18 @@ Email: rakijat182@crsay.com
 Password: hrrecuiter@123
 ```
 
----
 
-## 🎯 Key Features (Everything Implemented)
+
+## 🏗️ System Workflow
+
+- **Superadmin** → Creates Admin (via Django Admin)  
+- **Admin** → Invites HR (secure token-only, no open signup)  
+- **HR** → Posts jobs, screens applicants  
+- **Candidates** → Apply without accounts
+
+
+
+## 🎯 Key Features
 
 ### ✔ **Public Job Portal**
 - Browse & filter jobs  
@@ -62,33 +73,43 @@ Password: hrrecuiter@123
 
 ### ✔ **Resume Parsing (PyPDF2)**
 Extracts:
+- Name, Email, Phone  
 - Skills  
 - Experience  
 - Education  
 - Projects  
 - Certifications  
-- Contact details  
 
-### ✔ **Match Scoring Engine**
-Weighted scoring:
-- **Skills — 50%**  
-- **Experience — 30%**  
+**Safe Handling:**
+- Max 5MB file size
+- PDF-only uploads
+- Detects corrupted/encrypted files
+- Sanitized parsing with fallback
+
+### ✔ **Automated Match Scoring**
+Weighted scoring algorithm:
+- **Skills Match — 50%**  
+- **Experience Match — 30%**  
 - **JD Keywords — 20%**
 
-Outputs:
-- Final Score  
+**Outputs:**
+- Final Score (0-100)
 - Category (Strong / Good / Average / Weak)  
-- Summary & evaluation  
+- Detailed Summary & Evaluation  
 
-### ✔ **Role-Based Access**
-- **Superadmin** → Creates Admin  
-- **Admin** → Invites HR users (secure UUID tokens)  
-- **HR** → Job CRUD + Application review  
-- **Candidate** → Public apply  
+### ✔ **Role-Based Access Control (RBAC)**
 
-### ✔ **HR Invite System**
-- Unique UUID signup link  
-- 48-hour expiry  
+| Role          | Key Capabilities                                   | Restrictions                          |
+|---------------|----------------------------------------------------|---------------------------------------|
+| **Superadmin**| Full system control (Django Admin)                | -                                     |
+| **Admin**     | Invite/manage HR, view all data & analytics       | Cannot post jobs or apply             |
+| **HR**        | Create/edit jobs, screen applicants               | Cannot download resumes or invite HR  |
+| **Candidate** | Apply to jobs                                      | No login required                     |
+
+### ✔ **Secure HR Invitation System**
+- UUID token-based signup links
+- 48-hour token expiry
+- Email delivery via SMTP
 - Prevents unauthorized HR accounts  
 
 ### ✔ **Application Workflow**
@@ -97,25 +118,19 @@ Status pipeline:
 Screening → Review → Interview → Hired / Rejected
 ```
 
-### ✔ **Secure File Handling**
-- PDF-only  
-- 5MB limit  
-- Sanitized parsing  
-- Fallback for unreadable files  
+### ✔ **Additional Features**
+- Job postings with required skills, keywords, salary (LPA/Monthly/Negotiable)
+- Duplicate application prevention
+- Rate-limited login (anti-bruteforce)
+- Password strength validation
+- 15-minute password reset expiry
 
-### ✔ **Logging (Production Standard)**
-Rotating logs:
-- `app.log`  
-- `error.log`  
 
-Logs:
-- Login attempts  
-- CRUD activity  
-- Parsing errors  
-
----
 
 ## 🧑‍💻 REST API Endpoints (DRF + Token Auth)
+> APIs are designed to mirror internal service boundaries and support future frontend or microservice expansion.
+
+
 
 ### **Authentication**
 ```
@@ -142,25 +157,32 @@ GET /api/applications/<id>/
 PATCH /api/applications/<id>/status/
 ```
 
----
+
 
 ## 🛠️ Tech Stack
 
 | Component | Technology |
 |-----------|------------|
 | Backend | Django 5.2 |
-| APIs | Django REST Framework |
-| Database | MySQL 8 |
+| APIs | Django REST Framework 3.14 |
+| Database | MySQL 8 (Development), SQLite (Deployed) |
 | Resume Parsing | PyPDF2 |
-| Authentication | DRF TokenAuth |
+| Authentication | DRF Token Authentication |
 | Logging | RotatingFileHandler |
 | Email System | SMTP (Brevo) |
-| Frontend | Django Templates + CSS |
-
-Database: SQLite (deployed), MySQL (development & learning)
+| Frontend | Django Templates + CSS/JS |
 
 
----
+
+## 🔒 Security Highlights
+- CSRF protection
+- Secure token workflows
+- Rate-limited authentication
+- Password strength validation
+- Sanitized file uploads
+- Structured logging (app.log, error.log)
+
+
 
 ## 📂 Project Structure
 
@@ -176,149 +198,60 @@ Smart-ATS/
 ├── templates/          # UI pages
 ├── static/             # CSS / JS / Assets
 ├── logs/               # app.log + error.log
+│
 ├── requirements.txt
-└── manage.py
+├── manage.py
+└── README.md
 ```
 
----
+## 🖥️ UI & Responsiveness (Supporting Layer)
 
-## ⚙️ Installation Guide
+The UI is intentionally kept simple and framework-free to **support backend workflows**, not to showcase frontend design.
 
-### 1️⃣ Clone Repo
+- Server-rendered Django templates
+- Responsive layout for basic mobile usability
+- Sidebar-based navigation for role-specific dashboards
+- Focus on data flow, forms, and system interaction
+
+> The primary focus of this project is **backend architecture, security, and workflow automation**.
+
+
+
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone Repository
 ```bash
 git clone https://github.com/SagarDhok/Smart_ATS.git
 cd Smart_ATS/backend
 ```
 
-### 2️⃣ Setup Virtual Environment
+### 2️⃣ Create Virtual Environment
 ```bash
 python -m venv env
-env\Scripts\activate        # Windows
-source env/bin/activate     # Mac/Linux
+```
+
+**Activate environment:**
+
+Windows:
+```bash
+env\Scripts\activate
+```
+
+macOS/Linux:
+```bash
+source env/bin/activate
 ```
 
 ### 3️⃣ Install Dependencies
 ```bash
-=======
-**Smart ATS** is a production-grade Applicant Tracking System built with Django. It features enterprise-level workflows inspired by platforms like Greenhouse, Lever, and Workable.
-
-Key highlights:  
-- Resume parsing with PyPDF2  
-- Automated candidate scoring  
-- Strict Role-Based Access Control (RBAC)  
-- Secure HR invitation system  
-- Dedicated dashboards for Admin & HR  
-
-Perfect for showcasing real-world Django backend architecture.
-
-## 🚀 Demo Accounts (Run Locally)
-
-### Admin
-- **Email**: `admin@demo.com`  
-- **Password**: `admin@123`
-
-### HR Recruiter
-- **Email**: `rakijat182@crsay.com`  
-- **Password**: `hrrecuiter@123`
-
-> **Test Secure Invite Flow**: Log in as Admin → Invite HR → Use any email (or temp mail) to receive the tokenized signup link.
-
-## 🏗️ System Workflow
-
-- **Superadmin** → Creates Admin (via Django Admin)  
-- **Admin** → Invites HR (secure token-only, no open signup)  
-- **HR** → Posts jobs, screens applicants  
-- **Candidates** → Apply without accounts
-
-## 🔥 Key Features
-
-### Resume Parsing (PyPDF2)
-- Extracts: Name, Email, Phone, Skills, Experience, Projects, Education, Certifications
-- Safe handling: Max 5MB, PDF-only, detects corrupted/encrypted files
-
-### Automated Scoring
-- **50%** Skills Match  
-- **30%** Experience Match  
-- **20%** JD Keywords  
-- Outputs: Score, Summary, Evaluation, Fit Category (Strong / Good / Average / Weak)
-
-### Role-Based Access Control
-| Role          | Key Capabilities                                   | Restrictions                          |
-|---------------|----------------------------------------------------|---------------------------------------|
-| **Superadmin**| Full system control (Django Admin)                | -                                     |
-| **Admin**     | Invite/manage HR, view all data & analytics       | Cannot post jobs or apply             |
-| **HR**        | Create/edit jobs, screen applicants               | Cannot download resumes or invite HR  |
-| **Candidate** | Apply to jobs                                      | No login required                     |
-
-### Secure HR Invitation System
-- UUID token-based signup
-- 48-hour token expiry
-- Delivered via email
-
-### Other Features
-- Job postings with required skills, keywords, salary (LPA/Monthly/Negotiable)
-- Application status pipeline: Screening → Review → Interview → Hired → Rejected
-- Sanitized & secure PDF uploads
-- Duplicate application prevention
-
-## 🔒 Security Highlights
-- Rate-limited login (anti-bruteforce)
-- CSRF protection
-- Secure token workflows
-- Password strength validation
-- 15-minute password reset expiry
-
-## 🛠️ Tech Stack
-- **Backend**: Django
-- **Database**: MySQL
-- **Parsing**: PyPDF2
-- **Frontend**: HTML/CSS/JavaScript (Django templates)
-- **Email**: SMTP (Brevo recommended)
-- **Auth**: Email-based with token security
-
-## 📂 Project Structure
-Smart-ATS/
-│
-├── applications/        # Parsing, scoring, models
-├── jobs/                # Job CRUD operations
-├── users/               # Authentication, RBAC, invite flow
-│
-├── templates/           # HTML UI templates
-├── static/              # CSS, JS, images
-│
-├── core/                # Settings, URLs
-│
-├── requirements.txt
-└── README.md
-
-⚙️ Installation & Setup
-1️⃣ Clone Repository
-git clone https://github.com/SagarDhok/Smart_ATS.git
-cd Smart_ATS/backend
-
-2️⃣ Create Virtual Environment
-python -m venv env
-
-
-Activate environment:
-Windows:
-env\Scripts\activate
-
-macOS/Linux:
-source env/bin/activate
-
-3️⃣ Install Dependencies
 pip install -r requirements.txt
 ```
 
+### 4️⃣ Create `.env` File
+Create a file named `.env` in the root directory:
 
-### ### 4️⃣ Create `.env` File
 ```ini
-SECRET_KEY=your-secret
-
-4️⃣ Create .env File
-Create a file named .env and paste:
-
 SECRET_KEY=your-secret-key
 DB_NAME=smart_ats
 DB_USER=root
@@ -333,16 +266,25 @@ DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
-### 5️⃣ Run Migrations
+### 5️⃣ Apply Migrations
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6️⃣ Start Server
+### 6️⃣ Start Development Server
 ```bash
 python manage.py runserver
 ```
-Open → http://127.0.0.1:8000
+
+**Visit:** 👉 http://127.0.0.1:8000
+
+
+
+## 💡 Testing the System
+
+> **Test Secure Invite Flow**: Log in as Admin → Invite HR → Use any email (or temp mail) to receive the tokenized signup link.
+
 
 
 ## 👨‍💻 Developer
@@ -350,31 +292,24 @@ Open → http://127.0.0.1:8000
 **Sagar Dhok**  
 Backend Developer (Python • Django • REST APIs • MySQL)
 
-- GitHub: [https://github.com/SagarDhok](https://github.com/SagarDhok)
-- LinkedIn: [https://linkedin.com/in/sagardhok](https://linkedin.com/in/sagardhok)
-- Email : sdhok041@gmail.com
-⭐ **Like this project? Star it on GitHub!**
+- 🌐 GitHub: [github.com/SagarDhok](https://github.com/SagarDhok)
+- 💼 LinkedIn: [linkedin.com/in/sagardhok](https://linkedin.com/in/sagardhok)
+- 📧 Email: sdhok041@gmail.com
 
-5️⃣ Apply Migrations
-python manage.py makemigrations
-python manage.py migrate
 
-6️⃣ Start Server
-python manage.py runserver
-Visit:
-👉 http://127.0.0.1:8000
 
-🧑‍💻 Author
-Sagar Dhok
-Backend Developer — Python / Django
+## 🎯 Why This Project?
 
-🏁 Conclusion
-Smart ATS is a complete enterprise-grade recruitment platform demonstrating:
-Secure RBAC system
-HR onboarding via token invites
-Resume parsing
-Automated scoring
-Production-ready Django architecture
+This project was built to simulate how real-world ATS platforms handle **secure onboarding, candidate evaluation, and role-based workflows**, rather than focusing on CRUD-only features.
 
-Ideal for backend portfolios and interviews!
-Feel free to ⭐ the repo if you like it.
+
+## 🏁 Conclusion
+
+**Smart ATS** is a complete enterprise-grade recruitment platform demonstrating:
+
+- ✅ Secure RBAC system
+- ✅ HR onboarding via token invites
+- ✅ Intelligent resume parsing
+- ✅ Automated candidate scoring
+- ✅ Production-ready Django architecture
+
