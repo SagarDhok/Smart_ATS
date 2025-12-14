@@ -173,8 +173,10 @@ PATCH /api/applications/<id>/status/
 | APIs | Django REST Framework 3.14 |
 | Frontend | Django Templates + CSS/JS |
 | Authentication | DRF Token Authentication |
-| Database | MySQL 8 (Development), SQLite (Deployed) |
-| Email System | SendGrid Email API (HTTP, SMTP-free) |
+|Database | PostgreSQL (Neon – Production), MySQL (Local)|
+| Email System | SendGrid Email API (HTTP-based, production-safe)|
+
+
 
 
 
