@@ -111,8 +111,10 @@ Weighted scoring algorithm:
 ### ✔ **Secure HR Invitation System**
 - UUID token-based signup links
 - 48-hour token expiry
-- Email delivery via SMTP
-- Prevents unauthorized HR accounts  
+- Email delivery via **Email API (SendGrid HTTP API)**
+- Prevents unauthorized HR accounts
+- SMTP avoided for cloud compatibility (Render Free Tier)
+
 
 ### ✔ **Application Workflow**
 Status pipeline:
@@ -166,13 +168,13 @@ PATCH /api/applications/<id>/status/
 | Component | Technology |
 |-----------|------------|
 | Backend | Django 5.2 |
-| APIs | Django REST Framework 3.14 |
-| Database | MySQL 8 (Development), SQLite (Deployed) |
 | Resume Parsing | PyPDF2 |
-| Authentication | DRF Token Authentication |
 | Logging | RotatingFileHandler |
-| Email System | SMTP (Brevo) |
+| APIs | Django REST Framework 3.14 |
 | Frontend | Django Templates + CSS/JS |
+| Authentication | DRF Token Authentication |
+| Database | MySQL 8 (Development), SQLite (Deployed) |
+| Email System | SendGrid Email API (HTTP, SMTP-free) |
 
 
 
@@ -303,6 +305,11 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 ## 🎯 Why This Project?
 
 This project was built to simulate how real-world ATS platforms handle **secure onboarding, candidate evaluation, and role-based workflows**, rather than focusing on CRUD-only features.
+
+> **Note:** Email delivery uses an HTTP-based Email API instead of SMTP to ensure
+> reliability on cloud platforms with restricted outbound SMTP ports (e.g. Render Free Tier).
+
+
 
 
 ## 🏁 Conclusion
