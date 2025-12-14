@@ -12,6 +12,8 @@ from django.db import IntegrityError
 from django.core.mail import send_mail
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import update_session_auth_hash
+from django.conf import settings
+
 
 # ---------------- LOGGING ----------------
 import logging
@@ -180,32 +182,47 @@ def forgot_password_request(request):
             logger.warning(f"Password reset requested for non-existent email: {email}")
             messages.success(request, "If the email exists, a reset link has been sent.")
             return redirect("forgot_password")
+        
+
+        if PasswordReset.objects.filter(
+            user=user,
+            used=False,
+            expires_at__gt=timezone.now()
+        ).exists():
+            messages.info(request, "A reset link is already active. Please check your email.")
+            return redirect("forgot_password")
 
         token = uuid.uuid4()
+        reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
 
+        # 1️⃣ SEND EMAIL FIRST
+        try:
+            send_mail(
+                subject="Reset Your Smart ATS Password",
+                message=f"""
+        Hello,
+
+        Click the link below to reset your password:
+        {reset_link}
+
+        This link is valid for 15 minutes.
+
+        If you did not request this, please ignore this email.
+        """,
+                from_email=settings.DEFAULT_FROM_EMAIL,  # ✅ FIX
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            logger.error(f"Password reset email failed for {email}: {e}")
+            messages.error(request, "Failed to send reset email. Please try again.")
+            return redirect("forgot_password")
+
+        # 2️⃣ SAVE TOKEN ONLY IF EMAIL SUCCESS
         PasswordReset.objects.create(
             user=user,
             token=token,
             expires_at=timezone.now() + timedelta(minutes=15)
-        )
-
-        reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
-
-        send_mail(
-            subject="Reset Your Smart ATS Password",
-            message=f"""
-Hello,
-
-Click to reset your password:
-{reset_link}
-
-Valid for 15 minutes.
-
-If you did not request this, ignore this email.
-""",
-            from_email=None,
-            recipient_list=[email],
-            fail_silently=False,
         )
 
         logger.info(f"Password reset link sent to {email}")

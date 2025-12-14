@@ -15,6 +15,8 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse, FileResponse
 import logging
 import os
+from django.conf import settings
+
 
 # ---------------- LOGGING ----------------
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 # =================================================================
 @login_required
 def admin_dashboard(request):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized admin dashboard access attempt by {request.user.email}")
         return redirect("login")
 
@@ -70,7 +72,7 @@ def admin_dashboard(request):
 # =================================================================
 @login_required
 def hr_management(request):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized HR management access attempt by {request.user.email}")
         return redirect("login")
 
@@ -99,7 +101,7 @@ def hr_management(request):
 @login_required
 @require_POST
 def suspend_hr(request, user_id):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized HR suspend attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -115,7 +117,7 @@ def suspend_hr(request, user_id):
 @login_required
 @require_POST
 def activate_hr(request, user_id):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized HR activate attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -133,32 +135,32 @@ def activate_hr(request, user_id):
 # =================================================================
 @login_required
 def invite_page(request):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized invite page access by {request.user.email}")
         messages.error(request, "You are not authorized to access the invite page.")
         return redirect("login")
 
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email", "").strip()
 
-        # Duplicate active invite prevention
+        if not email:
+            messages.error(request, "Email is required.")
+            return redirect("invite")
+
+
+        # Prevent duplicate active invites
         if Invite.objects.filter(email=email, used=False, expires_at__gt=timezone.now()).exists():
             logger.warning(f"Duplicate invite attempt for {email}")
-            messages.warning(request, f"Invite already sent to {email} and is still active.")
+            messages.warning(
+                request,
+                f"Invite already sent to {email} and is still active."
+            )
             return redirect("invite")
 
         token = uuid.uuid4()
-
-        Invite.objects.create(
-            email=email,
-            token=token,
-            created_by=request.user,
-            created_by_email=request.user.email,
-            expires_at=timezone.now() + timedelta(hours=48)
-        )
-
         signup_link = request.build_absolute_uri(f"/signup/?token={token}")
 
+        # 1️⃣ SEND EMAIL FIRST
         try:
             send_mail(
                 subject="Your ATS Signup Link",
@@ -167,23 +169,36 @@ Hello,
 
 You have been invited to join the Smart ATS platform as an HR user.
 
+Signup link:
 {signup_link}
 
-Valid for 48 hours.
+This link is valid for 48 hours.
 
 Regards,
 Smart ATS Admin
 """,
-                from_email=None,
+                from_email=settings.DEFAULT_FROM_EMAIL,  
                 recipient_list=[email],
                 fail_silently=False,
             )
         except Exception as e:
             logger.error(f"Invite email failed for {email}: {e}")
-            messages.error(request, "Failed to send invite email. Try again.")
+            messages.error(
+                request,
+                "Email could not be sent. Please check email configuration."
+            )
             return redirect("invite")
 
-        logger.info(f"Invite sent to {email} by {request.user.email}")
+        # 2️⃣ SAVE INVITE ONLY IF EMAIL SUCCESS
+        Invite.objects.create(
+            email=email,
+            token=token,
+            created_by=request.user,
+            created_by_email=request.user.email,
+            expires_at=timezone.now() + timedelta(hours=48)
+        )
+
+        logger.info(f"Invite sent successfully to {email} by {request.user.email}")
         messages.success(request, f"Invite sent successfully to {email}")
         return redirect("invite")
 
@@ -195,7 +210,7 @@ Smart ATS Admin
 # =================================================================
 @login_required
 def admin_job_list(request):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -216,7 +231,7 @@ def admin_job_list(request):
 
 @login_required
 def admin_job_detail(request, id):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -229,7 +244,7 @@ def admin_job_detail(request, id):
 # =================================================================
 @login_required
 def admin_application_list(request):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized application list access by {request.user.email}")
         raise PermissionDenied()
 
@@ -270,7 +285,7 @@ def admin_application_list(request):
 
 @login_required
 def admin_application_detail(request, pk):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized application detail access by {request.user.email}")
         raise PermissionDenied()
 
@@ -280,7 +295,7 @@ def admin_application_detail(request, pk):
 
 @login_required
 def admin_job_applications(request, id):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized job applications access by {request.user.email}")
         raise PermissionDenied()
 
@@ -298,7 +313,7 @@ def admin_job_applications(request, id):
 # =================================================================
 @login_required
 def admin_resume_download(request, pk):
-    if request.user.role not in ["ADMIN", "SuperUser"]:
+    if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized resume download attempt by {request.user.email}")
         raise PermissionDenied()
 
