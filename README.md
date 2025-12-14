@@ -9,6 +9,8 @@ A **production-grade Applicant Tracking System (ATS)** built with **Django, MySQ
 
 **Smart ATS** includes resume parsing, automated candidate scoring, strict Role-Based Access Control (RBAC), secure HR invitation system, and dedicated dashboards for Admin & HR.
 
+### LIVE LINK  : https://smart-ats-v0yf.onrender.com
+
 
 
 ## 📸 UI Screenshots (Dashboard & Workflows)
