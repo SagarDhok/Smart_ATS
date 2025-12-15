@@ -109,6 +109,36 @@ function togglePassword(fieldId, icon) {
         if (icon) icon.classList.remove("active");
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const logoutBtn = document.getElementById("logoutConfirmBtn");
+    const popup = document.getElementById("logoutPopup");
+    const yesBtn = document.getElementById("logoutYes");
+    const noBtn = document.getElementById("logoutNo");
+
+    if (logoutBtn && popup) {
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            popup.style.display = "flex";
+        });
+    }
+
+    if (noBtn) {
+        noBtn.addEventListener("click", () => {
+            popup.style.display = "none";
+        });
+    }
+
+    if (yesBtn) {
+        yesBtn.addEventListener("click", () => {
+            window.location.href = "{% url 'logout_user' %}";
+        });
+    }
+
+});
+
 </script>
 
 </body>
