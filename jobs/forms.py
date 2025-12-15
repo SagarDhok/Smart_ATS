@@ -9,8 +9,16 @@ class JobForm(forms.ModelForm):
     min_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=5)
     max_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=5)
 
-    required_skills = forms.CharField(required=False, help_text="Enter comma separated skills")
-    jd_keywords = forms.CharField(required=False, help_text="Enter comma separated keywords")
+    required_skills = forms.CharField(
+        required=False,
+        help_text="Enter comma separated skills"
+    )
+
+    jd_keywords = forms.CharField(
+        required=False,
+        help_text="Enter comma separated keywords"
+    )
+
 
     class Meta:
         model = Job
@@ -32,6 +40,8 @@ class JobForm(forms.ModelForm):
         # fix browser decimal block
         self.fields["min_salary"].widget.attrs.update({"step": "any"})
         self.fields["max_salary"].widget.attrs.update({"step": "any"})
+
+        
 
         # ----------------------------
         # EDIT MODE INITIAL DATA

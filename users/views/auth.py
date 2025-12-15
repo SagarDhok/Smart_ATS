@@ -57,11 +57,11 @@ def login_page(request):
 
         # Role-based redirect
         if user.role == "ADMIN":
-            messages.success(request, f"Welcome {user.first_name or user.email}")
+            messages.success(request, f"Welcome {user.first_name ,user.last_name or user.email}")
             return redirect("admin_dashboard")
 
         if user.role == "HR":
-            messages.success(request, f"Welcome {user.first_name or user.email}")
+            messages.success(request, f"Welcome {user.first_name , user.last_name or user.email}")
             return redirect("hr_dashboard")
 
         return redirect("/")
