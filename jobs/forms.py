@@ -11,12 +11,12 @@ class JobForm(forms.ModelForm):
 
     required_skills = forms.CharField(
         required=False,
-        help_text="Enter comma separated skills"
+        help_text="Enter comma separated skills. Ex : Python, Django, REST API"
     )
 
     jd_keywords = forms.CharField(
         required=False,
-        help_text="Enter comma separated keywords"
+        help_text="Enter comma separated keywords. Ex : backend, API, automation"
     )
 
 
