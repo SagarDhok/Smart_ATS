@@ -180,6 +180,7 @@ Smart ATS Admin
                 from_email=settings.DEFAULT_FROM_EMAIL,  
                 recipient_list=[email],
                 fail_silently=False,
+                headers={"Reply-To": "sdhok041@gmail.com"},
             )
         except Exception as e:
             logger.error(f"Invite email failed for {email}: {e}")

@@ -57,11 +57,13 @@ def login_page(request):
 
         # Role-based redirect
         if user.role == "ADMIN":
-            messages.success(request, f"Welcome {user.first_name ,user.last_name or user.email}")
+            messages.success(request,   f"Welcome {user.first_name} {user.last_name}".strip()
+                                          if user.first_name else f"Welcome {user.email}")
             return redirect("admin_dashboard")
 
         if user.role == "HR":
-            messages.success(request, f"Welcome {user.first_name , user.last_name or user.email}")
+            messages.success(request,   f"Welcome {user.first_name} {user.last_name}".strip()
+                                          if user.first_name else f"Welcome {user.email}")
             return redirect("hr_dashboard")
 
         return redirect("/")
@@ -212,6 +214,7 @@ def forgot_password_request(request):
                 from_email=settings.DEFAULT_FROM_EMAIL,  # ✅ FIX
                 recipient_list=[email],
                 fail_silently=False,
+                 headers={"Reply-To": "sdhok041@gmail.com"},
             )
         except Exception as e:
             logger.error(f"Password reset email failed for {email}: {e}")

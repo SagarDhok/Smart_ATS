@@ -186,13 +186,13 @@ input:focus, textarea:focus, select:focus {
 
 /* --- ALERT CONTAINER (FIXED POSITIONING) --- */
 .alert-container {
-    position: fixed; 
+    position: fixed;
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
-    top: 15px; 
     max-width: 500px;
-    width: 90%; 
-    z-index: 1000; 
+    width: 90%;
+    z-index: 4000; /* ABOVE sidebar + toggle + popup */
 }
 
 
@@ -236,6 +236,13 @@ input:focus, textarea:focus, select:focus {
     font-weight: 300; 
     cursor: pointer;
     line-height: 1;
+}
+
+
+@media (max-width: 768px) {
+    .alert-container {
+        top: 70px; 
+    }
 }
 
 
@@ -421,7 +428,7 @@ img {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 3000;
 }
 
 .logout-box {
@@ -431,4 +438,23 @@ img {
     max-width: 320px;
     width: 90%;
     text-align: center;
+}
+
+
+
+.logout-box p {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-text-dark);
+}
+
+.logout-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.logout-actions .btn {
+    min-width: 100px;
 }
