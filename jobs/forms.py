@@ -6,8 +6,8 @@ from decimal import Decimal
 class JobForm(forms.ModelForm):
 
     # Allow up to 5 decimal places, browser won't complain
-    min_salary = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
-    max_salary = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
+    min_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=2)
+    max_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=2)
 
     required_skills = forms.CharField(
         required=False,

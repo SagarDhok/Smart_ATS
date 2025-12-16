@@ -61,6 +61,28 @@
     background: #1558b0;
 }
 
+.hrjob-error {
+    color: #dc2626;              /* red-600 */
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+
+.hrjob-field input,
+.hrjob-field select,
+.hrjob-field textarea {
+    border: 1px solid #d1d5db;
+}
+
+.hrjob-field input:has(+ .hrjob-error),
+.hrjob-field select:has(+ .hrjob-error),
+.hrjob-field textarea:has(+ .hrjob-error) {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+
+
 /* ============================= */
 /*   Job List Styling            */
 /* ============================= */
