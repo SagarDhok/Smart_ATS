@@ -111,9 +111,9 @@ Weighted scoring algorithm:
 ### ✔ **Secure HR Invitation System**
 - UUID token-based signup links
 - 48-hour token expiry
-- Email delivery via **Email API (SendGrid HTTP API)**
+- Email delivery via **Gmail SMTP (App Password)**
 - Prevents unauthorized HR accounts
-- SMTP avoided for cloud compatibility (Render Free Tier)
+- Production-safe for low-volume transactional emails
 
 
 ### ✔ **Application Workflow**
@@ -173,8 +173,9 @@ PATCH /api/applications/<id>/status/
 | APIs | Django REST Framework 3.14 |
 | Frontend | Django Templates + CSS/JS |
 | Authentication | DRF Token Authentication |
-|Database | PostgreSQL (Neon – Production), MySQL (Local)|
-| Email System | SendGrid Email API (HTTP-based, production-safe)|
+| Database | PostgreSQL (Neon – Production), MySQL (Local)|
+| Email System | Gmail SMTP (App Password – transactional emails) |
+
 
 
 
@@ -265,8 +266,8 @@ DB_PASSWORD=1234
 DB_HOST=127.0.0.1
 DB_PORT=3306
 
-EMAIL_HOST_USER=your-brevo-email
-EMAIL_HOST_PASSWORD=your-brevo-smtp-key
+EMAIL_HOST_USER=your-gmail-address
+EMAIL_HOST_PASSWORD=your-gmail-app-password
 
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
@@ -308,9 +309,9 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 
 This project was built to simulate how real-world ATS platforms handle **secure onboarding, candidate evaluation, and role-based workflows**, rather than focusing on CRUD-only features.
 
-> **Note:** Email delivery uses an HTTP-based Email API instead of SMTP to ensure
-> reliability on cloud platforms with restricted outbound SMTP ports (e.g. Render Free Tier).
-
+> **Note:** Email delivery uses Gmail SMTP with App Password authentication.
+> This approach is reliable for low-volume transactional emails (invites, password resets).
+> In large-scale production systems, this can be replaced with SES / Resend / SendGrid.
 
 
 

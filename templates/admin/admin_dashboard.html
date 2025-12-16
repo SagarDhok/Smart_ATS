@@ -71,7 +71,7 @@
                 <tr>
                     <td>{{ hr.first_name }} {{ hr.last_name }}</td>
                     <td>{{ hr.email }}</td>
-                    <td>{{ hr.created_at|date:"Y-m-d H:i" }}</td>
+                   <td>{{ hr.created_at|date:"d M Y, h:i A" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -128,8 +128,8 @@
                 {% for inv in pending_invites_page %}
                 <tr>
                     <td>{{ inv.email }}</td>
-                    <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
-                    <td>{{ inv.expires_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ inv.created_at|date:"d M Y, h:i A" }}</td>
+                    <td>{{ inv.expires_at|date:"d M Y, h:i A"}}</td>
                 </tr>
                 {% empty %}
                 <tr>

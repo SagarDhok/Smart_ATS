@@ -36,7 +36,7 @@
                     <span class="count-pill" style="font-weight:700;">{{ app.match_score }}%</span>
                 </td>
         <td>{{ app.status|title }}</td>
-        <td>{{ app.applied_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ app.applied_at|date:"d M Y, h:i A" }}</td>
       </tr>
 
       {% empty %}
