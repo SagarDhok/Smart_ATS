@@ -7,7 +7,6 @@ import uuid
 from jobs.models import Job
 from applications.models import Application
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -147,9 +146,12 @@ def invite_page(request):
             messages.error(request, "Email is required.")
             return redirect("invite")
 
-
         # Prevent duplicate active invites
-        if Invite.objects.filter(email=email, used=False, expires_at__gt=timezone.now()).exists():
+        if Invite.objects.filter(
+            email=email,
+            used=False,
+            expires_at__gt=timezone.now()
+        ).exists():
             logger.warning(f"Duplicate invite attempt for {email}")
             messages.warning(
                 request,
@@ -160,34 +162,32 @@ def invite_page(request):
         token = uuid.uuid4()
         signup_link = request.build_absolute_uri(f"/signup/?token={token}")
 
-        # 1️⃣ SEND EMAIL FIRST
-        try:
-            send_mail(
-                subject="Your ATS Signup Link",
-                message=f"""
-Hello,
+        # 1️⃣ SEND EMAIL FIRST (RESEND)
+        from core.utils.email import send_resend_email
 
-You have been invited to join the Smart ATS platform as an HR user.
+        email_sent = send_resend_email(
+            to_email=email,
+            subject="Your Smart ATS Signup Link",
+            html_content=f"""
+                <p>Hello,</p>
 
-Signup link:
-{signup_link}
+                <p>You have been invited to join <strong>Smart ATS</strong> as an HR user.</p>
 
-This link is valid for 48 hours.
+                <p>
+                    <a href="{signup_link}">
+                        Click here to create your account
+                    </a>
+                </p>
 
-Regards,
-Smart ATS Admin
-""",
-                from_email=settings.DEFAULT_FROM_EMAIL,  
-                recipient_list=[email],
-                fail_silently=False,
-                headers={"Reply-To": "sdhok041@gmail.com"},
-            )
-        except Exception as e:
-            logger.error(f"Invite email failed for {email}: {e}")
-            messages.error(
-                request,
-                "Email could not be sent. Please check email configuration."
-            )
+                <p>This link is valid for <strong>48 hours</strong>.</p>
+
+                <p>— Smart ATS Admin</p>
+            """
+        )
+
+        if not email_sent:
+            logger.error(f"Invite email failed for {email}")
+            messages.error(request, "Email could not be sent. Please try again later.")
             return redirect("invite")
 
         # 2️⃣ SAVE INVITE ONLY IF EMAIL SUCCESS

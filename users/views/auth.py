@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.core.mail import send_mail
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
@@ -184,7 +183,6 @@ def forgot_password_request(request):
             logger.warning(f"Password reset requested for non-existent email: {email}")
             messages.success(request, "If the email exists, a reset link has been sent.")
             return redirect("forgot_password")
-        
 
         if PasswordReset.objects.filter(
             user=user,
@@ -197,27 +195,31 @@ def forgot_password_request(request):
         token = uuid.uuid4()
         reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
 
-        # 1️⃣ SEND EMAIL FIRST
-        try:
-            send_mail(
-                subject="Reset Your Smart ATS Password",
-                message=f"""
-        Hello,
+        # 1️⃣ SEND EMAIL FIRST (RESEND)
+        from core.utils.email import send_resend_email
 
-        Click the link below to reset your password:
-        {reset_link}
+        email_sent = send_resend_email(
+            to_email=email,
+            subject="Reset Your Smart ATS Password",
+            html_content=f"""
+                <p>Hello,</p>
 
-        This link is valid for 15 minutes.
+                <p>Click the link below to reset your password:</p>
 
-        If you did not request this, please ignore this email.
-        """,
-                from_email=settings.DEFAULT_FROM_EMAIL,  # ✅ FIX
-                recipient_list=[email],
-                fail_silently=False,
-                 headers={"Reply-To": "sdhok041@gmail.com"},
-            )
-        except Exception as e:
-            logger.error(f"Password reset email failed for {email}: {e}")
+                <p>
+                    <a href="{reset_link}">
+                        Reset Password
+                    </a>
+                </p>
+
+                <p>This link is valid for <strong>15 minutes</strong>.</p>
+
+                <p>If you did not request this, please ignore this email.</p>
+            """
+        )
+
+        if not email_sent:
+            logger.error(f"Password reset email failed for {email}")
             messages.error(request, "Failed to send reset email. Please try again.")
             return redirect("forgot_password")
 
@@ -233,7 +235,6 @@ def forgot_password_request(request):
         return redirect("forgot_password")
 
     return render(request, "auth/forgot_password.html")
-
 
 # ---------------- RESET PASSWORD ----------------
 def reset_password_page(request):
