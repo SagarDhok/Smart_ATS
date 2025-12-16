@@ -12,6 +12,7 @@ from django.db import IntegrityError
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
+from core.utils.email import send_brevo_email
 
 
 # ---------------- LOGGING ----------------
@@ -195,10 +196,9 @@ def forgot_password_request(request):
         token = uuid.uuid4()
         reset_link = request.build_absolute_uri(f"/reset-password/?token={token}")
 
-        # 1️⃣ SEND EMAIL FIRST (RESEND)
-        from core.utils.email import send_resend_email
 
-        email_sent = send_resend_email(
+
+        email_sent = send_brevo_email(
             to_email=email,
             subject="Reset Your Smart ATS Password",
             html_content=f"""

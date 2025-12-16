@@ -15,6 +15,8 @@ from django.http import JsonResponse, FileResponse
 import logging
 import os
 from django.conf import settings
+from core.utils.email import send_brevo_email
+
 
 
 # ---------------- LOGGING ----------------
@@ -163,9 +165,8 @@ def invite_page(request):
         signup_link = request.build_absolute_uri(f"/signup/?token={token}")
 
         # 1️⃣ SEND EMAIL FIRST (RESEND)
-        from core.utils.email import send_resend_email
 
-        email_sent = send_resend_email(
+        email_sent = send_brevo_email(
             to_email=email,
             subject="Your Smart ATS Signup Link",
             html_content=f"""
