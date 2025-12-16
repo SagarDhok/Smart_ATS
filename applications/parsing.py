@@ -9,62 +9,116 @@ logger = logging.getLogger(__name__)
 # =====================================================================
 # SKILL DATABASE (COMPLETE + DART/FLUTTER ADDED)
 # =====================================================================
-
 SKILL_DB = {
-    # Mobile Development
-    "dart": ["flutter dart"],
-    "flutter": ["flutter sdk", "flutter framework"],
 
+    # =========================
     # Programming Languages
+    # =========================
     "python": ["py"],
     "java": [],
     "javascript": ["js"],
     "typescript": ["ts"],
+    "go": ["golang"],
     "c": [],
     "c++": ["cpp"],
     "c#": ["csharp"],
-    "go": ["golang"],
-    "rust": [],
     "php": [],
     "ruby": [],
     "kotlin": [],
     "swift": [],
 
-    # Frameworks
+    # =========================
+    # Backend Frameworks
+    # =========================
+    "django": ["django framework"],
+    "django rest framework": ["drf", "django rest", "rest framework"],
+    "flask": [],
+    "fastapi": [],
+    "spring boot": ["springboot"],
+    "nodejs": ["node", "node.js", "express"],
+    "express": ["expressjs"],
+    "nestjs": ["nest js"],
+
+    # =========================
+    # Frontend (lightweight)
+    # =========================
     "react": [],
     "angular": [],
     "vue": [],
-    "django": ["drf", "django rest", "rest framework"],
-    "flask": [],
-    "fastapi": [],
+    "nextjs": ["next.js"],
+    "html": [],
+    "css": [],
 
+    # =========================
     # Databases
-    "mysql": ["sql"],
+    # =========================
     "postgresql": ["postgres"],
+    "mysql": ["mysql database"],
+
     "mongodb": ["mongo"],
     "redis": [],
+    "sqlite": [],
+    "elasticsearch": ["elastic search"],
+    "dynamodb": [],
 
-    # DevOps
+    # =========================
+    # API & Backend Concepts
+    # =========================
+    "rest apis": ["rest api", "api"],
+    "graphql": [],
+    "microservices": ["microservice"],
+    "authentication": ["auth", "authorization"],
+    "authorization": ["rbac", "abac"],
+    "jwt": ["json web token"],
+    "oauth": ["oauth2"],
+    "rbac": ["role based access"],
+    "api security": ["rate limiting", "throttling"],
+    "websockets": ["socket.io"],
+    "background jobs": ["celery", "rq"],
+    "message queues": ["rabbitmq", "kafka"],
+    "caching": ["cache", "redis cache"],
+
+    # =========================
+    # DevOps / Infra
+    # =========================
     "git": [],
     "github": [],
+    "gitlab": [],
     "docker": [],
     "kubernetes": ["k8s"],
     "aws": ["amazon web services"],
-    "ci/cd": ["cicd"],
+    "gcp": ["google cloud"],
+    "azure": [],
+    "ci/cd": ["cicd", "continuous integration"],
     "jenkins": [],
-
-    # API / Backend Concepts
-    "rest apis": ["rest api", "api"],
-    "restapi": ["rest api", "restapis"],
-    "graphql": [],
-    "microservices": [],
-    "jwt": [],
-
-    # Tools
-    "postman": [],
-    "swagger": [],
-    "jira": [],
+    "github actions": [],
+    "terraform": [],
+    "nginx": [],
     "linux": [],
+
+    # =========================
+    # Testing & Quality
+    # =========================
+    "unit testing": ["unittest"],
+    "pytest": [],
+    "integration testing": [],
+    "test automation": [],
+
+    # =========================
+    # Observability & Security
+    # =========================
+    "logging": ["log monitoring"],
+    "monitoring": ["prometheus", "grafana"],
+    "error tracking": ["sentry"],
+    "security best practices": ["owasp"],
+
+    # =========================
+    # Tools
+    # =========================
+    "postman": [],
+    "swagger": ["openapi"],
+    "jira": [],
+    "confluence": [],
 }
 
 
@@ -134,16 +188,20 @@ def extract_phone(text):
 
 def extract_experience(text):
     patterns = [
-        r"(\d+)\+?\s*years",
-        r"(\d+)\s*yrs",
-        r"(\d+)\s*yr",
+        r"(\d+(?:\.\d+)?)\s*\+?\s*years?",
+        r"(\d+(?:\.\d+)?)\s*yrs?",
+        r"(\d+(?:\.\d+)?)\s*yr",
     ]
+
     for p in patterns:
         m = re.search(p, text)
         if m:
-            y = int(m.group(1))
-            if 0 < y <= 40:
-                return y
+            try:
+                y = float(m.group(1))
+                if 0 < y <= 40:
+                    return round(y, 2)
+            except ValueError:
+                pass
 
     m = re.search(r"(\d+)\s*months?", text)
     if m:
@@ -159,7 +217,7 @@ def extract_skills(text):
     for skill, synonyms in SKILL_DB.items():
         all_terms = [skill] + synonyms
         for term in all_terms:
-            if term.lower() in text:
+            if re.search(rf"\b{re.escape(term.lower())}\b", text):
                 found.add(skill)
                 break
     return list(found)
@@ -169,7 +227,7 @@ def extract_keywords(text, jd_keywords):
     jd = normalize(jd_keywords)
     found = []
     for w in jd:
-        if w in text:
+        if re.search(rf"\b{re.escape(w)}\b", text):
             found.append(w)
     return list(set(found))
 

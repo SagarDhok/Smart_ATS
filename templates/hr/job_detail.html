@@ -24,6 +24,8 @@
 <p><strong>Status:</strong> {{ job.status }}</p>
 <p><strong>Deadline:</strong> {{ job.deadline }}</p>
 <p><strong>Vacancies:</strong> {{ job.vacancies }}</p>
+<p><strong>Deadline:</strong> {{ job.deadline|date:"d M Y"|default:"Not specified" }}</p>
+
 
 <a href="{% url 'edit_job' job.slug %}" class="btn btn-warning">Edit Job</a>
 

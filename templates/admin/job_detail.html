@@ -80,6 +80,14 @@
        {{job.required_education|default:"Not specified" }}
     </div>
 
+    <div class="job-info-item">
+    <strong>Deadline:</strong>
+    <span>
+        {{ job.deadline|date:"d M Y"|default:"Not specified" }}
+    </span>
+</div>
+
+
     <!-- APPLICATIONS -->
     <div class="job-section">
         <h3>Applications ({{ job.applications.count }})</h3>
