@@ -111,9 +111,10 @@ Weighted scoring algorithm:
 ### ✔ **Secure HR Invitation System**
 - UUID token-based signup links
 - 48-hour token expiry
-- Email delivery via **Gmail SMTP (App Password)**
+- Email delivery via **Brevo Email API (HTTP-based)**
 - Prevents unauthorized HR accounts
-- Production-safe for low-volume transactional emails
+- Reliable delivery on cloud platforms (Render-compatible)
+- High inbox placement for transactional emails
 
 
 ### ✔ **Application Workflow**
@@ -174,7 +175,8 @@ PATCH /api/applications/<id>/status/
 | Frontend | Django Templates + CSS/JS |
 | Authentication | DRF Token Authentication |
 | Database | PostgreSQL (Neon – Production), MySQL (Local)|
-| Email System | Gmail SMTP (App Password – transactional emails) |
+| Email System | Brevo Email API (HTTP-based, production-safe) |
+
 
 
 
@@ -309,9 +311,12 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 
 This project was built to simulate how real-world ATS platforms handle **secure onboarding, candidate evaluation, and role-based workflows**, rather than focusing on CRUD-only features.
 
-> **Note:** Email delivery uses Gmail SMTP with App Password authentication.
-> This approach is reliable for low-volume transactional emails (invites, password resets).
-> In large-scale production systems, this can be replaced with SES / Resend / SendGrid.
+> **Note:** Email delivery is implemented using **Brevo’s HTTP Email API**
+> instead of SMTP to ensure reliable delivery on cloud platforms like Render,
+> where outbound SMTP is restricted or unreliable.
+>
+> This mirrors real-world production setups used for transactional emails
+> such as HR invites and password resets.
 
 
 

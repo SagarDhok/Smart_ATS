@@ -6,8 +6,8 @@ from decimal import Decimal
 class JobForm(forms.ModelForm):
 
     # Allow up to 5 decimal places, browser won't complain
-    min_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=5)
-    max_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=5)
+    min_salary = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
+    max_salary = forms.DecimalField(required=False, max_digits=6, decimal_places=2)
 
     required_skills = forms.CharField(
         required=False,
@@ -38,8 +38,9 @@ class JobForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # fix browser decimal block
-        self.fields["min_salary"].widget.attrs.update({"step": "any"})
-        self.fields["max_salary"].widget.attrs.update({"step": "any"})
+        self.fields["min_salary"].widget.attrs.update({"step": "0.01"})
+        self.fields["max_salary"].widget.attrs.update({"step": "0.01"})
+
 
         
 
@@ -97,10 +98,15 @@ class JobForm(forms.ModelForm):
         if job.salary_type == "yearly":
 
             if job.min_salary is not None and job.min_salary < 1000:
-                job.min_salary = (Decimal(job.min_salary) * Decimal("100000")).quantize(Decimal("1"))
+                job.min_salary = (
+                    Decimal(job.min_salary) * Decimal("100000")
+                ).quantize(Decimal("0.01"))
 
             if job.max_salary is not None and job.max_salary < 1000:
-                job.max_salary = (Decimal(job.max_salary) * Decimal("100000")).quantize(Decimal("1"))
+                job.max_salary = (
+                    Decimal(job.max_salary) * Decimal("100000")
+                ).quantize(Decimal("0.01"))
+
 
         if commit:
             job.save()
@@ -120,7 +126,10 @@ class JobForm(forms.ModelForm):
         # yearly limits
         if salary_type == "yearly":
             for val in [min_salary, max_salary]:
-                if val not in [None, ""] and float(val) > 100:
-                    raise forms.ValidationError("Yearly salary must be entered in LPA (0–100).")
+               if val is not None and val > Decimal("100"):
+                    raise forms.ValidationError(
+                        "Yearly salary must be entered in LPA (0–100)."
+                    )
+
 
         return cleaned

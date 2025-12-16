@@ -101,7 +101,8 @@ class Job(models.Model):
         # Convert INR → LPA string
         def format_lpa(amount):
             lpa = Decimal(amount) / Decimal("100000")
-            return f"{lpa.normalize()} LPA"
+            return f"{lpa:.2f}".rstrip("0").rstrip(".") + " LPA"
+
 
         def format_month(amount):
             return f"₹{int(amount):,}/month"
