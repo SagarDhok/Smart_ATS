@@ -42,7 +42,19 @@ INSTALLED_APPS = [
     "jobs",
     "applications",
     "api",
+    "cloudinary",
+    "cloudinary_storage",
 ]
+
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+}
+
 
 # -------------------------------------------------------------------
 # MIDDLEWARE
@@ -134,11 +146,6 @@ STATICFILES_DIRS = [
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# -------------------------------------------------------------------
-# MEDIA (Ephemeral on Render – acceptable for demo)
-# -------------------------------------------------------------------
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # -------------------------------------------------------------------
 # EMAIL
@@ -181,3 +188,5 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+

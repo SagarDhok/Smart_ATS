@@ -174,6 +174,7 @@ PATCH /api/applications/<id>/status/
 | APIs | Django REST Framework 3.14 |
 | Frontend | Django Templates + CSS/JS |
 | Authentication | DRF Token Authentication |
+| File Storage | Cloudinary (Object Storage) |
 | Database | PostgreSQL (Neon – Production), MySQL (Local)|
 | Email System | Brevo Email API (HTTP-based, production-safe) |
 
@@ -223,6 +224,33 @@ The UI is intentionally kept simple and framework-free to **support backend work
 - Focus on data flow, forms, and system interaction
 
 > The primary focus of this project is **backend architecture, security, and workflow automation**.
+
+
+
+## 📦 File Storage & Media Handling
+
+Resume files are stored using **Cloudinary Cloud Storage** instead of the application server filesystem.
+
+### Why Cloudinary?
+- Cloud platforms like **Render (Free Tier)** use **ephemeral filesystems**
+- Uploaded files do not persist across redeploys or restarts
+- To ensure **reliable and persistent resume storage**, Cloudinary is used
+
+### How it works
+- Resume uploads are sent directly to Cloudinary
+- Django stores only the file reference (URL)
+- Resume preview & download are served via Cloudinary CDN URLs
+- No dependency on local or server-side storage
+
+### Benefits
+- Persistent file storage (no data loss)
+- CDN-backed fast resume access
+- Works reliably on free cloud infrastructure
+- Easily replaceable with AWS S3 in production
+
+> This mirrors real-world production systems where user-uploaded files
+> are stored in object storage rather than application servers.
+
 
 
 

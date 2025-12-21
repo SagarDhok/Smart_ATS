@@ -7,6 +7,9 @@ from jobs.models import Job
 from django.db.models import Q
 import logging
 import os
+from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -130,45 +133,38 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         form.save()
         return redirect("hr_application_detail", pk=self.object.pk)
+    
 
-
-# ------------------------------
-# PDF PREVIEW
-# ------------------------------
+@login_required
 def preview_resume(request, pk):
     app = get_object_or_404(
-        Application, pk=pk,
+        Application,
+        pk=pk,
         job__created_by=request.user,
         job__is_deleted=False
     )
 
-    file_path = app.resume.path
-
-    if not os.path.exists(file_path):
-        logger.error(f"Resume preview failed (file missing): {app.email}, path={file_path}")
+    if not app.resume:
+        logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
-    response = FileResponse(open(file_path, "rb"), content_type="application/pdf")
-    response["Content-Disposition"] = f'inline; filename="{app.resume.name}"'
-    return response
+    return redirect(app.resume.url)
 
 
 # ------------------------------
-# PDF DOWNLOAD
+# PDF DOWNLOAD (CLOUDINARY)
 # ------------------------------
+@login_required
 def download_resume(request, pk):
     app = get_object_or_404(
-        Application, pk=pk,
+        Application,
+        pk=pk,
         job__created_by=request.user,
         job__is_deleted=False
     )
 
-    file_path = app.resume.path
-
-    if not os.path.exists(file_path):
-        logger.error(f"Resume download failed (file missing): {app.email}, path={file_path}")
+    if not app.resume:
+        logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
-    response = FileResponse(open(file_path, "rb"), as_attachment=True)
-    response["Content-Disposition"] = f'attachment; filename="{app.resume.name}"'
-    return response
+    return redirect(app.resume.url)

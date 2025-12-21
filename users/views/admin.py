@@ -316,20 +316,16 @@ def admin_job_applications(request, id):
 @login_required
 def admin_resume_download(request, pk):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(f"Unauthorized resume download attempt by {request.user.email}")
+        logger.warning(
+            f"Unauthorized resume download attempt by {request.user.email}"
+        )
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
 
-    if not os.path.exists(app.resume.path):
-        logger.error(
-            f"Resume file missing on disk: applicant={app.email}, file={app.resume.path}"
-        )
-        messages.error(request, "Resume file not found on server.")
+    if not app.resume:
+        logger.error(f"Resume missing for applicant: {app.email}")
+        messages.error(request, "Resume not found.")
         return redirect("admin_application_detail", pk=pk)
 
-    return FileResponse(
-        open(app.resume.path, "rb"),
-        as_attachment=True,
-        filename=os.path.basename(app.resume.name)
-    )
+    return redirect(app.resume.url)
