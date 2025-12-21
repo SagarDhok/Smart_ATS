@@ -2,6 +2,7 @@ from django.db import models
 from jobs.models import Job
 import os
 from django.utils.text import slugify
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 
 
@@ -66,3 +67,11 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.job.title}"
+
+
+
+
+    resume = models.FileField(
+        upload_to="resumes/",
+        storage=RawMediaCloudinaryStorage()
+    )

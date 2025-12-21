@@ -16,19 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.conf.urls.static import static
-from django.conf import settings
-
-from users.views.public import landing_page    # CORRECT IMPORT
+from users.views.public import landing_page
 
 urlpatterns = [
     path("", landing_page, name="landing_page"),
 
     path("admin/", admin.site.urls),
 
-    path("", include("users.urls")),
+    path("users/", include("users.urls")),
     path("jobs/", include("jobs.urls")),
     path("applications/", include("applications.urls")),
     path("api/", include("api.urls")),
 ]
+
 
