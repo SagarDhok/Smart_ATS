@@ -141,6 +141,29 @@ else:
         }
     }
 
+
+
+# -------------------------------------------------------------------
+# CACHE (Required for django-ratelimit)
+# -------------------------------------------------------------------
+if ENVIRONMENT == "production":
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": os.getenv("REDIS_URL"),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+
+
 # -------------------------------------------------------------------
 # AUTH
 # -------------------------------------------------------------------
