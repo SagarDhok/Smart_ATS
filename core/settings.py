@@ -7,7 +7,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+# -------------------------------------------------------------------
+# ENV
+# -------------------------------------------------------------------
 load_dotenv()
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 # -------------------------------------------------------------------
 # BASE DIR
@@ -18,11 +22,14 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 # -------------------------------------------------------------------
 # SECURITY
 # -------------------------------------------------------------------
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.getenv("SECRET_KEY", "insecure-local-secret-key")
 
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = ENVIRONMENT != "production"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+if ENVIRONMENT == "production":
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+else:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # -------------------------------------------------------------------
 # APPLICATIONS
@@ -42,19 +49,27 @@ INSTALLED_APPS = [
     "jobs",
     "applications",
     "api",
+
     "cloudinary",
     "cloudinary_storage",
 ]
 
+# ✅ ratelimit ONLY in production
+if ENVIRONMENT == "production":
+    INSTALLED_APPS += ["django_ratelimit"]
 
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
-    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
-}
-
+# -------------------------------------------------------------------
+# FILE STORAGE
+# -------------------------------------------------------------------
+if ENVIRONMENT == "production":
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    CLOUDINARY_STORAGE = {
+        "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+        "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+        "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+    }
+else:
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 # -------------------------------------------------------------------
 # MIDDLEWARE
@@ -71,6 +86,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# ✅ ratelimit middleware ONLY in production
+if ENVIRONMENT == "production":
+    MIDDLEWARE += ["django_ratelimit.middleware.RatelimitMiddleware"]
+    RATELIMIT_ENABLE = True
+else:
+    RATELIMIT_ENABLE = False
 
 ROOT_URLCONF = "core.urls"
 
@@ -96,22 +118,28 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # -------------------------------------------------------------------
-# DATABASE (Neon PostgreSQL)
+# DATABASE
 # -------------------------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": "5432",
-        "CONN_MAX_AGE": 60,
-        "OPTIONS": {
-            "sslmode": "require",
-        },
+if ENVIRONMENT == "production":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": "5432",
+            "CONN_MAX_AGE": 60,
+            "OPTIONS": {"sslmode": "require"},
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # -------------------------------------------------------------------
 # AUTH
@@ -140,18 +168,13 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
 # -------------------------------------------------------------------
-# EMAIL
+# EMAIL (BREVO)
 # -------------------------------------------------------------------
-
-# EMAIL (BREVO API)
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
@@ -173,20 +196,16 @@ REST_FRAMEWORK = {
 CSRF_FAILURE_VIEW = "core.views.custom_csrf_failure"
 
 # -------------------------------------------------------------------
-# LOGGING (Render-friendly)
+# LOGGING
 # -------------------------------------------------------------------
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
+        "console": {"class": "logging.StreamHandler"},
     },
     "root": {
         "handlers": ["console"],
         "level": "INFO",
     },
 }
-
-
