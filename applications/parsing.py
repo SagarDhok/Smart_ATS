@@ -317,17 +317,14 @@ def parse_resume(file_path, job=None):
     try:
         text = extract_text_from_pdf(file_path)
 
-        # ✅ ADD THIS
         if not text:
             raise ValueError("Empty resume text")
-
-        text = text
 
     except Exception as e:
         logger.error(
             f"Resume parsing crashed for file: {file_path} | error={e}"
         )
-        raise  # IMPORTANT: let view catch it
+        raise
 
     return {
         "name": extract_name(text),
