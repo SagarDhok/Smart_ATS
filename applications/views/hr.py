@@ -135,6 +135,11 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
         return redirect("hr_application_detail", pk=self.object.pk)
     
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 @login_required
 def preview_resume(request, pk):
     app = get_object_or_404(
@@ -148,12 +153,10 @@ def preview_resume(request, pk):
         logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
+    # 👀 PREVIEW
     return redirect(app.resume.url)
 
 
-# ------------------------------
-# PDF DOWNLOAD (CLOUDINARY)
-# ------------------------------
 @login_required
 def download_resume(request, pk):
     app = get_object_or_404(
@@ -167,4 +170,7 @@ def download_resume(request, pk):
         logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
-    return redirect(app.resume.url)
+    # ⬇️ FORCE DOWNLOAD
+    return redirect(
+        f"{app.resume.url}?response-content-disposition=attachment"
+    )
