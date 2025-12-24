@@ -2,7 +2,6 @@ from django.db import models
 from jobs.models import Job
 from django.utils.text import slugify
 import os
-from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 STATUS_CHOICES = [
     ("screening", "Screening"),
@@ -24,11 +23,8 @@ class Application(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
-    # ✅ CLOUDINARY RAW STORAGE (CORRECT)
-    resume = models.FileField(
-        upload_to=resume_upload_path,
-        storage=RawMediaCloudinaryStorage()
-    )
+    # ✅ STORAGE ONLY FROM settings.py
+    resume = models.FileField(upload_to=resume_upload_path)
 
     parsed_name = models.CharField(max_length=255, blank=True, null=True)
     parsed_email = models.EmailField(blank=True, null=True)
@@ -56,6 +52,3 @@ class Application(models.Model):
 
     class Meta:
         unique_together = ("job", "email")
-
-    def __str__(self):
-        return f"{self.full_name} - {self.job.title}"
