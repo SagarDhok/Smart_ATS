@@ -79,6 +79,12 @@ def apply_job(request, slug):
 
             # 4️⃣ SAVE TO DB + CLOUDINARY (NO TRANSACTION)
             try:
+
+                from django.conf import settings
+
+                print("ENVIRONMENT =", settings.ENVIRONMENT)
+                print("DEFAULT_FILE_STORAGE =", settings.DEFAULT_FILE_STORAGE)
+
                 app.save()
             except Exception:
                 logger.exception("Final save failed")
