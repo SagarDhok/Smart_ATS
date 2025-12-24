@@ -139,7 +139,9 @@ def extract_text_from_pdf(file_path):
                 try:
                     reader.decrypt("")
                 except Exception as e:
-                    logger.error(f"Encrypted PDF could not be decrypted: {file_path} | error={e}")
+                    logger.error(
+                        f"Encrypted PDF could not be decrypted: {file_path} | error={e}"
+                    )
                     return ""
 
             for i in range(min(20, len(reader.pages))):
@@ -148,12 +150,17 @@ def extract_text_from_pdf(file_path):
                     if page_text:
                         text += page_text + "\n"
                 except Exception as e:
-                    logger.warning(f"Failed to extract page {i} from {file_path} | error={e}")
+                    logger.warning(
+                        f"Failed to extract page {i} from {file_path} | error={e}"
+                    )
                     continue
 
     except Exception as e:
         logger.error(f"PDF extraction crashed for {file_path} | error={e}")
         return ""
+
+    if not text.strip():
+        logger.warning(f"No extractable text found in PDF: {file_path}")
 
     return text.lower().strip()
 
@@ -308,11 +315,19 @@ def extract_certifications(text):
 # ================================================================
 def parse_resume(file_path, job=None):
     try:
-        text = extract_text_from_pdf(file_path) or ""
-        text = text.lower()
+        text = extract_text_from_pdf(file_path)
+
+        # ✅ ADD THIS
+        if not text:
+            raise ValueError("Empty resume text")
+
+        text = text
+
     except Exception as e:
-        logger.error(f"Resume parsing crashed for file: {file_path} | error={e}")
-        return {}
+        logger.error(
+            f"Resume parsing crashed for file: {file_path} | error={e}"
+        )
+        raise  # IMPORTANT: let view catch it
 
     return {
         "name": extract_name(text),
@@ -324,5 +339,5 @@ def parse_resume(file_path, job=None):
         "projects": extract_projects(text),
         "education": extract_education(text),
         "certifications": extract_certifications(text),
-        "raw_text": text
+        "raw_text": text,
     }

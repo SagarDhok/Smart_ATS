@@ -10,9 +10,10 @@ from applications.utils import (
     fit_category
 )
 import logging
+import os
+import tempfile
 
 logger = logging.getLogger(__name__)
-
 
 def apply_job(request, slug):
     job = get_object_or_404(Job, slug=slug)
@@ -28,8 +29,10 @@ def apply_job(request, slug):
             email = form.cleaned_data.get("email")
 
             if Application.objects.filter(job=job, email=email).exists():
-                logger.info(f"Duplicate application attempt for job={job.id} | email={email}")
-                form.add_error('email', 'You have already applied for this job.')
+                logger.info(
+                    f"Duplicate application attempt for job={job.id} | email={email}"
+                )
+                form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {
                     "form": form,
                     "job": job
@@ -43,20 +46,33 @@ def apply_job(request, slug):
             app.save()
 
             # -----------------------------
-            # PARSE RESUME  (CRITICAL)
+            # PARSE RESUME (PRODUCTION SAFE)
             # -----------------------------
             try:
-                parsed = parse_resume(app.resume.path, job)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    for chunk in app.resume.chunks():
+                        tmp.write(chunk)
+                    tmp_path = tmp.name
+
+                parsed = parse_resume(tmp_path, job)
+
             except Exception as e:
                 logger.error(
                     f"Resume parsing failed for job={job.id} | email={app.email} | error={e}"
                 )
-                form.add_error(None, "Could not process your resume. Try another file.")
+                form.add_error(
+                    None,
+                    "Could not process your resume. Try another file."
+                )
                 app.delete()
                 return render(request, "applications/apply.html", {
                     "form": form,
                     "job": job
                 })
+
+            finally:
+                if "tmp_path" in locals() and os.path.exists(tmp_path):
+                    os.remove(tmp_path)
 
             # -----------------------------
             # SCORING
@@ -92,4 +108,7 @@ def apply_job(request, slug):
     else:
         form = ApplicationForm()
 
-    return render(request, "applications/apply.html", {"form": form, "job": job})
+    return render(request, "applications/apply.html", {
+        "form": form,
+        "job": job
+    })
