@@ -27,6 +27,7 @@ def resume_upload_path(instance, filename):
     return f"resumes/{instance.job.slug}/{safe_filename}"
 
 class Application(models.Model):
+    unique_together = ("job", "email")
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
 
     full_name = models.CharField(max_length=255)

@@ -10,9 +10,9 @@ from applications.utils import (
     evaluate_candidate,
     fit_category
 )
-import logging
-import os
 import tempfile
+import os
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def apply_job(request, slug):
         if form.is_valid():
             email = form.cleaned_data["email"]
 
-            # ✅ DUPLICATE CHECK (BEFORE SAVE)
+            # ✅ DUPLICATE CHECK (ONLY REAL RECORDS)
             if Application.objects.filter(job=job, email=email).exists():
                 form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {
@@ -36,22 +36,24 @@ def apply_job(request, slug):
             try:
                 with transaction.atomic():
 
-                    # ❌ DO NOT SAVE YET
+                    # ⚠️ DO NOT SAVE YET
                     app = form.save(commit=False)
                     app.job = job
 
-                    # -------- SAFE RESUME PARSING --------
+                    # ---------- TEMP FILE ----------
+                    resume_file = request.FILES["resume"]
+
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                        for chunk in request.FILES["resume"].chunks():
+                        for chunk in resume_file.chunks():
                             tmp.write(chunk)
                         tmp_path = tmp.name
 
-                    parsed = parse_resume(tmp_path, job)
-
-                    if os.path.exists(tmp_path):
+                    try:
+                        parsed = parse_resume(tmp_path, job)
+                    finally:
                         os.remove(tmp_path)
 
-                    # -------- SCORING --------
+                    # ---------- SCORING ----------
                     scoring = compute_match_score(parsed, job)
 
                     app.match_score = scoring["final_score"]
@@ -76,12 +78,12 @@ def apply_job(request, slug):
                     app.parsed_education = parsed.get("education")
                     app.parsed_certifications = parsed.get("certifications")
 
-                    # ✅ SAVE ONLY WHEN EVERYTHING SUCCEEDS
+                    # ✅ NOW SAVE (ONLY ON SUCCESS)
                     app.save()
 
                 return redirect("application_success")
 
-            except Exception as e:
+            except Exception:
                 logger.exception("Application submission failed")
                 form.add_error(None, "Something went wrong. Please try again.")
                 return render(request, "applications/apply.html", {
