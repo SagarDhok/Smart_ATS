@@ -25,7 +25,6 @@ def apply_job(request, slug):
         if form.is_valid():
             email = form.cleaned_data["email"]
 
-            # ✅ DUPLICATE CHECK (ONLY REAL RECORDS)
             if Application.objects.filter(job=job, email=email).exists():
                 form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {
@@ -33,63 +32,53 @@ def apply_job(request, slug):
                     "job": job
                 })
 
+            app = form.save(commit=False)
+            app.job = job
+
+            # 🔹 TEMP FILE FOR PARSING ONLY
             try:
-                with transaction.atomic():
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    for chunk in request.FILES["resume"].chunks():
+                        tmp.write(chunk)
+                    tmp_path = tmp.name
 
-                    # ⚠️ DO NOT SAVE YET
-                    app = form.save(commit=False)
-                    app.job = job
+                parsed = parse_resume(tmp_path, job)
 
-                    # ---------- TEMP FILE ----------
-                    resume_file = request.FILES["resume"]
+            except Exception as e:
+                logger.exception("Resume parsing failed")
+                parsed = {}
 
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                        for chunk in resume_file.chunks():
-                            tmp.write(chunk)
-                        tmp_path = tmp.name
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
 
-                    try:
-                        parsed = parse_resume(tmp_path, job)
-                    finally:
-                        os.remove(tmp_path)
+            # 🔹 SCORING (safe even if parsed = {})
+            scoring = compute_match_score(parsed, job)
 
-                    # ---------- SCORING ----------
-                    scoring = compute_match_score(parsed, job)
+            app.match_score = scoring["final_score"]
+            app.skill_score = scoring["skill_score"]
+            app.experience_score = scoring["experience_score"]
+            app.keyword_score = scoring["keyword_score"]
 
-                    app.match_score = scoring["final_score"]
-                    app.skill_score = scoring["skill_score"]
-                    app.experience_score = scoring["experience_score"]
-                    app.keyword_score = scoring["keyword_score"]
+            app.matched_skills = scoring["matched_skills"]
+            app.missing_skills = scoring["missing_skills"]
 
-                    app.matched_skills = ", ".join(scoring["matched_skills"])
-                    app.missing_skills = ", ".join(scoring["missing_skills"])
+            app.summary = generate_summary(parsed, scoring["final_score"])
+            app.evaluation = evaluate_candidate(scoring["final_score"])
+            app.fit_category = fit_category(scoring["final_score"])
 
-                    app.summary = generate_summary(parsed, scoring["final_score"])
-                    app.evaluation = evaluate_candidate(scoring["final_score"])
-                    app.fit_category = fit_category(scoring["final_score"])
+            app.parsed_name = parsed.get("name")
+            app.parsed_email = parsed.get("email")
+            app.parsed_phone = parsed.get("phone")
+            app.parsed_experience = parsed.get("experience_years")
+            app.parsed_skills = parsed.get("skills")
+            app.parsed_projects = parsed.get("projects")
+            app.parsed_education = parsed.get("education")
+            app.parsed_certifications = parsed.get("certifications")
 
-                    # Parsed fields
-                    app.parsed_name = parsed.get("name")
-                    app.parsed_email = parsed.get("email")
-                    app.parsed_phone = parsed.get("phone")
-                    app.parsed_experience = parsed.get("experience_years")
-                    app.parsed_skills = parsed.get("skills")
-                    app.parsed_projects = parsed.get("projects")
-                    app.parsed_education = parsed.get("education")
-                    app.parsed_certifications = parsed.get("certifications")
+            app.save()  # ✅ ONLY ONE SAVE
 
-                    # ✅ NOW SAVE (ONLY ON SUCCESS)
-                    app.save()
-
-                return redirect("application_success")
-
-            except Exception:
-                logger.exception("Application submission failed")
-                form.add_error(None, "Something went wrong. Please try again.")
-                return render(request, "applications/apply.html", {
-                    "form": form,
-                    "job": job
-                })
+            return redirect("application_success")
 
     else:
         form = ApplicationForm()

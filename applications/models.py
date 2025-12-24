@@ -27,19 +27,25 @@ def resume_upload_path(instance, filename):
     return f"resumes/{instance.job.slug}/{safe_filename}"
 
 class Application(models.Model):
-    unique_together = ("job", "email")
+
+    class Meta:
+        unique_together = ("job", "email")
+
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
 
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-    resume = models.FileField(upload_to=resume_upload_path)
 
+    resume = models.FileField(
+        upload_to="resumes/",
+        storage=RawMediaCloudinaryStorage()
+    )
 
     parsed_name = models.CharField(max_length=255, blank=True, null=True)
     parsed_email = models.EmailField(blank=True, null=True)
     parsed_phone = models.CharField(max_length=20, blank=True, null=True)
-    
+
     parsed_skills = models.JSONField(blank=True, null=True)
     parsed_experience = models.FloatField(blank=True, null=True)
     parsed_projects = models.TextField(blank=True, null=True)
@@ -47,24 +53,20 @@ class Application(models.Model):
     parsed_certifications = models.TextField(blank=True, null=True)
     parsed_keywords = models.JSONField(blank=True, null=True)
 
-
-
     match_score = models.FloatField(default=0)
     matched_skills = models.JSONField(default=list)
     missing_skills = models.JSONField(default=list)
     experience_score = models.FloatField(default=0)
     skill_score = models.FloatField(default=0)
     keyword_score = models.FloatField(default=0)
+
     summary = models.TextField(blank=True, null=True)
     evaluation = models.TextField(blank=True, null=True)
     fit_category = models.CharField(max_length=20, blank=True, null=True)
 
-
-
-
-
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="screening")
     applied_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"{self.full_name} - {self.job.title}"
