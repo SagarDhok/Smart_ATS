@@ -149,11 +149,9 @@ def preview_resume(request, pk):
     if not app.resume:
         return redirect("hr_application_detail", pk=pk)
 
-    cloud_url, _ = cloudinary_url(
-        app.resume.name,
-        resource_type="raw"
-    )
-    return redirect(cloud_url)
+    # ✅ Let Cloudinary storage generate correct URL
+    return redirect(app.resume.url)
+
 
 
 
@@ -169,10 +167,8 @@ def download_resume(request, pk):
     if not app.resume:
         return redirect("hr_application_detail", pk=pk)
 
-    cloud_url, _ = cloudinary_url(
-        app.resume.name,
-        resource_type="raw",
-        flags="attachment"
+    return redirect(
+        app.resume.url + "?response-content-disposition=attachment"
     )
-    return redirect(cloud_url)
+
 
