@@ -2,6 +2,7 @@ from django.db import models
 from jobs.models import Job
 from django.utils.text import slugify
 import os
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 STATUS_CHOICES = [
     ("screening", "Screening"),
@@ -16,14 +17,6 @@ def resume_upload_path(instance, filename):
     safe_name = slugify(name) or "resume"
     return f"resumes/{instance.job.slug}/{safe_name}{ext.lower()}"
 
-from cloudinary_storage.storage import RawMediaCloudinaryStorage
-
-resume = models.FileField(
-    upload_to=resume_upload_path,
-    storage=RawMediaCloudinaryStorage()
-)
-
-
 class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
 
@@ -31,8 +24,11 @@ class Application(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
-    # ✅ SINGLE resume field (storage controlled by settings)
-    resume = models.FileField(upload_to=resume_upload_path)
+    # ✅ CLOUDINARY RAW STORAGE (CORRECT)
+    resume = models.FileField(
+        upload_to=resume_upload_path,
+        storage=RawMediaCloudinaryStorage()
+    )
 
     parsed_name = models.CharField(max_length=255, blank=True, null=True)
     parsed_email = models.EmailField(blank=True, null=True)
