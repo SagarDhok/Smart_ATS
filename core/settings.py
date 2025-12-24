@@ -10,7 +10,10 @@ from dotenv import load_dotenv
 # -------------------------------------------------------------------
 # ENV
 # -------------------------------------------------------------------
-load_dotenv()
+
+if os.getenv("ENVIRONMENT") != "production":
+    load_dotenv()
+    
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 # -------------------------------------------------------------------
