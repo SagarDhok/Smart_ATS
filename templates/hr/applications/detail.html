@@ -50,16 +50,15 @@
             </div>
 
 <div class="action-buttons">
-    <a href="{% url 'preview_resume' app.id %}" 
-       target="_blank"
-       class="btn btn-primary">
-        <i class="fas fa-eye"></i> View Resume
-    </a>
+  <a href="{% url 'preview_resume' app.id %}" target="_blank">
+    View Resume
+</a>
 
-    <a href="{% url 'download_resume' app.id %}" 
-       class="btn btn-secondary">
-        <i class="fas fa-download"></i> Download
-    </a>
+
+<a href="{% url 'download_resume' app.id %}">
+    Download Resume
+</a>
+
 </div>
 
         </div>

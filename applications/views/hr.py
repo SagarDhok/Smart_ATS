@@ -150,10 +150,9 @@ def preview_resume(request, pk):
     )
 
     if not app.resume:
-        logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
-    # 👀 PREVIEW
+    # 👀 Preview in browser
     return redirect(app.resume.url)
 
 
@@ -167,10 +166,9 @@ def download_resume(request, pk):
     )
 
     if not app.resume:
-        logger.error(f"Resume missing for applicant: {app.email}")
         return redirect("hr_application_detail", pk=pk)
 
-    # ⬇️ FORCE DOWNLOAD
+    # ⬇️ Force download
     return redirect(
         f"{app.resume.url}?response-content-disposition=attachment"
     )
