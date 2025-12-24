@@ -62,7 +62,8 @@ if ENVIRONMENT == "production":
 # FILE STORAGE
 # -------------------------------------------------------------------
 if ENVIRONMENT == "production":
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.RawMediaCloudinaryStorage"
+
     CLOUDINARY_STORAGE = {
         "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
         "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
@@ -70,6 +71,7 @@ if ENVIRONMENT == "production":
     }
 else:
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
 
 # -------------------------------------------------------------------
 # MIDDLEWARE

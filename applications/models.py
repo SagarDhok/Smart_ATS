@@ -1,9 +1,7 @@
-# applications/models.py
 from django.db import models
 from jobs.models import Job
 from django.utils.text import slugify
 import os
-from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 STATUS_CHOICES = [
     ("screening", "Screening"),
@@ -25,11 +23,8 @@ class Application(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
-    # ✅ SINGLE resume field (Cloudinary RAW)
-    resume = models.FileField(
-        upload_to=resume_upload_path,
-        storage=RawMediaCloudinaryStorage()
-    )
+    # ✅ SINGLE resume field (storage controlled by settings)
+    resume = models.FileField(upload_to=resume_upload_path)
 
     parsed_name = models.CharField(max_length=255, blank=True, null=True)
     parsed_email = models.EmailField(blank=True, null=True)
@@ -40,7 +35,6 @@ class Application(models.Model):
     parsed_projects = models.TextField(blank=True, null=True)
     parsed_education = models.TextField(blank=True, null=True)
     parsed_certifications = models.TextField(blank=True, null=True)
-    parsed_keywords = models.JSONField(blank=True, null=True)
 
     match_score = models.FloatField(default=0)
     matched_skills = models.JSONField(default=list)
