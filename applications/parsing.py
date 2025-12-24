@@ -314,17 +314,12 @@ def extract_certifications(text):
 # MASTER PARSER (LOGGING REQUIRED ONLY FOR CRASH)
 # ================================================================
 def parse_resume(file_path, job=None):
-    try:
-        text = extract_text_from_pdf(file_path)
+    text = extract_text_from_pdf(file_path)
 
-        if not text:
-            raise ValueError("Empty resume text")
-
-    except Exception as e:
-        logger.error(
-            f"Resume parsing crashed for file: {file_path} | error={e}"
-        )
-        raise
+    # ❗ DO NOT CRASH FOR EMPTY TEXT
+    if not text:
+        logger.warning(f"Resume text empty but file uploaded: {file_path}")
+        text = ""  # fallback, not exception
 
     return {
         "name": extract_name(text),

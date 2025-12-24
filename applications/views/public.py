@@ -23,31 +23,19 @@ def apply_job(request, slug):
 
         if form.is_valid():
 
-            # -----------------------------
-            # DUPLICATE APPLICATION CHECK
-            # -----------------------------
             email = form.cleaned_data.get("email")
-
             if Application.objects.filter(job=job, email=email).exists():
-                logger.info(
-                    f"Duplicate application attempt for job={job.id} | email={email}"
-                )
                 form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {
                     "form": form,
                     "job": job
                 })
 
-            # -----------------------------
-            # CREATE APPLICATION
-            # -----------------------------
             app = form.save(commit=False)
             app.job = job
             app.save()
 
-            # -----------------------------
-            # PARSE RESUME (PRODUCTION SAFE)
-            # -----------------------------
+            # ✅ SAFE PARSING
             try:
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                     for chunk in app.resume.chunks():
@@ -57,26 +45,13 @@ def apply_job(request, slug):
                 parsed = parse_resume(tmp_path, job)
 
             except Exception as e:
-                logger.error(
-                    f"Resume parsing failed for job={job.id} | email={app.email} | error={e}"
-                )
-                form.add_error(
-                    None,
-                    "Could not process your resume. Try another file."
-                )
-                app.delete()
-                return render(request, "applications/apply.html", {
-                    "form": form,
-                    "job": job
-                })
+                logger.error(f"Hard resume failure: {e}")
+                parsed = {}  # fallback, DO NOT reject candidate
 
             finally:
-                if "tmp_path" in locals() and os.path.exists(tmp_path):
+                if os.path.exists(tmp_path):
                     os.remove(tmp_path)
 
-            # -----------------------------
-            # SCORING
-            # -----------------------------
             scoring = compute_match_score(parsed, job)
 
             app.match_score = scoring["final_score"]
@@ -91,7 +66,6 @@ def apply_job(request, slug):
             app.evaluation = evaluate_candidate(scoring["final_score"])
             app.fit_category = fit_category(scoring["final_score"])
 
-            # RAW PARSED FIELDS
             app.parsed_name = parsed.get("name")
             app.parsed_email = parsed.get("email")
             app.parsed_phone = parsed.get("phone")
@@ -102,7 +76,6 @@ def apply_job(request, slug):
             app.parsed_certifications = parsed.get("certifications")
 
             app.save()
-
             return redirect("application_success")
 
     else:
