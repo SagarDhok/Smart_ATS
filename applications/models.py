@@ -1,10 +1,9 @@
+# applications/models.py
 from django.db import models
 from jobs.models import Job
-import os
 from django.utils.text import slugify
+import os
 from cloudinary_storage.storage import RawMediaCloudinaryStorage
-
-
 
 STATUS_CHOICES = [
     ("screening", "Screening"),
@@ -14,31 +13,21 @@ STATUS_CHOICES = [
     ("rejected", "Rejected"),
 ]
 
-
 def resume_upload_path(instance, filename):
     name, ext = os.path.splitext(filename)
-
-    safe_name = slugify(name)
-    if not safe_name:
-        safe_name = "resume"
-
-    safe_filename = f"{safe_name}{ext.lower()}"
-
-    return f"resumes/{instance.job.slug}/{safe_filename}"
+    safe_name = slugify(name) or "resume"
+    return f"resumes/{instance.job.slug}/{safe_name}{ext.lower()}"
 
 class Application(models.Model):
-
-    class Meta:
-        unique_together = ("job", "email")
-
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
 
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
+    # ✅ SINGLE resume field (Cloudinary RAW)
     resume = models.FileField(
-        upload_to="resumes/",
+        upload_to=resume_upload_path,
         storage=RawMediaCloudinaryStorage()
     )
 
@@ -67,14 +56,8 @@ class Application(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="screening")
     applied_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ("job", "email")
 
     def __str__(self):
         return f"{self.full_name} - {self.job.title}"
-
-
-
-
-    resume = models.FileField(
-        upload_to="resumes/",
-        storage=RawMediaCloudinaryStorage()
-    )
