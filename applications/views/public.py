@@ -94,9 +94,10 @@ def apply_job(request, slug):
 
             try:
                 app.save()
-            except Exception:
-                logger.exception("Application save failed")
-                form.add_error(None, "Application submission failed.")
+            except Exception as e:
+                logger.exception(e)
+                form.add_error(None, str(e))
+
                 return render(request, "applications/apply.html", {"form": form, "job": job})
 
             return redirect("application_success")
