@@ -9,13 +9,14 @@ from applications.utils import (
     evaluate_candidate,
     fit_category
 )
+from django.db import IntegrityError, transaction
+
 from applications.supabase_client import upload_resume
 import logging
 import os
 import tempfile
 
 logger = logging.getLogger(__name__)
-
 
 def apply_job(request, slug):
     job = get_object_or_404(Job, slug=slug)
@@ -25,8 +26,8 @@ def apply_job(request, slug):
 
         if form.is_valid():
             email = form.cleaned_data["email"]
-            
-            # 🔒 DUPLICATE CHECK
+
+            # 🔒 DUPLICATE CHECK (FAST FAIL)
             if Application.objects.filter(job=job, email=email).exists():
                 form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {
@@ -38,9 +39,8 @@ def apply_job(request, slug):
             app = form.save(commit=False)
             app.job = job
 
-            # 2️⃣ GET RESUME FILE
+            # 2️⃣ RESUME FILE
             resume_file = request.FILES.get("resume")
-
             if not resume_file:
                 form.add_error("resume", "Resume is required.")
                 return render(request, "applications/apply.html", {
@@ -48,25 +48,7 @@ def apply_job(request, slug):
                     "job": job
                 })
 
-            # 3️⃣ UPLOAD RESUME TO SUPABASE FIRST (before parsing)
-            try:
-                logger.info(f"Uploading resume for job: {job.slug}")
-                resume_file.seek(0)  # Reset file pointer
-                app.resume_url = upload_resume(resume_file, job.slug)
-                logger.info(f"Resume uploaded successfully: {app.resume_url}")
-                
-            except Exception as e:
-                logger.exception(f"Supabase resume upload failed: {e}")
-                form.add_error("resume", f"Resume upload failed: {str(e)}. Please try again.")
-                return render(request, "applications/apply.html", {
-                    "form": form,
-                    "job": job
-                })
-
-            # 4️⃣ PARSE RESUME (TEMP FILE)
-            parsed = {}
-            resume_file.seek(0)  # Reset again for parsing
-            
+            # 3️⃣ PARSE RESUME (TEMP FILE)
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                 for chunk in resume_file.chunks():
                     tmp.write(chunk)
@@ -74,16 +56,14 @@ def apply_job(request, slug):
 
             try:
                 parsed = parse_resume(tmp_path, job)
-                logger.info(f"Resume parsed successfully for {email}")
             except Exception as e:
                 logger.warning(f"Resume parsing failed (non-blocking): {e}")
+                parsed = {}
             finally:
-                try:
+                if os.path.exists(tmp_path):
                     os.remove(tmp_path)
-                except Exception as e:
-                    logger.warning(f"Failed to delete temp file: {e}")
 
-            # 5️⃣ SCORING
+            # 4️⃣ SCORING
             scoring = compute_match_score(parsed, job)
 
             app.match_score = scoring["final_score"]
@@ -107,12 +87,29 @@ def apply_job(request, slug):
             app.parsed_education = parsed.get("education")
             app.parsed_certifications = parsed.get("certifications")
 
-            # 6️⃣ FINAL SAVE
+            # 5️⃣ UPLOAD RESUME TO SUPABASE
             try:
-                app.save()
-                logger.info(f"Application saved successfully for {email}")
-            except Exception as e:
-                logger.exception(f"Final save failed: {e}")
+                app.resume_url = upload_resume(resume_file, job.slug)
+            except Exception:
+                logger.exception("Supabase resume upload failed")
+                form.add_error("resume", "Resume upload failed. Please try again.")
+                return render(request, "applications/apply.html", {
+                    "form": form,
+                    "job": job
+                })
+
+            # 6️⃣ FINAL SAVE (SAFE + ATOMIC)
+            try:
+                with transaction.atomic():
+                    app.save()
+            except IntegrityError:
+                form.add_error("email", "You have already applied for this job.")
+                return render(request, "applications/apply.html", {
+                    "form": form,
+                    "job": job
+                })
+            except Exception:
+                logger.exception("Final save failed")
                 form.add_error(None, "Application submission failed. Please try again.")
                 return render(request, "applications/apply.html", {
                     "form": form,
