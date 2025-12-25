@@ -86,6 +86,10 @@ def preview_resume(request, pk):
     return redirect(app.resume_url)
 
 
+import requests
+from django.http import FileResponse, HttpResponse
+
+
 @login_required
 def download_resume(request, pk):
     app = get_object_or_404(
@@ -94,4 +98,20 @@ def download_resume(request, pk):
         job__created_by=request.user,
         job__is_deleted=False,
     )
-    return redirect(app.resume_url)
+
+    try:
+        resp = requests.get(app.resume_url, stream=True, timeout=10)
+        resp.raise_for_status()
+    except Exception:
+        return HttpResponse("Resume not available", status=404)
+
+    filename = app.resume_url.split("/")[-1]
+
+    response = FileResponse(
+        resp.raw,
+        as_attachment=True,
+        filename=filename,
+        content_type="application/pdf",
+    )
+
+    return response
