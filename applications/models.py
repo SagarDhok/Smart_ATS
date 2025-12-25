@@ -43,6 +43,9 @@ class Application(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="screening")
     applied_at = models.DateTimeField(auto_now_add=True)
+    # TEMP FIELD — REMOVE LATER
+    migration_fix = models.BooleanField(default=False)
+
 
     class Meta:
         unique_together = ("job", "email")
