@@ -50,7 +50,8 @@ INSTALLED_APPS = [
 
     "users",
     "jobs",
-    "applications",
+    "applications.apps.ApplicationsConfig",
+
     "api",
 
 ]
