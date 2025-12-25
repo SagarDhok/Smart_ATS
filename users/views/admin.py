@@ -309,31 +309,3 @@ def admin_job_applications(request, id):
         "applications": applications
     })
 
-
-# =================================================================
-#                        DOWNLOAD RESUME
-# =================================================================
-import requests
-from django.http import FileResponse, HttpResponse
-
-@login_required
-def admin_resume_download(request, pk):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        raise PermissionDenied()
-
-    app = get_object_or_404(Application, pk=pk)
-
-    try:
-        resp = requests.get(app.resume_url, stream=True, timeout=10)
-        resp.raise_for_status()
-    except Exception:
-        return HttpResponse("Resume not available", status=404)
-
-    filename = app.resume_url.split("/")[-1]
-
-    return FileResponse(
-        resp.raw,
-        as_attachment=True,
-        filename=filename,
-        content_type="application/pdf",
-    )
