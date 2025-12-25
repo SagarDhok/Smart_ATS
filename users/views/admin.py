@@ -288,7 +288,6 @@ def admin_application_list(request):
 @login_required
 def admin_application_detail(request, pk):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(f"Unauthorized application detail access by {request.user.email}")
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
