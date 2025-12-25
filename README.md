@@ -170,12 +170,12 @@ PATCH /api/applications/<id>/status/
 |-----------|------------|
 | Backend | Django 5.2 |
 | Resume Parsing | PyPDF2 |
-| Logging | RotatingFileHandler |
 | APIs | Django REST Framework 3.14 |
 | Frontend | Django Templates + CSS/JS |
 | Authentication | DRF Token Authentication |
-| File Storage | Cloudinary (Object Storage) |
+| File Storage | Supabase Storage (Object Storage) |
 | Database | PostgreSQL (Neon – Production), MySQL (Local)|
+| Logging | Python logging (structured, environment-aware) |
 | Email System | Brevo Email API (HTTP-based, production-safe) |
 
 
@@ -225,30 +225,33 @@ The UI is intentionally kept simple and framework-free to **support backend work
 
 > The primary focus of this project is **backend architecture, security, and workflow automation**.
 
+## 📦 File Storage & Resume Handling
 
+Resume files are stored using **Supabase Storage (Object Storage)** instead of the application server filesystem.
 
-## 📦 File Storage & Media Handling
-
-Resume files are stored using **Cloudinary Cloud Storage** instead of the application server filesystem.
-
-### Why Cloudinary?
+### Why Supabase Storage?
 - Cloud platforms like **Render (Free Tier)** use **ephemeral filesystems**
 - Uploaded files do not persist across redeploys or restarts
-- To ensure **reliable and persistent resume storage**, Cloudinary is used
+- Supabase provides **persistent, production-grade object storage**
+- Tight integration with PostgreSQL-based backends
+- Simple public URL access for controlled resume viewing
 
 ### How it works
-- Resume uploads are sent directly to Cloudinary
-- Django stores only the file reference (URL)
-- Resume preview & download are served via Cloudinary CDN URLs
-- No dependency on local or server-side storage
+- Resume files are uploaded to a **Supabase public bucket**
+- Files are organized by job slug for isolation
+- Django stores only the **resume URL** (`resume_url`)
+- Resume preview opens in-browser
+- Resume download is handled via backend-controlled streaming
+- No dependency on local disk or media server
 
 ### Benefits
-- Persistent file storage (no data loss)
+- Persistent storage across deployments
 - CDN-backed fast resume access
-- Works reliably on free cloud infrastructure
-- Easily replaceable with AWS S3 in production
+- Works reliably on Render free tier
+- Clear separation of compute (Django) and storage (Supabase)
+- Easily replaceable with AWS S3 / GCS in large-scale setups
 
-> This mirrors real-world production systems where user-uploaded files
+> This mirrors real-world production systems where user-uploaded documents
 > are stored in object storage rather than application servers.
 
 
@@ -336,15 +339,27 @@ Backend Developer (Python • Django • REST APIs • MySQL)
 
 
 ## 🎯 Why This Project?
+## 🎯 Why I Built This Project
 
-This project was built to simulate how real-world ATS platforms handle **secure onboarding, candidate evaluation, and role-based workflows**, rather than focusing on CRUD-only features.
+Most beginner backend projects stop at basic CRUD.
 
-> **Note:** Email delivery is implemented using **Brevo’s HTTP Email API**
-> instead of SMTP to ensure reliable delivery on cloud platforms like Render,
-> where outbound SMTP is restricted or unreliable.
->
-> This mirrors real-world production setups used for transactional emails
-> such as HR invites and password resets.
+I wanted to build something closer to how **real hiring systems work internally**, where:
+- not everyone can sign up freely
+- roles have strict boundaries
+- uploaded files cannot live on the application server
+- resumes must be parsed safely, not blindly trusted
+- scoring logic must be explainable, not just “AI magic”
+
+This project forced me to think about:
+- RBAC edge cases
+- invite-based onboarding flows
+- production deployment constraints (Render, Neon, cloud storage)
+- schema evolution & migrations
+- handling broken, encrypted, or malformed PDFs safely
+
+Smart ATS represents how I approach backend systems:  
+**secure first, boring where needed, explicit over clever.**
+
 
 
 
