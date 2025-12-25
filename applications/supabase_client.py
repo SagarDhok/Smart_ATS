@@ -8,11 +8,13 @@ supabase = create_client(
 )
 
 BUCKET = os.getenv("SUPABASE_BUCKET", "resumes")
+
 def upload_resume(file, job_slug):
+    import uuid
+
     ext = file.name.split(".")[-1].lower()
     filename = f"{job_slug}/{uuid.uuid4()}.{ext}"
 
-    # Convert Django file → bytes
     file.seek(0)
     file_bytes = file.read()
 
@@ -21,7 +23,9 @@ def upload_resume(file, job_slug):
             path=filename,
             file=file_bytes,
             file_options={
-                "content-type": file.content_type,
+                # FORCE STRINGS — storage3 bug workaround
+                "content-type": "application/pdf",
+                "x-upsert": "false",
             },
         )
     except Exception as e:
