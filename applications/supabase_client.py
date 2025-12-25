@@ -8,12 +8,11 @@ supabase = create_client(
 )
 
 BUCKET = os.getenv("SUPABASE_BUCKET", "resumes")
-
 def upload_resume(file, job_slug):
     ext = file.name.split(".")[-1].lower()
     filename = f"{job_slug}/{uuid.uuid4()}.{ext}"
 
-    # Read raw bytes from Django file
+    # Convert Django file → bytes
     file.seek(0)
     file_bytes = file.read()
 
@@ -23,11 +22,9 @@ def upload_resume(file, job_slug):
             file=file_bytes,
             file_options={
                 "content-type": file.content_type,
-                "upsert": False,
             },
         )
     except Exception as e:
         raise Exception(f"Supabase upload failed: {e}")
 
-    public_url = supabase.storage.from_(BUCKET).get_public_url(filename)
-    return public_url
+    return supabase.storage.from_(BUCKET).get_public_url(filename)
