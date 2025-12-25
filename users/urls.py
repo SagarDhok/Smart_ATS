@@ -7,7 +7,7 @@ from users.views.auth import (
 from users.views.admin import (
     admin_dashboard, hr_management,
     suspend_hr, activate_hr,
-    invite_page,admin_application_detail,admin_application_list,admin_job_detail,admin_job_list,admin_job_applications,admin_resume_download
+    invite_page,admin_application_detail,admin_application_list,admin_job_detail,admin_job_list,admin_job_applications
 )
 from users.views.hr import hr_dashboard,hr_job_applications
 
@@ -48,7 +48,6 @@ urlpatterns = [
     path("dashboard/admin/applications/", admin_application_list, name="admin_application_list"),
     path("dashboard/admin/applications/<int:pk>/", admin_application_detail, name="admin_application_detail"),
     path("dashboard/admin/job/<int:id>/applications/", admin_job_applications, name="admin_job_applications"),
-    path("dashboard/admin/resume/<int:pk>/download/", admin_resume_download, name="admin_download_resume"),
     path("dashboard/admin/applications/", admin_application_list, name="admin_application_list"),
 
     # HR job-specific applications list

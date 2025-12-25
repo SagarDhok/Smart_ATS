@@ -4,7 +4,7 @@ from applications.views.public import apply_job
 
 from applications.views.hr import (
     HRApplicationListView, HRApplicationDetailView,
-    preview_resume, download_resume,HRStatusUpdateView
+    preview_resume,HRStatusUpdateView
 )
 
 urlpatterns = [
@@ -18,5 +18,4 @@ urlpatterns = [
     path("hr/<int:pk>/status/", HRStatusUpdateView.as_view(), name="hr_application_status"),
 
     path("hr/<int:pk>/resume/preview/", preview_resume, name="preview_resume"),
-    path("hr/<int:pk>/resume/download/", download_resume, name="download_resume"),
 ]
