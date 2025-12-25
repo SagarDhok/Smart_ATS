@@ -313,19 +313,27 @@ def admin_job_applications(request, id):
 # =================================================================
 #                        DOWNLOAD RESUME
 # =================================================================
+import requests
+from django.http import FileResponse, HttpResponse
+
 @login_required
 def admin_resume_download(request, pk):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(
-            f"Unauthorized resume download attempt by {request.user.email}"
-        )
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
 
-    if not app.resume:
-        logger.error(f"Resume missing for applicant: {app.email}")
-        messages.error(request, "Resume not found.")
-        return redirect("admin_application_detail", pk=pk)
+    try:
+        resp = requests.get(app.resume_url, stream=True, timeout=10)
+        resp.raise_for_status()
+    except Exception:
+        return HttpResponse("Resume not available", status=404)
 
-    return redirect(app.resume.url)
+    filename = app.resume_url.split("/")[-1]
+
+    return FileResponse(
+        resp.raw,
+        as_attachment=True,
+        filename=filename,
+        content_type="application/pdf",
+    )
