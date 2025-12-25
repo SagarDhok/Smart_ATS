@@ -1,20 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db import transaction
 from applications.forms import ApplicationForm
 from jobs.models import Job
-from applications.parsing import parse_resume
 from applications.models import Application
+from applications.parsing import parse_resume
 from applications.utils import (
     compute_match_score,
     generate_summary,
     evaluate_candidate,
     fit_category
 )
+from applications.supabase_client import upload_resume
 import logging
 import os
 import tempfile
 
 logger = logging.getLogger(__name__)
+
+
 def apply_job(request, slug):
     job = get_object_or_404(Job, slug=slug)
 
@@ -36,24 +38,30 @@ def apply_job(request, slug):
             app = form.save(commit=False)
             app.job = job
 
-            # 2️⃣ TEMP FILE FOR PARSING (LOCAL ONLY)
+            # 2️⃣ PARSE RESUME (TEMP FILE)
             parsed = {}
             resume_file = request.FILES.get("resume")
 
-            if resume_file:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                    for chunk in resume_file.chunks():
-                        tmp.write(chunk)
-                    tmp_path = tmp.name
+            if not resume_file:
+                form.add_error("resume", "Resume is required.")
+                return render(request, "applications/apply.html", {
+                    "form": form,
+                    "job": job
+                })
 
-                try:
-                    parsed = parse_resume(tmp_path, job)
-                except Exception as e:
-                    logger.warning(f"Resume parsing failed (non-blocking): {e}")
-                finally:
-                    os.remove(tmp_path)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                for chunk in resume_file.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
 
-            # 3️⃣ SCORING (SAFE)
+            try:
+                parsed = parse_resume(tmp_path, job)
+            except Exception as e:
+                logger.warning(f"Resume parsing failed (non-blocking): {e}")
+            finally:
+                os.remove(tmp_path)
+
+            # 3️⃣ SCORING
             scoring = compute_match_score(parsed, job)
 
             app.match_score = scoring["final_score"]
@@ -77,18 +85,25 @@ def apply_job(request, slug):
             app.parsed_education = parsed.get("education")
             app.parsed_certifications = parsed.get("certifications")
 
-            # 4️⃣ SAVE TO DB + CLOUDINARY (NO TRANSACTION)
+            # 4️⃣ UPLOAD RESUME TO SUPABASE
             try:
+                resume_file.seek(0)
+                app.resume_url = upload_resume(resume_file, job.slug)
 
-                from django.conf import settings
+            except Exception:
+                logger.exception("Supabase resume upload failed")
+                form.add_error("resume", "Resume upload failed. Please try again.")
+                return render(request, "applications/apply.html", {
+                    "form": form,
+                    "job": job
+                })
 
-                print("ENVIRONMENT =", settings.ENVIRONMENT)
-                print("DEFAULT_FILE_STORAGE =", settings.DEFAULT_FILE_STORAGE)
-
+            # 5️⃣ FINAL SAVE
+            try:
                 app.save()
             except Exception:
                 logger.exception("Final save failed")
-                form.add_error(None, "Resume upload failed. Please try again.")
+                form.add_error(None, "Application submission failed. Please try again.")
                 return render(request, "applications/apply.html", {
                     "form": form,
                     "job": job

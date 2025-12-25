@@ -50,14 +50,19 @@
             </div>
 
 <div class="action-buttons">
-    <a href="{% url 'preview_resume' app.id %}" target="_blank">
+    <a href="{{ app.resume_url }}"
+       target="_blank"
+       class="btn btn-primary btn-sm">
         View Resume
     </a>
 
-    <a href="{% url 'download_resume' app.id %}">
+    <a href="{{ app.resume_url }}"
+       download
+       class="btn btn-outline-primary btn-sm">
         Download Resume
     </a>
 </div>
+
 
         </div>
     </aside>

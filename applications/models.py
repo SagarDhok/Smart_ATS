@@ -1,7 +1,5 @@
 from django.db import models
 from jobs.models import Job
-from django.utils.text import slugify
-import os
 
 STATUS_CHOICES = [
     ("screening", "Screening"),
@@ -11,11 +9,6 @@ STATUS_CHOICES = [
     ("rejected", "Rejected"),
 ]
 
-def resume_upload_path(instance, filename):
-    name, ext = os.path.splitext(filename)
-    safe_name = slugify(name) or "resume"
-    return f"resumes/{instance.job.slug}/{safe_name}{ext.lower()}"
-
 class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
 
@@ -23,8 +16,9 @@ class Application(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
-    # ✅ STORAGE ONLY FROM settings.py
-    resume = models.FileField(upload_to=resume_upload_path)
+    # ✅ ONLY URL (NO FileField)
+    resume_url = models.URLField(blank=True, null=True)
+
 
     parsed_name = models.CharField(max_length=255, blank=True, null=True)
     parsed_email = models.EmailField(blank=True, null=True)

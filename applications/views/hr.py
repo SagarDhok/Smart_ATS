@@ -134,8 +134,6 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
         form.save()
         return redirect("hr_application_detail", pk=self.object.pk)
     
-from cloudinary.utils import cloudinary_url
-
 
 @login_required
 def preview_resume(request, pk):
@@ -143,16 +141,9 @@ def preview_resume(request, pk):
         Application,
         pk=pk,
         job__created_by=request.user,
-        job__is_deleted=False
+        job__is_deleted=False,
     )
-
-    if not app.resume:
-        return redirect("hr_application_detail", pk=pk)
-
-    # ✅ Let Cloudinary storage generate correct URL
-    return redirect(app.resume.url)
-
-
+    return redirect(app.resume_url)
 
 
 @login_required
@@ -161,14 +152,6 @@ def download_resume(request, pk):
         Application,
         pk=pk,
         job__created_by=request.user,
-        job__is_deleted=False
+        job__is_deleted=False,
     )
-
-    if not app.resume:
-        return redirect("hr_application_detail", pk=pk)
-
-    return redirect(
-        app.resume.url + "?response-content-disposition=attachment"
-    )
-
-
+    return redirect(app.resume_url)

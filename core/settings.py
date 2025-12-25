@@ -53,30 +53,12 @@ INSTALLED_APPS = [
     "applications",
     "api",
 
-    "cloudinary",
-    "cloudinary_storage",
 ]
 
 # ✅ ratelimit ONLY in production
 if ENVIRONMENT == "production":
     INSTALLED_APPS += ["django_ratelimit"]
 
-# -------------------------------------------------------------------
-# FILE STORAGE
-# -------------------------------------------------------------------
-if ENVIRONMENT == "production":
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.RawMediaCloudinaryStorage"
-
-    CLOUDINARY_STORAGE = {
-        "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
-        "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
-        "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
-    }
-else:
-    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
 
 
 # -------------------------------------------------------------------
