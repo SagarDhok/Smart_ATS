@@ -1,15 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import FileResponse
+from django.http import HttpResponse
 from applications.models import Application
 from jobs.models import Job
 from django.db.models import Q
 import logging
-import os
 from django.contrib.auth.decorators import login_required
-
-logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -137,21 +134,37 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
 
 @login_required
 def preview_resume(request, pk):
+    """Preview resume in browser (opens Supabase URL in new tab)"""
     app = get_object_or_404(
         Application,
         pk=pk,
         job__created_by=request.user,
         job__is_deleted=False,
     )
+    
+    if not app.resume_url:
+        logger.warning(f"No resume URL found for application {pk}")
+        return HttpResponse("Resume not found", status=404)
+    
+    logger.info(f"Previewing resume for application {pk}: {app.resume_url}")
     return redirect(app.resume_url)
 
 
 @login_required
 def download_resume(request, pk):
+    """Download resume (redirects to Supabase URL with download headers)"""
     app = get_object_or_404(
         Application,
         pk=pk,
         job__created_by=request.user,
         job__is_deleted=False,
     )
-    return redirect(app.resume_url)
+    
+    if not app.resume_url:
+        logger.warning(f"No resume URL found for application {pk}")
+        return HttpResponse("Resume not found", status=404)
+    
+    # Add download parameter to force download
+    download_url = f"{app.resume_url}?download=true"
+    logger.info(f"Downloading resume for application {pk}: {download_url}")
+    return redirect(download_url)

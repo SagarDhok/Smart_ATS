@@ -25,7 +25,7 @@ def apply_job(request, slug):
 
         if form.is_valid():
             email = form.cleaned_data["email"]
-
+            
             # 🔒 DUPLICATE CHECK
             if Application.objects.filter(job=job, email=email).exists():
                 form.add_error("email", "You have already applied for this job.")
@@ -38,8 +38,7 @@ def apply_job(request, slug):
             app = form.save(commit=False)
             app.job = job
 
-            # 2️⃣ PARSE RESUME (TEMP FILE)
-            parsed = {}
+            # 2️⃣ GET RESUME FILE
             resume_file = request.FILES.get("resume")
 
             if not resume_file:
@@ -49,6 +48,25 @@ def apply_job(request, slug):
                     "job": job
                 })
 
+            # 3️⃣ UPLOAD RESUME TO SUPABASE FIRST (before parsing)
+            try:
+                logger.info(f"Uploading resume for job: {job.slug}")
+                resume_file.seek(0)  # Reset file pointer
+                app.resume_url = upload_resume(resume_file, job.slug)
+                logger.info(f"Resume uploaded successfully: {app.resume_url}")
+                
+            except Exception as e:
+                logger.exception(f"Supabase resume upload failed: {e}")
+                form.add_error("resume", f"Resume upload failed: {str(e)}. Please try again.")
+                return render(request, "applications/apply.html", {
+                    "form": form,
+                    "job": job
+                })
+
+            # 4️⃣ PARSE RESUME (TEMP FILE)
+            parsed = {}
+            resume_file.seek(0)  # Reset again for parsing
+            
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                 for chunk in resume_file.chunks():
                     tmp.write(chunk)
@@ -56,12 +74,16 @@ def apply_job(request, slug):
 
             try:
                 parsed = parse_resume(tmp_path, job)
+                logger.info(f"Resume parsed successfully for {email}")
             except Exception as e:
                 logger.warning(f"Resume parsing failed (non-blocking): {e}")
             finally:
-                os.remove(tmp_path)
+                try:
+                    os.remove(tmp_path)
+                except Exception as e:
+                    logger.warning(f"Failed to delete temp file: {e}")
 
-            # 3️⃣ SCORING
+            # 5️⃣ SCORING
             scoring = compute_match_score(parsed, job)
 
             app.match_score = scoring["final_score"]
@@ -85,24 +107,12 @@ def apply_job(request, slug):
             app.parsed_education = parsed.get("education")
             app.parsed_certifications = parsed.get("certifications")
 
-            # 4️⃣ UPLOAD RESUME TO SUPABASE
-            try:
-                resume_file.seek(0)
-                app.resume_url = upload_resume(resume_file, job.slug)
-
-            except Exception:
-                logger.exception("Supabase resume upload failed")
-                form.add_error("resume", "Resume upload failed. Please try again.")
-                return render(request, "applications/apply.html", {
-                    "form": form,
-                    "job": job
-                })
-
-            # 5️⃣ FINAL SAVE
+            # 6️⃣ FINAL SAVE
             try:
                 app.save()
-            except Exception:
-                logger.exception("Final save failed")
+                logger.info(f"Application saved successfully for {email}")
+            except Exception as e:
+                logger.exception(f"Final save failed: {e}")
                 form.add_error(None, "Application submission failed. Please try again.")
                 return render(request, "applications/apply.html", {
                     "form": form,
