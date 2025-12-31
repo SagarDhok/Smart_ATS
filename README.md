@@ -1,16 +1,31 @@
-# 🚀 Smart ATS — Enterprise Applicant Tracking System
+#  **Smart ATS** is a production-ready internal recruitment platform demonstrating:
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Django](https://img.shields.io/badge/Django-5.2-green.svg)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)
 ![DRF](https://img.shields.io/badge/DRF-3.14-red.svg)
 
-A **production-grade Applicant Tracking System (ATS)** built with **Django, MySQL, and Django REST Framework**. Implements enterprise-style hiring workflows inspired by platforms like Greenhouse, Lever, and Workable.
 
-**Smart ATS** includes resume parsing, automated candidate scoring, strict Role-Based Access Control (RBAC), secure HR invitation system, and dedicated dashboards for Admin & HR.
+A **production-ready Applicant Tracking System (ATS)** built for **one organization to manage its complete hiring process** — from job posting to candidate shortlisting.
+
+Smart ATS is designed for **internal HR teams**, allowing them to:
+- post and manage job openings
+- receive and screen applications
+- automatically analyze resumes
+- score candidates based on job requirements
+- move applicants through hiring stages (Screening → Interview → Hired / Rejected)
+
+The system enforces **strict role-based access control**, uses a **secure invite-only HR onboarding flow**, and provides **separate dashboards for Admin and HR** to ensure clear responsibility and data safety.
+
+This project focuses on **real-world internal hiring workflows**, similar to how enterprise companies use tools like Greenhouse or Workable **within a single organization**.
+
+> ⚠️ Scope Note: Smart ATS is a **single-tenant system** designed for internal hiring within one organization.
+> Multi-company (SaaS-style) support is intentionally excluded to keep workflows secure, explicit, and production-correct.
+
+
 
 ### LIVE LINK  : https://smart-ats-v0yf.onrender.com
-
+but ye proejct linkdin pe post karna padega na i didint posted this on linkdin 
 
 
 ## 📸 UI Screenshots (Dashboard & Workflows)
