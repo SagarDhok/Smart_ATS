@@ -25,50 +25,54 @@
             </tr>
         </thead>
 
-        <tbody>
-            {% if hr_page %} {% for hr in hr_page %}
-            <tr>
-                <td>{{ hr.first_name }} {{ hr.last_name }}</td>
-                <td>{{ hr.email }}</td>
+<tbody>
+{% if hr_page %}
+{% for hr in hr_page %}
+<tr>
 
-                <td>
-                    {% if hr.is_active %}
-                    <span class="badge badge-success">Active</span>
-                    {% else %}
-                    <span class="badge badge-danger">Suspended</span>
-                    {% endif %}
-                </td>
+    <td data-label="HR Name">
+        {{ hr.first_name }} {{ hr.last_name }}
+    </td>
 
-                <td class="action-cell">
-    {% if hr.is_active %}
-        <button class="btn btn-danger btn-sm toggle-status-btn"
-                data-id="{{ hr.id }}"
-                data-action="suspend">
-            Suspend
-        </button>
-    {% else %}
-        <button class="btn btn-primary btn-sm toggle-status-btn"
-                data-id="{{ hr.id }}"
-                data-action="activate">
-            Activate
-        </button>
-    {% endif %}
-</td>
+    <td data-label="Email">
+        {{ hr.email }}
+    </td>
 
-            </tr>
-            {% endfor %} {% else %}
-            <tr>
-                <td colspan="4" style="
-            text-align: center;
-            padding: 25px;
-            color: #999;
-            font-style: italic;
-          ">
-                    No HR users found for your search.
-                </td>
-            </tr>
-            {% endif %}
-        </tbody>
+    <td data-label="Status">
+        {% if hr.is_active %}
+            <span class="badge badge-success">Active</span>
+        {% else %}
+            <span class="badge badge-danger">Suspended</span>
+        {% endif %}
+    </td>
+
+    <td data-label="Action" class="action-cell">
+        {% if hr.is_active %}
+            <button class="btn btn-danger btn-sm toggle-status-btn"
+                    data-id="{{ hr.id }}"
+                    data-action="suspend">
+                Suspend
+            </button>
+        {% else %}
+            <button class="btn btn-primary btn-sm toggle-status-btn"
+                    data-id="{{ hr.id }}"
+                    data-action="activate">
+                Activate
+            </button>
+        {% endif %}
+    </td>
+
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td colspan="4" class="table-empty">
+        No HR users found for your search.
+    </td>
+</tr>
+{% endif %}
+</tbody>
+
     </table>
 
     <!-- PAGINATION -->

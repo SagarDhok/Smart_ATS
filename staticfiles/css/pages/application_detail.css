@@ -320,3 +320,81 @@ body {
     white-space: pre-wrap;
     border: 1px solid #e5e7eb;
 }
+
+
+/* =========================================== */
+/* MOBILE: NORMAL SCROLL (NO STICKY) */
+/* =========================================== */
+
+@media (max-width: 900px) {
+
+    .ats-wrapper {
+        display: block;
+        padding: 16px;
+    }
+
+    .ats-sidebar {
+        position: static;   /* ✅ key fix */
+        top: auto;
+        box-shadow: none;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .ats-main {
+        padding: 0;
+    }
+}
+
+
+/* =========================================== */
+/* ADMIN VIEW NOTE */
+/* =========================================== */
+
+.admin-view-note {
+    padding: 10px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+
+/* =========================================== */
+/* 📱 MOBILE REFINEMENTS (ADMIN DETAIL) */
+/* =========================================== */
+
+@media (max-width: 600px) {
+
+    .candidate-name {
+        font-size: 1.25rem;
+    }
+
+    .job-role {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr); /* 👈 force 2 per row */
+        gap: 12px;
+    }
+
+    .stat-value {
+        font-size: 22px; /* 👈 reduce oversized % */
+    }
+
+    .content-section {
+        padding: 16px;
+    }
+
+    .projects-block {
+        font-size: 12px;
+        padding: 14px;
+    }
+
+    .ats-sidebar {
+        padding: 20px 16px;
+    }
+}

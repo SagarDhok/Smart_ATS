@@ -14,12 +14,19 @@
     <div class="apps-filter-bar">
         <form method="GET" class="apps-filter-form">
 
-            <input type="text" name="search" placeholder="Search candidate or email..."
-                   value="{{ search }}" class="apps-input">
+            <input type="text"
+                   name="search"
+                   placeholder="Search candidate or email..."
+                   value="{{ search }}"
+                   class="apps-input">
 
-            <button type="submit" class="btn btn-primary apps-btn">Search</button>
+            <button type="submit" class="btn btn-primary apps-btn">
+                Search
+            </button>
 
-            <select name="status" class="apps-select" onchange="this.form.submit()">
+            <select name="status"
+                    class="apps-select"
+                    onchange="this.form.submit()">
                 <option value="">All Status</option>
                 <option value="screening" {% if status_filter == "screening" %}selected{% endif %}>
                     Screening ({{ counts.screening }})
@@ -57,21 +64,43 @@
         <tbody>
         {% for app in apps_page %}
             <tr>
-                <td><a href="{% url 'hr_application_detail' app.id %}" class="table-link">{{ app.full_name }}</a></td>
-                <td>{{ app.email }}</td>
-                <td>
-    <a href="{% url 'hr_job_detail' app.job.id %}" class="table-link">
-        {{ app.job.title }}
-    </a>
-</td>
 
-                <td><span class="count-pill">{{ app.match_score }}%</span></td>
-                <td>{{ app.status|title }}</td>
-                <td>{{ app.applied_at|date:"d M Y, h:i A" }}</td>
+                <td data-label="Candidate">
+                    <a href="{% url 'hr_application_detail' app.id %}"
+                       class="table-link">
+                        {{ app.full_name }}
+                    </a>
+                </td>
+
+                <td data-label="Email">
+                    {{ app.email }}
+                </td>
+
+                <td data-label="Job">
+                    <a href="{% url 'hr_job_detail' app.job.id %}"
+                       class="table-link">
+                        {{ app.job.title }}
+                    </a>
+                </td>
+
+                <td data-label="Score">
+                    <span class="count-pill">
+                        {{ app.match_score }}%
+                    </span>
+                </td>
+
+                <td data-label="Status">
+                    {{ app.status|title }}
+                </td>
+
+                <td data-label="Applied On">
+                    {{ app.applied_at|date:"d M Y, h:i A" }}
+                </td>
+
             </tr>
         {% empty %}
             <tr>
-                <td colspan="6" style="text-align:center;color:#777;padding:20px;">
+                <td colspan="6" class="table-empty">
                     No applications found.
                 </td>
             </tr>
@@ -80,22 +109,25 @@
     </table>
 
     <!-- PAGINATION -->
-<div class="pagination-controls mt-3">
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ status_filter }}"
-           class="btn btn-outline">Previous</a>
-    {% endif %}
+    <div class="pagination-controls mt-3">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ status_filter }}"
+               class="btn btn-outline">
+                Previous
+            </a>
+        {% endif %}
 
-    <span class="page-info">
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-    </span>
+        <span class="page-info">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ status_filter }}"
-           class="btn btn-outline">Next</a>
-    {% endif %}
-</div>
-
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ status_filter }}"
+               class="btn btn-outline">
+                Next
+            </a>
+        {% endif %}
+    </div>
 
 </div>
 {% endblock %}

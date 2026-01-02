@@ -116,3 +116,52 @@
         gap: 12px;
     }
 }
+
+
+
+/* =========================================== */
+/* 📱 MOBILE CARD VIEW (HR Management) */
+/* =========================================== */
+
+@media (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        background: #ffffff;
+        margin-bottom: 16px;
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border: none;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #4A5568;
+        margin-right: 10px;
+    }
+
+    .action-cell {
+        justify-content: flex-start;
+    }
+}

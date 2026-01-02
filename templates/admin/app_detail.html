@@ -21,9 +21,10 @@
             <!-- ✅ ADMIN VIEW ONLY (NO STATUS DROPDOWN) -->
             <div class="status-workflow">
                 <label class="section-label">Admin Mode</label>
-                <div style="padding:10px; background:#f3f4f6; border-radius:8px; font-size:14px; font-weight:600; color:#374151;">
-                    View Only Access
-                </div>
+ <div class="admin-view-note">
+    Current Stage: <strong>{{ app.status|title }}</strong>
+</div>
+
             </div>
 
             <div class="contact-info">

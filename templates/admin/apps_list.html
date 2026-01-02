@@ -61,34 +61,48 @@
         </tr>
     </thead>
 
-    <tbody>
-        {% for app in apps_page %}
-        <tr>
-            <td>
-                <a href="{% url 'admin_application_detail' app.id %}" class="table-link">
-                    {{ app.full_name }}
-                </a>
-            </td>
+<tbody>
+{% for app in apps_page %}
+<tr>
 
-            <td>{{ app.email }}</td>
-            <td>
-    <a href="{% url 'admin_job_detail' app.job.id %}" class="table-link">
-        {{ app.job.title }}
-    </a>
-</td>
+    <td data-label="Candidate">
+        <a href="{% url 'admin_application_detail' app.id %}" class="table-link">
+            {{ app.full_name }}
+        </a>
+    </td>
 
-            <td><span class="count-pill">{{ app.match_score }}%</span></td>
-            <td>{{ app.status|title }}</td>
-            <td>{{ app.applied_at|date:"d M Y, h:i A" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5" style="text-align:center;color:#777;padding:20px;">
-                No applications found.
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+    <td data-label="Email">
+        {{ app.email }}
+    </td>
+
+    <td data-label="Job">
+        <a href="{% url 'admin_job_detail' app.job.id %}" class="table-link">
+            {{ app.job.title }}
+        </a>
+    </td>
+
+    <td data-label="Score">
+        <span class="count-pill">{{ app.match_score }}%</span>
+    </td>
+
+    <td data-label="Status">
+        {{ app.status|title }}
+    </td>
+
+    <td data-label="Applied On">
+        {{ app.applied_at|date:"d M Y, h:i A" }}
+    </td>
+
+</tr>
+{% empty %}
+<tr>
+    <td colspan="6" class="table-empty">
+        No applications found.
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+
 </table>
 
 <!-- PAGINATION -->

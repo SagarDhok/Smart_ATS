@@ -350,3 +350,65 @@
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+
+/* =============================== */
+/*   MOBILE CARD VIEW (Job List)   */
+/* =============================== */
+
+@media (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        background: #ffffff;
+        margin-bottom: 16px;
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border: none;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #4A5568;
+        margin-right: 10px;
+    }
+
+    td[data-label="Actions"] {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .action-buttons {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
