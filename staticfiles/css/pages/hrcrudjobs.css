@@ -412,3 +412,25 @@
         font-size: 13px;
     }
 }
+
+
+/* =============================================== */
+/* MOBILE FIX: Applications Count Button Size     */
+/* =============================================== */
+
+@media (max-width: 768px) {
+
+    td[data-label="Applications"] {
+        justify-content: space-between;   
+        align-items: center;
+    }
+
+    td[data-label="Applications"] a.btn {
+        margin-left: auto;               
+        width: fit-content;
+        padding: 4px 10px;
+        font-size: 13px;
+        line-height: 1.2;
+        text-align: center;
+    }
+}
