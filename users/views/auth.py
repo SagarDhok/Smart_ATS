@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from users.models import User, Invite, PasswordReset
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,10 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.conf import settings
-
-from users.models import User, Invite, PasswordReset
 from core.utils.email import send_brevo_email
-
 from datetime import timedelta
 import uuid
 import logging
@@ -35,6 +33,7 @@ def login_page(request):
 
         return _wrapped(request)
 
+    #local
     return _login_logic(request)
 
 
@@ -50,6 +49,22 @@ def _login_logic(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            logger.warning(
+                f"Failed login attempt: email={email}, IP={request.META.get('REMOTE_ADDR')}"
+            )
+            return render(request, "auth/login.html", {"error": "Invalid credentials"})
+
+        if not user_obj.is_active:
+            logger.warning(f"Inactive user login attempt: {email}")
+            return render(
+                request,
+                "auth/login.html",
+                {"error": "Your account is suspended"},
+            )
+
         user = authenticate(request, email=email, password=password)
 
         if not user:
@@ -58,15 +73,8 @@ def _login_logic(request):
             )
             return render(request, "auth/login.html", {"error": "Invalid credentials"})
 
-        if not user.is_active:
-            logger.warning(f"Inactive user login attempt: {email}")
-            return render(
-                request,
-                "auth/login.html",
-                {"error": "Your account is suspended"},
-            )
-
         login(request, user)
+
 
         # SUPERUSER skip force reset
         if user.role == "SUPERUSER":

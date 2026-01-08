@@ -78,7 +78,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ✅ ratelimit middleware ONLY in production
+# ratelimit middleware ONLY in production
 if ENVIRONMENT == "production":
     MIDDLEWARE += ["django_ratelimit.middleware.RatelimitMiddleware"]
     RATELIMIT_ENABLE = True
