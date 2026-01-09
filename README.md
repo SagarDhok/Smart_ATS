@@ -25,7 +25,6 @@ This project focuses on **real-world internal hiring workflows**, similar to how
 
 
 ### LIVE LINK  : https://smart-ats-v0yf.onrender.com
-but ye proejct linkdin pe post karna padega na i didint posted this on linkdin 
 
 
 ## 📸 UI Screenshots (Dashboard & Workflows)

@@ -117,7 +117,6 @@ def logout_user(request):
 # =====================================================
 # PROFILE
 # =====================================================
-
 @login_required
 def profile_view(request):
     user = request.user
@@ -211,7 +210,6 @@ def signup_page(request):
 # =====================================================
 # FORGOT PASSWORD
 # =====================================================
-
 def forgot_password_request(request):
     if request.method == "POST":
         email = request.POST.get("email")

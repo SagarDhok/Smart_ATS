@@ -81,7 +81,7 @@ class Invite(models.Model):
 # Password reset
 # --------------------------
 class PasswordReset(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  #!email(user) id 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  #!email(user) id  #sagar_id connected to User
     token = models.UUIDField(default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()

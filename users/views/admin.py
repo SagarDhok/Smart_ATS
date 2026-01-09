@@ -22,7 +22,6 @@ from core.utils.email import send_brevo_email
 # ---------------- LOGGING ----------------
 logger = logging.getLogger(__name__)
 
-
 # =================================================================
 #                           ADMIN DASHBOARD
 # =================================================================
@@ -34,7 +33,7 @@ def admin_dashboard(request):
 
     # HR USERS PAGINATION
     hr_qs = User.objects.filter(role="HR", is_active=True).order_by("-created_at")
-    hr_paginator = Paginator(hr_qs, 10)
+    hr_paginator = Paginator(hr_qs, 10)  #10 pages 1 , 2 3 
     hr_page = hr_paginator.get_page(request.GET.get("hr_page"))
 
     # PENDING INVITES PAGINATION
@@ -81,11 +80,7 @@ def hr_management(request):
     hr_users = User.objects.filter(role="HR").order_by("-created_at")
 
     if search:
-        hr_users = hr_users.filter(
-            Q(first_name__icontains=search) |
-            Q(last_name__icontains=search) |
-            Q(email__icontains=search)
-        )
+        hr_users = hr_users.filter(Q(first_name__icontains=search) |Q(last_name__icontains=search) |Q(email__icontains=search)) #or
 
     paginator = Paginator(hr_users, 10)
     hr_page = paginator.get_page(request.GET.get("page"))
@@ -136,6 +131,7 @@ def activate_hr(request, user_id):
 # =================================================================
 @login_required
 def invite_page(request):
+
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
         logger.warning(f"Unauthorized invite page access by {request.user.email}")
         messages.error(request, "You are not authorized to access the invite page.")
@@ -146,7 +142,7 @@ def invite_page(request):
 
         if not email:
             messages.error(request, "Email is required.")
-            return redirect("invite")
+            return redirect("invite") #ye html me handle kar sakte ya kiya hai dekh
 
         # Prevent duplicate active invites
         if Invite.objects.filter(
@@ -274,7 +270,7 @@ def admin_application_list(request):
         "rejected": all_counts.filter(status="rejected").count(),
     }
 
-    paginator = Paginator(applications.order_by("-applied_at"), 15)
+    paginator = Paginator(applications.order_by("-applied_at"), 10)
     apps_page = paginator.get_page(request.GET.get("page", 1))
 
     return render(request, "admin/apps_list.html", {

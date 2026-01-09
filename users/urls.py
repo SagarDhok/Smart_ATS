@@ -15,9 +15,8 @@ urlpatterns = [
 
     # AUTH
     path("login/", login_page, name="login"),
-    
     path("logout/", logout_user, name="logout_user"),
-   path("profile/", profile_view, name="profile"),
+    path("profile/", profile_view, name="profile"),
 
     path("signup/", signup_page, name="signup"),
     path("forgot-password/", forgot_password_request, name="forgot_password"),
