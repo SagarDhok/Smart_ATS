@@ -129,6 +129,10 @@
 /*   Filter Bar                  */
 /* ============================= */
 
+.jobs-header {
+    margin-bottom: 30px;
+}
+
 .apps-filter-bar {
     background: #fff;
     padding: 15px 20px;
