@@ -6,16 +6,16 @@ import random
 
 
 class Command(BaseCommand):
-    help = "Seed professional jobs for a specific HR user"
+    help = "Seed professional jobs for a specific Recruiter user"
 
     def handle(self, *args, **kwargs):
         User = get_user_model()
-        hr_email = "rakijat182@crsay.com"
+        recruiter_email = "rakijat182@crsay.com"
 
         try:
-            hr = User.objects.get(email=hr_email)
+            recruiter = User.objects.get(email=recruiter_email)
         except User.DoesNotExist:
-            self.stdout.write(self.style.ERROR(f"HR user not found: {hr_email}"))
+            self.stdout.write(self.style.ERROR(f"Recruiter user not found: {recruiter_email}"))
             return
 
         # -----------------------------------
@@ -112,7 +112,7 @@ class Command(BaseCommand):
                 employment_type="full_time",
                 vacancies=1,
                 deadline=date.today() + timedelta(days=random.randint(10, 45)),
-                created_by=hr
+                created_by=recruiter
             )
 
         self.stdout.write(self.style.SUCCESS(f"⭐ Successfully inserted {count} professional jobs!"))

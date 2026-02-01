@@ -1,10 +1,10 @@
 /* =========================================== */
-/* 📂 static\css\pages\hr_management.css */
+/* 📂 static\css\pages\recruiter_management.css */
 /* =========================================== */
 
 
 /* --- 🔍 SEARCH BAR STYLES --- */
-.search_hr {
+.search_recruiter {
     background: #ffffff;
     padding: 15px 20px;
     border-radius: 12px;
@@ -12,29 +12,31 @@
     margin-bottom: 25px;
 }
 
-.search_hr form {
+.search_recruiter form {
     display: flex;
     gap: 10px;
     align-items: center;
     margin: 0;
-    flex-wrap: wrap; /* 🔥 ensures mid-screen responsiveness */
+    flex-wrap: wrap;
+    /* 🔥 ensures mid-screen responsiveness */
 }
 
-.search_hr .input-field {
+.search_recruiter .input-field {
     padding: 10px 15px;
     border: 1px solid #cbd5e0;
     border-radius: 8px;
     width: 350px;
     max-width: 100%;
     font-size: 1rem;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.search_hr .btn-primary {
+.search_recruiter .btn-primary {
     padding: 10px 20px;
     font-size: 1rem;
     height: 44px;
-    white-space: nowrap; /* prevent button text breaking */
+    white-space: nowrap;
+    /* prevent button text breaking */
 }
 
 
@@ -84,7 +86,8 @@
     margin-top: 20px;
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* 🔥 prevents overflow */
+    flex-wrap: wrap;
+    /* 🔥 prevents overflow */
     gap: 10px;
 }
 
@@ -98,13 +101,13 @@
 
 /* 📱 Small Screens */
 @media (max-width: 600px) {
-    .search_hr form {
+    .search_recruiter form {
         flex-direction: column;
         width: 100%;
     }
 
-    .search_hr .input-field,
-    .search_hr .btn-primary {
+    .search_recruiter .input-field,
+    .search_recruiter .btn-primary {
         width: 100%;
         max-width: 100%;
     }
@@ -112,7 +115,7 @@
 
 /* 📲 Mid-size screens (tablets) */
 @media (max-width: 900px) {
-    .search_hr form {
+    .search_recruiter form {
         gap: 12px;
     }
 }
@@ -120,7 +123,7 @@
 
 
 /* =========================================== */
-/* 📱 MOBILE CARD VIEW (HR Management) */
+/* 📱 MOBILE CARD VIEW (Recruiter Management) */
 /* =========================================== */
 
 @media (max-width: 768px) {
@@ -142,7 +145,7 @@
         margin-bottom: 16px;
         border-radius: 14px;
         padding: 14px 16px;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     }
 
     td {

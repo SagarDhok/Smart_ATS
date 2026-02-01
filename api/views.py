@@ -19,7 +19,7 @@ from .serializers import (
     ApplicationSerializer, PublicApplicationSerializer
 )
 
-from .permissions import IsHR
+from .permissions import IsRecruiter
 from applications.parsing import parse_resume
 from applications.utils import compute_match_score, generate_summary, evaluate_candidate, fit_category
 
@@ -81,28 +81,28 @@ class PublicJobDetailAPI(RetrieveAPIView):
 
 
 # ============================================================
-# HR JOB APIs
+# RECRUITER JOB APIs
 # ============================================================
 
-class HRJobCreateAPI(CreateAPIView):
+class RecruiterJobCreateAPI(CreateAPIView):
     serializer_class = JobSerializer
-    permission_classes = [IsHR]
+    permission_classes = [IsRecruiter]
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
 
-class HRJobUpdateAPI(UpdateAPIView):
+class RecruiterJobUpdateAPI(UpdateAPIView):
     queryset = Job.objects.filter(is_deleted=False)
     serializer_class = JobSerializer
-    permission_classes = [IsHR]
+    permission_classes = [IsRecruiter]
     lookup_field = "id"
 
 
-class HRJobDeleteAPI(DestroyAPIView):
+class RecruiterJobDeleteAPI(DestroyAPIView):
     queryset = Job.objects.filter(is_deleted=False)
     serializer_class = JobSerializer
-    permission_classes = [IsHR]
+    permission_classes = [IsRecruiter]
     lookup_field = "id"
 
     def perform_destroy(self, instance):
@@ -143,12 +143,12 @@ class ApplyJobAPI(APIView):
 
 
 # ============================================================
-# HR APPLICATION APIs
+# RECRUITER APPLICATION APIs
 # ============================================================
 
-class HRApplicationListAPI(ListAPIView):
+class RecruiterApplicationListAPI(ListAPIView):
     serializer_class = ApplicationSerializer
-    permission_classes = [IsHR]
+    permission_classes = [IsRecruiter]
 
     def get_queryset(self):
         return Application.objects.filter(
@@ -157,9 +157,9 @@ class HRApplicationListAPI(ListAPIView):
         ).order_by("-applied_at")
 
 
-class HRApplicationDetailAPI(RetrieveAPIView):
+class RecruiterApplicationDetailAPI(RetrieveAPIView):
     serializer_class = ApplicationSerializer
-    permission_classes = [IsHR]
+    permission_classes = [IsRecruiter]
     lookup_field = "id"
 
     def get_queryset(self):
@@ -168,8 +168,8 @@ class HRApplicationDetailAPI(RetrieveAPIView):
         )
 
 
-class HRUpdateStatusAPI(APIView):
-    permission_classes = [IsHR]
+class RecruiterUpdateStatusAPI(APIView):
+    permission_classes = [IsRecruiter]
 
     def patch(self, request, id):
         app = get_object_or_404(

@@ -2,9 +2,9 @@ from django.urls import path
 from .views import (
     LoginAPI, LogoutAPI, MeAPI,
     PublicJobListAPI, PublicJobDetailAPI,
-    HRJobCreateAPI, HRJobUpdateAPI, HRJobDeleteAPI,
+    RecruiterJobCreateAPI, RecruiterJobUpdateAPI, RecruiterJobDeleteAPI,
     ApplyJobAPI,
-    HRApplicationListAPI, HRApplicationDetailAPI, HRUpdateStatusAPI
+    RecruiterApplicationListAPI, RecruiterApplicationDetailAPI, RecruiterUpdateStatusAPI
 )
 
 urlpatterns = [
@@ -17,16 +17,16 @@ urlpatterns = [
     path("jobs/", PublicJobListAPI.as_view()),
     path("jobs/<slug:slug>/", PublicJobDetailAPI.as_view()),
 
-    # HR Job Management
-    path("jobs/create/", HRJobCreateAPI.as_view()),
-    path("jobs/<int:id>/update/", HRJobUpdateAPI.as_view()),
-    path("jobs/<int:id>/delete/", HRJobDeleteAPI.as_view()),
+    # Recruiter Job Management
+    path("jobs/create/", RecruiterJobCreateAPI.as_view()),
+    path("jobs/<int:id>/update/", RecruiterJobUpdateAPI.as_view()),
+    path("jobs/<int:id>/delete/", RecruiterJobDeleteAPI.as_view()),
 
     # Apply API (public)
     path("apply/<slug:slug>/", ApplyJobAPI.as_view()),
 
-    # HR Application Management
-    path("applications/", HRApplicationListAPI.as_view()),
-    path("applications/<int:id>/", HRApplicationDetailAPI.as_view()),
-    path("applications/<int:id>/status/", HRUpdateStatusAPI.as_view()),
+    # Recruiter Application Management
+    path("applications/", RecruiterApplicationListAPI.as_view()),
+    path("applications/<int:id>/", RecruiterApplicationDetailAPI.as_view()),
+    path("applications/<int:id>/status/", RecruiterUpdateStatusAPI.as_view()),
 ]

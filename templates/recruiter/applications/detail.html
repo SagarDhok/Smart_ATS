@@ -19,7 +19,7 @@
             
             <div class="status-workflow">
                 <label class="section-label">Current Stage</label>
-                <form method="POST" action="{% url 'hr_application_status' app.id %}">
+                <form method="POST" action="{% url 'recruiter_application_status' app.id %}">
                     {% csrf_token %}
                     <div class="select-wrapper">
                         <select name="status" class="status-dropdown {{ app.status }}" onchange="this.form.submit()">

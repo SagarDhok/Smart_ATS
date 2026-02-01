@@ -9,25 +9,25 @@
 
 <div class="page-container">
 
-    <h1>HR Dashboard</h1>
+    <h1>Recruiter Dashboard</h1>
 
-    <div class="flex hrdash-row">
+    <div class="flex recruiter-dash-row">
 
         <!-- JOBS -->
-        <div class="card hrdash-card">
+        <div class="card recruiter-dash-card">
             <h3>Total Jobs</h3>
             <p class="big">{{ total_jobs }}</p>
 
          
 
-         <a href="{% url 'hr_job_list' %}" class="btn btn-outline mt-3 view-jobs-btn">
+         <a href="{% url 'recruiter_job_list' %}" class="btn btn-outline mt-3 view-jobs-btn">
     View All Jobs 
 </a>
 
         </div>
 
         <!-- APPLICATIONS -->
-        <div class="card hrdash-card">
+        <div class="card recruiter-dash-card">
             <h3>Total Applications</h3>
             <p class="big">{{ total_applications }}</p>
 
@@ -37,7 +37,7 @@
             <p><span>Hired</span><span>{{ hired }}</span></p>
             <p><span>Rejected</span><span>{{ rejected }}</span></p>
 
-            <a href="{% url 'hr_applications_list' %}" class="btn btn-outline mt-3">
+            <a href="{% url 'recruiter_applications_list' %}" class="btn btn-outline mt-3">
                 View Applications 
             </a>
         </div>
@@ -45,8 +45,8 @@
     </div>
 
     <!-- CENTER BUTTON -->
-    <div class="hr-create-wrapper">
-        <a href="{% url 'hr_job_create' %}" class="btn btn-primary hr-create-btn">
+    <div class="recruiter-create-wrapper">
+        <a href="{% url 'recruiter_job_create' %}" class="btn btn-primary recruiter-create-btn">
             Create New Job
         </a>
     </div>

@@ -1,7 +1,4 @@
-"""
-Django settings for core project.
-Production-ready for Render + Neon PostgreSQL.
-"""
+
 
 import os
 from pathlib import Path
@@ -56,7 +53,7 @@ INSTALLED_APPS = [
 
 ]
 
-# ✅ ratelimit ONLY in production
+#  ratelimit ONLY in production
 if ENVIRONMENT == "production":
     INSTALLED_APPS += ["django_ratelimit"]
 
@@ -110,28 +107,20 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # -------------------------------------------------------------------
 # DATABASE
-# -------------------------------------------------------------------
-if ENVIRONMENT == "production":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": "5432",
-            "CONN_MAX_AGE": 60,
-            "OPTIONS": {"sslmode": "require"},
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+# --------------------------------------------------------------------
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+        "CONN_MAX_AGE": 60,
+        "OPTIONS": {"sslmode": "require"},
+    }
+}
 
 
 # -------------------------------------------------------------------

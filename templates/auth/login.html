@@ -5,8 +5,8 @@
 {% endblock %}
 {% block content %}
 
-<div class="auth-container">
-
+<div class="login-wrapper">
+    <!-- Left: Login Form -->
     <div class="auth-card">
         <h1 class="auth-title">Login</h1>
         <p class="auth-subtitle">Welcome back. Please enter your credentials.</p>
@@ -18,12 +18,11 @@
 
             <label>Password</label>
             <div class="password-wrapper">
-    <input type="password" name="password" id="password" required>
-    <img src="{% static 'icons/show.png' %}" 
-         class="password-toggle"
-         onclick="togglePassword('password', this)">
-</div>
-
+                <input type="password" name="password" id="password" required>
+                <img src="{% static 'icons/show.png' %}" 
+                     class="password-toggle"
+                     onclick="togglePassword('password', this)">
+            </div>
 
             {% if error %}
                 <p class="auth-error">{{ error }}</p>
@@ -36,7 +35,24 @@
             </div>
         </form>
     </div>
-</div>
 
+    <!-- Right: Demo Credentials -->
+    <div class="demo-credentials-card">
+        <h3 class="demo-card-title">🔑 Demo Credentials</h3>
+        <p class="demo-card-subtitle">Use these to test the system</p>
+
+        <div class="demo-section">
+            <p class="demo-label">👑 Admin</p>
+            <p class="demo-value">Email: <strong>admin@demo.com</strong></p>
+            <p class="demo-value">Password: <strong>admin@1234</strong></p>
+        </div>
+
+        <div class="demo-section">
+            <p class="demo-label">🧑‍💻 Recruiter</p>
+            <p class="demo-value">Email: <strong>dhokved7@gmail.com</strong></p>
+            <p class="demo-value">Password: <strong>ved@1234</strong></p>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

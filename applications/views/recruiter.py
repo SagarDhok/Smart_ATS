@@ -6,6 +6,9 @@ from applications.models import Application
 from django.db.models import Q
 import logging
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
@@ -19,13 +22,13 @@ def app_queryset_for(user):
     )
 
 
-class HRApplicationListView(LoginRequiredMixin, ListView):
-    template_name = "hr/applications/list.html"
+class RecruiterApplicationListView(LoginRequiredMixin, ListView):
+    template_name = "recruiter/applications/list.html"
     context_object_name = "apps_page"
     paginate_by = 10
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.role != "HR":
+        if request.user.role != "RECRUITER":
             return redirect("login")
         return super().dispatch(request, *args, **kwargs)
 
@@ -43,12 +46,12 @@ class HRApplicationListView(LoginRequiredMixin, ListView):
         return qs
 
 
-class HRApplicationDetailView(LoginRequiredMixin, DetailView):
-    template_name = "hr/applications/detail.html"
+class RecruiterApplicationDetailView(LoginRequiredMixin, DetailView):
+    template_name = "recruiter/applications/detail.html"
     context_object_name = "app"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.role != "HR":
+        if request.user.role != "RECRUITER":
             return redirect("login")
         return super().dispatch(request, *args, **kwargs)
 
@@ -56,14 +59,14 @@ class HRApplicationDetailView(LoginRequiredMixin, DetailView):
         return app_queryset_for(self.request.user)
 
 
-class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
+class RecruiterStatusUpdateView(LoginRequiredMixin, UpdateView):
     model = Application
     fields = ["status"]
-    template_name = "hr/applications/status_update.html"
+    template_name = "recruiter/applications/status_update.html"
     context_object_name = "app"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.role != "HR":
+        if request.user.role != "RECRUITER":
             return redirect("login")
         return super().dispatch(request, *args, **kwargs)
 
@@ -72,7 +75,7 @@ class HRStatusUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
-        return redirect("hr_application_detail", pk=self.object.pk)
+        return redirect("recruiter_application_detail", pk=self.object.pk)
 
 
 

@@ -42,8 +42,8 @@ def _login_logic(request):
     if request.user.is_authenticated:
         if request.user.role == "ADMIN":
             return redirect("admin_dashboard")
-        if request.user.role == "HR":
-            return redirect("hr_dashboard")
+        if request.user.role == "RECRUITER":
+            return redirect("recruiter_dashboard")
 
     if request.method == "POST":
         email = request.POST.get("email")
@@ -74,7 +74,7 @@ def _login_logic(request):
             return render(request, "auth/login.html", {"error": "Invalid credentials"})
 
         login(request, user)
-
+        logger.info(f"User logged in: {user.email}, Role: '{user.role}'")
 
         # SUPERUSER skip force reset
         if user.role == "SUPERUSER":
@@ -92,13 +92,13 @@ def _login_logic(request):
             )
             return redirect("admin_dashboard")
 
-        if user.role == "HR":
+        if user.role == "RECRUITER":
             messages.success(
                 request,
                 f"Welcome {user.first_name} {user.last_name}".strip()
                 if user.first_name else f"Welcome {user.email}",
             )
-            return redirect("hr_dashboard")
+            return redirect("recruiter_dashboard")
 
         return redirect("/")
 
@@ -108,7 +108,6 @@ def _login_logic(request):
 # =====================================================
 # LOGOUT
 # =====================================================
-
 def logout_user(request):
     logout(request)
     return redirect("login")
@@ -135,7 +134,6 @@ def profile_view(request):
 # =====================================================
 # SIGNUP VIA INVITE
 # =====================================================
-
 def signup_page(request):
     token = request.GET.get("token")
 
@@ -186,7 +184,7 @@ def signup_page(request):
                 password=password,
                 first_name=request.POST.get("first_name"),
                 last_name=request.POST.get("last_name"),
-                role="HR",
+                role="RECRUITER",
                 is_active=True,
                 must_change_password=False,
             )

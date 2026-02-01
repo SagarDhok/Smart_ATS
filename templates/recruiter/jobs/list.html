@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/hrcrudjobs.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/recruiter_crud_jobs.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
     <div class="jobs-header">
         <h1>My Jobs</h1>
 
-        <a href="{% url 'hr_job_create' %}" class="btn btn-primary">
+        <a href="{% url 'recruiter_job_create' %}" class="btn btn-primary">
             Create New Job
         </a>
     </div>
@@ -45,7 +45,7 @@
                 Search
             </button>
 
-            <a href="{% url 'hr_job_list' %}" class="apps-clear-btn">
+            <a href="{% url 'recruiter_job_list' %}" class="apps-clear-btn">
                 Clear
             </a>
 
@@ -70,7 +70,7 @@
             <tr>
 
                 <td data-label="Title">
-                    <a href="{% url 'hr_job_detail' job.id %}" class="table-link">
+                    <a href="{% url 'recruiter_job_detail' job.id %}" class="table-link">
                         {{ job.title }}
                     </a>
                 </td>
@@ -88,18 +88,18 @@
                 </td>
 
                 <td data-label="Applications">
-                    <a href="{% url 'hr_job_applications' job.id %}" class="btn btn-outline">
+                    <a href="{% url 'recruiter_job_applications' job.id %}" class="btn btn-outline">
                         {{ job.app_count }}
                     </a>
                 </td>
 
                 <td data-label="Actions">
                     <div class="action-buttons">
-                        <a href="{% url 'hr_job_edit' job.id %}" class="btn-action btn-edit">
+                        <a href="{% url 'recruiter_job_edit' job.id %}" class="btn-action btn-edit">
                             Edit
                         </a>
 
-                        <form action="{% url 'hr_job_delete' job.id %}" method="post">
+                        <form action="{% url 'recruiter_job_delete' job.id %}" method="post">
                             {% csrf_token %}
                             <button class="btn-action btn-delete"
                                     onclick="return confirm('Are you sure?');">

@@ -4,7 +4,7 @@
 
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/hrcrudjobs.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/recruiter_crud_jobs.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -18,9 +18,9 @@
         </div>
 
         <div class="job-detail-actions">
-            <a href="{% url 'hr_job_edit' job.id %}" class="btn-detail btn-detail-edit">Edit</a>
+            <a href="{% url 'recruiter_job_edit' job.id %}" class="btn-detail btn-detail-edit">Edit</a>
 
-            <form action="{% url 'hr_job_delete' job.id %}" method="post">
+            <form action="{% url 'recruiter_job_delete' job.id %}" method="post">
                 {% csrf_token %}
                 <button class="btn-detail btn-detail-delete"
                         onclick="return confirm('Are you sure you want to delete this job?');">
@@ -91,7 +91,7 @@
     <div class="job-section">
         <h3>Applications ({{ job.applications.count }})</h3>
 
-      <a href="{% url 'hr_job_applications' job.id %}" class="btn btn-outline mt-2">
+      <a href="{% url 'recruiter_job_applications' job.id %}" class="btn btn-outline mt-2">
 
             View Applications
         </a>

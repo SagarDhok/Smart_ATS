@@ -22,6 +22,7 @@ from core.utils.email import send_brevo_email
 # ---------------- LOGGING ----------------
 logger = logging.getLogger(__name__)
 
+
 # =================================================================
 #                           ADMIN DASHBOARD
 # =================================================================
@@ -31,10 +32,10 @@ def admin_dashboard(request):
         logger.warning(f"Unauthorized admin dashboard access attempt by {request.user.email}")
         return redirect("login")
 
-    # HR USERS PAGINATION
-    hr_qs = User.objects.filter(role="HR", is_active=True).order_by("-created_at")
-    hr_paginator = Paginator(hr_qs, 10)  #10 pages 1 , 2 3 
-    hr_page = hr_paginator.get_page(request.GET.get("hr_page"))
+    # RECRUITER USERS PAGINATION
+    recruiter_qs = User.objects.filter(role="RECRUITER", is_active=True).order_by("-created_at")
+    recruiter_paginator = Paginator(recruiter_qs, 10)  #10 pages 1 , 2 3 
+    recruiter_page = recruiter_paginator.get_page(request.GET.get("recruiter_page"))
 
     # PENDING INVITES PAGINATION
     pending_invites_qs = Invite.objects.filter(
@@ -55,7 +56,7 @@ def admin_dashboard(request):
     rejected = Application.objects.filter(status="rejected", job__is_deleted=False).count()
 
     return render(request, "admin/admin_dashboard.html", {
-        "hr_page": hr_page,
+        "recruiter_page": recruiter_page,
         "pending_invites_page": pending_invites_page,
         "total_jobs": total_jobs,
         "total_applications": total_applications,
@@ -68,66 +69,66 @@ def admin_dashboard(request):
 
 
 # =================================================================
-#                         HR MANAGEMENT PAGE
+#                         RECRUITER MANAGEMENT PAGE
 # =================================================================
 @login_required
-def hr_management(request):
+def recruiter_management(request):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(f"Unauthorized HR management access attempt by {request.user.email}")
+        logger.warning(f"Unauthorized Recruiter management access attempt by {request.user.email}")
         return redirect("login")
 
     search = request.GET.get("search", "").strip()
-    hr_users = User.objects.filter(role="HR").order_by("-created_at")
+    recruiter_users = User.objects.filter(role="RECRUITER").order_by("-created_at")
 
     if search:
-        hr_users = hr_users.filter(Q(first_name__icontains=search) |Q(last_name__icontains=search) |Q(email__icontains=search)) #or
+        recruiter_users = recruiter_users.filter(Q(first_name__icontains=search) |Q(last_name__icontains=search) |Q(email__icontains=search)) #or
 
-    paginator = Paginator(hr_users, 10)
-    hr_page = paginator.get_page(request.GET.get("page"))
+    paginator = Paginator(recruiter_users, 10)
+    recruiter_page = paginator.get_page(request.GET.get("page"))
 
-    return render(request, "admin/hr_management.html", {
-        "hr_page": hr_page,
+    return render(request, "admin/recruiter_management.html", {
+        "recruiter_page": recruiter_page,
         "search": search,
     })
 
 
 # =================================================================
-#                ACTIVATE / SUSPEND HR (AJAX JSON API)
+#                ACTIVATE / SUSPEND RECRUITER (AJAX JSON API)
 # =================================================================
 @login_required
 @require_POST
-def suspend_hr(request, user_id):
+def suspend_recruiter(request, user_id):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(f"Unauthorized HR suspend attempt by {request.user.email}")
+        logger.warning(f"Unauthorized Recruiter suspend attempt by {request.user.email}")
         raise PermissionDenied()
 
-    hr = get_object_or_404(User, id=user_id, role="HR")
-    hr.is_active = False
-    hr.save()
+    recruiter = get_object_or_404(User, id=user_id, role="RECRUITER")
+    recruiter.is_active = False
+    recruiter.save()
 
-    logger.info(f"HR suspended: id={hr.id}, email={hr.email}, by={request.user.email}")
+    logger.info(f"Recruiter suspended: id={recruiter.id}, email={recruiter.email}, by={request.user.email}")
 
     return JsonResponse({"status": "suspended"})
 
 
 @login_required
 @require_POST
-def activate_hr(request, user_id):
+def activate_recruiter(request, user_id):
     if request.user.role not in ["ADMIN", "SUPERUSER"]:
-        logger.warning(f"Unauthorized HR activate attempt by {request.user.email}")
+        logger.warning(f"Unauthorized Recruiter activate attempt by {request.user.email}")
         raise PermissionDenied()
 
-    hr = get_object_or_404(User, id=user_id, role="HR")
-    hr.is_active = True
-    hr.save()
+    recruiter = get_object_or_404(User, id=user_id, role="RECRUITER")
+    recruiter.is_active = True
+    recruiter.save()
 
-    logger.info(f"HR activated: id={hr.id}, email={hr.email}, by={request.user.email}")
+    logger.info(f"Recruiter activated: id={recruiter.id}, email={recruiter.email}, by={request.user.email}")
 
     return JsonResponse({"status": "activated"})
 
 
 # =================================================================
-#                            INVITE HR PAGE
+#                            INVITE RECRUITER PAGE
 # =================================================================
 @login_required
 def invite_page(request):
@@ -168,7 +169,7 @@ def invite_page(request):
             html_content=f"""
                 <p>Hello,</p>
 
-                <p>You have been invited to join <strong>Smart ATS</strong> as an HR user.</p>
+                <p>You have been invited to join <strong>Smart ATS</strong> as a Recruiter.</p>
 
                 <p>
                     <a href="{signup_link}">
@@ -200,7 +201,7 @@ def invite_page(request):
         messages.success(request, f"Invite sent successfully to {email}")
         return redirect("invite")
 
-    return render(request, "hr/invite.html")
+    return render(request, "recruiter/invite.html")
 
 
 # =================================================================

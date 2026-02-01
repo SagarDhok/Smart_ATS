@@ -10,9 +10,10 @@
 
 h1 {
     margin-bottom: 30px;
-    color: #1a202c;
+    color: var(--color-text-dark);
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -1px;
 }
 
 /* Flexible Cards Row */
@@ -24,41 +25,36 @@ h1 {
 }
 
 /* Card Styling */
+/* Card Styling (Inherits from theme.css, adds layout specs) */
 .card {
     flex: 1;
     min-width: 280px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 25px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    /* Theme.css handles bg, shadow, border-radius */
 }
 
 .card h3 {
     margin-top: 0;
-    font-size: 1.25rem;
-    color: #4a5568;
-    border-bottom: 1px solid #edf2f7;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    opacity: 0.9;
 }
 
 .card .big {
     font-size: 3.5rem;
-    font-weight: 700;
-    color: #2c5282;
+    font-weight: 800;
+    color: var(--color-primary);
     margin-bottom: 10px;
     line-height: 1;
+    letter-spacing: -2px;
 }
 
 .card p {
     font-size: 1rem;
-    color: #4a5568;
+    color: var(--color-text-subtle);
     margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
@@ -101,7 +97,9 @@ h1 {
     border-color: #4299e1;
 }
 
-.mt-2 { margin-top: 10px; }
+.mt-2 {
+    margin-top: 10px;
+}
 
 /* Badges */
 .badge {
@@ -110,52 +108,80 @@ h1 {
     font-weight: 600;
     font-size: 0.85rem;
 }
-.badge-warning { background-color: #fefcbf; color: #975a16; }
-.badge-success { background-color: #9ae6b4; color: #276749; }
-.badge-danger  { background-color: #feb2b2; color: #9b2c2c; }
+
+.badge-warning {
+    background-color: #fefcbf;
+    color: #975a16;
+}
+
+.badge-success {
+    background-color: #9ae6b4;
+    color: #276749;
+}
+
+.badge-danger {
+    background-color: #feb2b2;
+    color: #9b2c2c;
+}
 
 /* Section Titles */
-section { margin-bottom: 40px; }
+section {
+    margin-bottom: 40px;
+}
 
 .section-title {
-    font-size: 1.75rem;
-    color: #1a202c;
-    margin-bottom: 20px;
-    border-left: 5px solid #4299e1;
-    padding-left: 10px;
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+    margin-bottom: 24px;
+    border-left: 5px solid var(--color-primary);
+    padding-left: 16px;
+    font-weight: 700;
 }
 
 /* Tables */
 .table {
     width: 100%;
-    border-collapse: collapse;
-    background-color: #ffffff;
-    border-radius: 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: var(--color-bg-card);
+    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }
 
-.table th, .table td {
-    padding: 15px;
+.table th,
+.table td {
+    padding: 16px 20px;
     text-align: left;
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .table thead th {
-    background-color: #f7fafc;
-    color: #4a5568;
+    background-color: var(--color-bg-body);
+    color: var(--color-text-subtle);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .table tbody tr:hover {
-    background-color: #f7fafc;
+    background-color: var(--color-primary-light);
 }
 
 .table tbody tr td[colspan="3"] {
     font-style: italic;
-    color: #a0aec0 !important;
+    color: var(--color-text-light) !important;
     text-align: center;
     padding: 30px;
 }
@@ -171,7 +197,8 @@ section { margin-bottom: 40px; }
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Prevent overflow */
+    flex-wrap: wrap;
+    /* Prevent overflow */
     gap: 15px;
     margin-top: 20px;
 }
@@ -191,24 +218,24 @@ section { margin-bottom: 40px; }
     color: #4a5568;
 }
 
-/* HR Dashboard Cards */
-.hrdash-row {
+/* Recruiter Dashboard Cards */
+.recruiter-dash-row {
     gap: 40px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.hrdash-card {
+.recruiter-dash-card {
     max-width: 450px;
     flex: 1;
 }
 
-.hr-create-wrapper {
+.recruiter-create-wrapper {
     text-align: center;
     margin-top: 35px;
 }
 
-.hr-create-btn {
+.recruiter-create-btn {
     width: auto !important;
     padding: 12px 28px !important;
     display: inline-block !important;

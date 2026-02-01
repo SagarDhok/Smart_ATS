@@ -66,7 +66,7 @@
             <tr>
 
                 <td data-label="Candidate">
-                    <a href="{% url 'hr_application_detail' app.id %}"
+                    <a href="{% url 'recruiter_application_detail' app.id %}"
                        class="table-link">
                         {{ app.full_name }}
                     </a>
@@ -77,7 +77,7 @@
                 </td>
 
                 <td data-label="Job">
-                    <a href="{% url 'hr_job_detail' app.job.id %}"
+                    <a href="{% url 'recruiter_job_detail' app.job.id %}"
                        class="table-link">
                         {{ app.job.title }}
                     </a>

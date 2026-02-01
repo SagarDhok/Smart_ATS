@@ -14,13 +14,13 @@
     <!-- TOP CARDS -->
     <div class="flex">
 
-        <!-- HR Count -->
+        <!-- Recruiter Count -->
         <div class="card">
-            <h3>Total HR</h3>
-            <p class="big">{{ hr_page.paginator.count }}</p>
+            <h3>Total Recruiters</h3>
+            <p class="big">{{ recruiter_page.paginator.count }}</p>
 
-            <a href="{% url 'invite' %}" class="btn btn-primary">Invite HR</a>
-            <a href="{% url 'hr_management' %}" class="btn btn-outline mt-2">Manage HR</a>
+            <a href="{% url 'invite' %}" class="btn btn-primary">Invite Recruiter</a>
+            <a href="{% url 'recruiter_management' %}" class="btn btn-outline mt-2">Manage Recruiters</a>
         </div>
 
         <!-- Jobs -->
@@ -52,10 +52,13 @@
     </div>
 
     <!-- ========================= -->
-    <!-- HR USERS TABLE -->
+    <!-- RECRUITER USERS TABLE -->
+    <!-- ========================= -->
+    <!-- ========================= -->
+    <!-- RECRUITER USERS TABLE -->
     <!-- ========================= -->
     <section>
-        <h2 class="section-title">HR Users</h2>
+        <h2 class="section-title">Recruiters</h2>
 
         <table class="table">
             <thead>
@@ -67,27 +70,27 @@
             </thead>
 
             <tbody>
-                {% for hr in hr_page %}
+                {% for recruiter in recruiter_page %}
                 <tr>
-                    <td>{{ hr.first_name }} {{ hr.last_name }}</td>
-                    <td>{{ hr.email }}</td>
-                   <td>{{ hr.created_at|date:"d M Y, h:i A" }}</td>
+                    <td>{{ recruiter.first_name }} {{ recruiter.last_name }}</td>
+                    <td>{{ recruiter.email }}</td>
+                   <td>{{ recruiter.created_at|date:"d M Y, h:i A" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="3" style="text-align:center; padding:20px; color:#777;">
-                        No HR users yet.
+                        No recruiters yet.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- HR Pagination -->
+        <!-- Recruiter Pagination -->
         <div class="pagination-controls">
 
-            {% if hr_page.has_previous %}
-                <a href="?hr_page={{ hr_page.previous_page_number }}" class="btn btn-outline">
+            {% if recruiter_page.has_previous %}
+                <a href="?recruiter_page={{ recruiter_page.previous_page_number }}" class="btn btn-outline">
                     Previous
                 </a>
             {% else %}
@@ -95,11 +98,11 @@
             {% endif %}
 
             <span class="page-info">
-                Page {{ hr_page.number }} of {{ hr_page.paginator.num_pages }}
+                Page {{ recruiter_page.number }} of {{ recruiter_page.paginator.num_pages }}
             </span>
 
-            {% if hr_page.has_next %}
-                <a href="?hr_page={{ hr_page.next_page_number }}" class="btn btn-outline">
+            {% if recruiter_page.has_next %}
+                <a href="?recruiter_page={{ recruiter_page.next_page_number }}" class="btn btn-outline">
                     Next
                 </a>
             {% else %}
