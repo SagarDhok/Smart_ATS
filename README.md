@@ -27,7 +27,7 @@ Smart ATS is an **internal recruitment management system** demonstrating product
 
 ### Resume Parsing & Match Scoring
 ![Application Score Summary](screenshots/application_score_summary.png)
-**Top-level match scores derived from skills, experience, and job description analysis*
+*Top-level match scores derived from skills, experience, and job description analysis*
 
 ![Skill Breakdown](screenshots/application_skill_breakdown.png)
 *Parsed resume data showing extracted skills, projects, and education*
@@ -103,6 +103,12 @@ CANDIDATE → Applies without account (public job listings)
 - **Unique constraints**: Prevents duplicate applications (`unique_together`)
 - **DecimalField for money**: Avoids floating-point precision issues
 
+### 7. **REST API Layer**
+- **DRF Token Authentication**: Stateless API auth for frontend/mobile expansion
+- **Public**: `GET /api/jobs/`, `POST /api/apply/<slug>/` (triggers parsing + scoring)
+- **Recruiter**: `POST /api/jobs/create/`, `GET /api/applications/`, `PATCH /api/applications/<id>/status/`
+- **Custom permissions**: `IsRecruiter`, `IsAdmin` control access
+
 ---
 
 ## Tech Stack
@@ -117,6 +123,8 @@ CANDIDATE → Applies without account (public job listings)
 | **Email** | Brevo HTTP API | Cloud-friendly transactional emails |
 | **Static** | WhiteNoise | Compressed, versioned files |
 | **Deploy** | Render | Free tier with production config |
+
+> PostgreSQL is used in production via Neon; MySQL is used for local development.
 
 ---
 
@@ -216,7 +224,7 @@ Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ## Developer
 
 **Sagar Dhok**  
-Backend Developer | Python • Django • REST APIs • MySQL
+Backend Developer | Python • Django • REST APIs • SQL (MySQL, PostgreSQL basics)
 
 - **GitHub**: [github.com/SagarDhok](https://github.com/SagarDhok/Smart_ATS)
 - **LinkedIn**: [linkedin.com/in/sagardhok](https://www.linkedin.com/in/sagardhok/)
