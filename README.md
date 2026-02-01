@@ -56,7 +56,7 @@ CANDIDATE → Applies without account (public job listings)
 
 **Data Isolation**: Recruiters access applications via role-enforced querysets (`job__created_by=request.user`), not URL manipulation checks.
 
-**Terminology**: "Recruiter" (not "HR") reflects talent acquisition focus, not broader HR functions like payroll or compliance.
+
 
 📖 **Details**: [docs/architecture.md](docs/architecture.md)
 
@@ -216,7 +216,7 @@ Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ## Developer
 
 **Sagar Dhok**  
-Backend Developer | Python • Django • REST APIs • PostgreSQL
+Backend Developer | Python • Django • REST APIs • MySQL
 
 - **GitHub**: [github.com/SagarDhok](https://github.com/SagarDhok/Smart_ATS)
 - **LinkedIn**: [linkedin.com/in/sagardhok](https://www.linkedin.com/in/sagardhok/)
