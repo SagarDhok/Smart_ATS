@@ -19,9 +19,10 @@ Smart ATS is an **internal recruitment management system** demonstrating product
 
 ## Screenshots
 
-### Recruiter Dashboard & Application Management
+### Recruiter Dashboard
 ![Recruiter Dashboard](screenshots/recruiter_dashboard.png)
 
+### Recruiter Jobs
 ![Recruiter Jobs](screenshots/recruiter_jobs.png)
 
 ### Resume Parsing & Match Scoring
