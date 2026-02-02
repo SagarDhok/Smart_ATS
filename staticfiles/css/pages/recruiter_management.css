@@ -1,0 +1,170 @@
+/* =========================================== */
+/* 📂 static\css\pages\recruiter_management.css */
+/* =========================================== */
+
+
+/* --- 🔍 SEARCH BAR STYLES --- */
+.search_recruiter {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 25px;
+}
+
+.search_recruiter form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+    flex-wrap: wrap;
+    /* 🔥 ensures mid-screen responsiveness */
+}
+
+.search_recruiter .input-field {
+    padding: 10px 15px;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    width: 350px;
+    max-width: 100%;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.search_recruiter .btn-primary {
+    padding: 10px 20px;
+    font-size: 1rem;
+    height: 44px;
+    white-space: nowrap;
+    /* prevent button text breaking */
+}
+
+
+/* --- TABLE WRAPPER (FIX FOR MOBILE) --- */
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+
+/* --- ACTION & UTILITY STYLES --- */
+.text-right {
+    text-align: right !important;
+}
+
+.action-cell {
+    text-align: right !important;
+}
+
+.inline-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* --- STATUS BADGES --- */
+.badge-success {
+    background: #9ae6b4 !important;
+    color: #276749 !important;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.badge-danger {
+    background: #feb2b2 !important;
+    color: #9b2c2c !important;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+
+/* --- PAGINATION --- */
+.pagination-controls {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    /* 🔥 prevents overflow */
+    gap: 10px;
+}
+
+.page-info {
+    font-size: 1rem;
+    color: #4a5568;
+}
+
+
+/* --- RESPONSIVE BREAKPOINTS --- */
+
+/* 📱 Small Screens */
+@media (max-width: 600px) {
+    .search_recruiter form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search_recruiter .input-field,
+    .search_recruiter .btn-primary {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* 📲 Mid-size screens (tablets) */
+@media (max-width: 900px) {
+    .search_recruiter form {
+        gap: 12px;
+    }
+}
+
+
+
+/* =========================================== */
+/* 📱 MOBILE CARD VIEW (Recruiter Management) */
+/* =========================================== */
+
+@media (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        background: #ffffff;
+        margin-bottom: 16px;
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border: none;
+        font-size: 14px;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #4A5568;
+        margin-right: 10px;
+    }
+
+    .action-cell {
+        justify-content: flex-start;
+    }
+}
