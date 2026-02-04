@@ -20,7 +20,15 @@
 
         <div class="hero-buttons">
             <a href="/jobs/" class="btn btn-primary">⭐ Browse Jobs</a>
-            <a href="/login/" class="btn btn-outline">👤 Recruiter / Admin Login</a>
+            {% if user.is_authenticated %}
+                {% if user.role == "SUPERUSER" or user.role == "ADMIN" %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">📊 Go to Dashboard</a>
+                {% elif user.role == "RECRUITER" %}
+                    <a href="{% url 'recruiter_dashboard' %}" class="btn btn-outline">📊 Go to Dashboard</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline">👤 Recruiter / Admin Login</a>
+            {% endif %}
         </div>
     </section>
 

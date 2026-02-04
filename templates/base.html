@@ -87,14 +87,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // Alert close
-    document.querySelectorAll(".alert-close").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const box = btn.closest(".alert");
-            box.classList.add("hide");
-            box.addEventListener("transitionend", () => box.remove());
-        });
+    // Alert close and auto-dismiss
+    document.querySelectorAll(".alert").forEach(alert => {
+        const closeBtn = alert.querySelector(".alert-close");
+        
+        // Close on button click
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => dismissAlert(alert));
+        }
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => dismissAlert(alert), 5000);
     });
+    
+    function dismissAlert(alert) {
+        if (alert.classList.contains("hide")) return;
+        alert.classList.add("hide");
+        setTimeout(() => alert.remove(), 300);
+    }
 
 function togglePassword(fieldId, icon) {
     const input = document.getElementById(fieldId);

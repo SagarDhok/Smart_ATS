@@ -3,4 +3,4 @@ __pycache__/
 .env
 rough.txt
 db.sqlite3
-Interviewquestions.txt
+interview_questions.md.resolved
