@@ -19,7 +19,7 @@
                 </a>
             </li>
 
-            {% if request.user.role == "ADMIN" or request.user.role == "SUPERADMIN" %}
+            {% if request.user.role == "ADMIN" or request.user.role == "SUPERUSER" %}
                 <li>
                     <a href="{% url 'admin_dashboard' %}">
                         📊 <span>Dashboard</span>
