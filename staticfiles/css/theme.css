@@ -300,79 +300,205 @@ select:focus {
 /* --- ALERT CONTAINER (FIXED POSITIONING) --- */
 .alert-container {
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 15px;
-    max-width: 500px;
-    width: 90%;
-    z-index: 1000;
+    top: 24px;
+    right: 24px;
+    left: auto;
+    transform: none;
+    max-width: 420px;
+    width: calc(100% - 48px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-
-/* --- ALERT STYLES (MODERN UPDATE) --- */
-
+/* --- PREMIUM ALERT TOAST STYLES --- */
 .alert {
-    padding: 16px 20px;
-    border-radius: 12px;
-    margin-bottom: 12px;
+    padding: 16px 20px 16px 56px;
+    border-radius: 14px;
     font-size: 15px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    opacity: 1;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 10px 40px -10px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: right center;
 }
 
-/* Applying theme-aligned status colors */
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(100px) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Icon pseudo-element */
+.alert::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* Progress bar for auto-dismiss feeling */
+.alert::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    animation: progressShrink 5s linear forwards;
+    border-radius: 0 0 14px 14px;
+}
+
+@keyframes progressShrink {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+/* Success Alert */
 .alert-success {
-    background: var(--color-success-bg);
-    color: #276749;
-    border-left: 4px solid var(--color-success);
-    border-right: none;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #065F46;
 }
 
+.alert-success::before {
+    content: '✓';
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+}
+
+.alert-success::after {
+    background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+/* Error Alert */
 .alert-error {
-    background: var(--color-danger-bg);
-    color: #9B2C2C;
-    border-left: 4px solid var(--color-danger);
-    border-right: none;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #991B1B;
 }
 
+.alert-error::before {
+    content: '✕';
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    color: white;
+}
+
+.alert-error::after {
+    background: linear-gradient(90deg, #EF4444, #F87171);
+}
+
+/* Warning Alert */
 .alert-warning {
-    background: var(--color-warning-bg);
-    color: #975A16;
-    border-left: 4px solid var(--color-warning);
-    border-right: none;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #92400E;
 }
 
+.alert-warning::before {
+    content: '!';
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+}
+
+.alert-warning::after {
+    background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+/* Info Alert */
 .alert-info {
-    background: #EBF8F8;
-    color: #2C7A7B;
-    border-left: 4px solid #38B2AC;
-    border-right: none;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #1E40AF;
 }
 
+.alert-info::before {
+    content: 'i';
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: white;
+    font-style: italic;
+}
+
+.alert-info::after {
+    background: linear-gradient(90deg, #3B82F6, #60A5FA);
+}
+
+/* Alert text */
 .alert span {
     flex-grow: 1;
     text-align: left;
-    /* Aligned left for better readability in a fixed alert */
     font-weight: 600;
-    padding-right: 15px;
+    padding-right: 12px;
+    line-height: 1.4;
 }
 
-.alert.hide {
-    opacity: 0;
-    transform: translateY(-6px);
-    pointer-events: none;
-}
-
+/* Close button */
 .alert-close {
-    font-size: 20px;
-    font-weight: 300;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 400;
     cursor: pointer;
-    line-height: 1;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    color: inherit;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.alert-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
+}
+
+/* Hide animation */
+.alert.hide {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideOutRight {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(100px) scale(0.9);
+    }
 }
 
 
