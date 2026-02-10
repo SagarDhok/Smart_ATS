@@ -47,6 +47,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
 # PUBLIC APPLY FORM
 # ----------------------------------------
 class PublicApplicationSerializer(serializers.ModelSerializer):
+    resume = serializers.FileField(required=True)
+
     class Meta:
         model = Application
         fields = ["full_name", "email", "phone", "resume"]
+
+    def validate_resume(self, value):
+        if not value.name.lower().endswith(".pdf"):
+            raise serializers.ValidationError("Only PDF files are allowed.")
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("Resume size cannot exceed 5MB.")
+        return value
+
+    def validate_email(self, value):
+        return value.strip().lower()

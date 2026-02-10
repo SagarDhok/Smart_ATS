@@ -74,12 +74,12 @@ def _login_logic(request):
         login(request, user)
         logger.info(f"User logged in: {user.email}, Role: '{user.role}'")
 
-        # SUPERUSER skip force reset
-        if user.role == "SUPERUSER":
-            return redirect("admin_dashboard")
+        # Django superuser → Django admin panel (not business dashboard)
+        if user.is_superuser:
+            return redirect("/admin/")
 
-        # FORCE PASSWORD RESET
-        if user.must_change_password and user.role == "ADMIN" and not user.is_superuser:
+        # FORCE PASSWORD RESET (for ADMIN users on first login)
+        if user.must_change_password and user.role == "ADMIN":
             return redirect("force_password_reset")
 
         if user.role == "ADMIN":

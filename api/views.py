@@ -1,7 +1,11 @@
 import logging
+import tempfile
+import os
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView, CreateAPIView,
     UpdateAPIView, DestroyAPIView
@@ -22,6 +26,7 @@ from .serializers import (
 from .permissions import IsRecruiter
 from applications.parsing import parse_resume
 from applications.utils import compute_match_score, generate_summary, evaluate_candidate, fit_category
+from applications.supabase_client import upload_resume
 
 
 logger = logging.getLogger(__name__)
@@ -118,30 +123,107 @@ class RecruiterJobDeleteAPI(DestroyAPIView):
 # APPLY JOB API
 # ============================================================
 
+class ApplyRateThrottle(AnonRateThrottle):
+    rate = "10/hour"
+
+
 class ApplyJobAPI(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ApplyRateThrottle]
 
     def post(self, request, slug):
-        job = get_object_or_404(Job, slug=slug)
+        # 1. Only allow active (non-deleted) jobs
+        job = get_object_or_404(Job, slug=slug, is_deleted=False)
 
+        # 2. Validate input (PDF-only, 5MB limit enforced by serializer)
         serializer = PublicApplicationSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
 
-        app = serializer.save(job=job)
+        email = serializer.validated_data["email"]
 
-        parsed = parse_resume(app.resume.path, job)
+        # 3. Duplicate check before any heavy processing
+        if Application.objects.filter(job=job, email=email).exists():
+            return Response(
+                {"error": "You have already applied for this job."},
+                status=400,
+            )
+
+        # 4. Extract resume file (not a model field, so pop it)
+        resume_file = serializer.validated_data.pop("resume")
+
+        # 5. Write to temp file for parsing
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                for chunk in resume_file.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
+        except Exception as e:
+            logger.error(f"Failed to write temp resume file: {e}")
+            return Response(
+                {"error": "Failed to process resume. Please try again."},
+                status=500,
+            )
+
+        # 6. Parse resume (safe — never crashes the request)
+        try:
+            parsed = parse_resume(tmp_path, job)
+        except Exception as e:
+            logger.warning(f"Resume parsing failed for job={slug}: {e}")
+            parsed = {}
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+        # 7. Upload resume to Supabase
+        try:
+            resume_file.seek(0)
+            resume_url = upload_resume(resume_file, job.slug)
+        except Exception as e:
+            logger.error(f"Supabase upload failed for job={slug}: {e}")
+            return Response(
+                {"error": "Failed to upload resume. Please try again."},
+                status=500,
+            )
+
+        # 8. Compute scores
         scoring = compute_match_score(parsed, job)
 
-        # Scoring fields
-        app.match_score = scoring["final_score"]
-        app.skill_score = scoring["skill_score"]
-        app.experience_score = scoring["experience_score"]
-        app.keyword_score = scoring["keyword_score"]
-        app.summary = generate_summary(parsed, scoring["final_score"])
-        app.evaluation = evaluate_candidate(scoring["final_score"])
-        app.fit_category = fit_category(scoring["final_score"])
-        app.save()
+        # 9. Build and save application
+        try:
+            app = Application(
+                job=job,
+                full_name=serializer.validated_data["full_name"],
+                email=email,
+                phone=serializer.validated_data["phone"],
+                resume_url=resume_url,
+                # Parsed fields
+                parsed_name=parsed.get("name"),
+                parsed_email=parsed.get("email"),
+                parsed_phone=parsed.get("phone"),
+                parsed_skills=parsed.get("skills"),
+                parsed_experience=parsed.get("experience_years"),
+                parsed_projects=parsed.get("projects"),
+                parsed_education=parsed.get("education"),
+                parsed_certifications=parsed.get("certifications"),
+                # Scoring fields
+                match_score=scoring["final_score"],
+                skill_score=scoring["skill_score"],
+                experience_score=scoring["experience_score"],
+                keyword_score=scoring["keyword_score"],
+                matched_skills=scoring.get("matched_skills", []),
+                missing_skills=scoring.get("missing_skills", []),
+                summary=generate_summary(parsed, scoring["final_score"]),
+                evaluation=evaluate_candidate(scoring["final_score"]),
+                fit_category=fit_category(scoring["final_score"]),
+            )
+            app.save()
+        except IntegrityError:
+            return Response(
+                {"error": "You have already applied for this job."},
+                status=400,
+            )
 
         return Response({"message": "Application submitted successfully"})
 

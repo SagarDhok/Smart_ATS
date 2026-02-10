@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # =================================================================
 @login_required
 def admin_dashboard(request):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized admin dashboard access attempt by {request.user.email}")
         return redirect("login")
 
@@ -71,7 +71,7 @@ def admin_dashboard(request):
 # =================================================================
 @login_required
 def recruiter_management(request):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized Recruiter management access attempt by {request.user.email}")
         return redirect("login")
 
@@ -96,7 +96,7 @@ def recruiter_management(request):
 @login_required
 @require_POST
 def suspend_recruiter(request, user_id):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized Recruiter suspend attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -112,7 +112,7 @@ def suspend_recruiter(request, user_id):
 @login_required
 @require_POST
 def activate_recruiter(request, user_id):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized Recruiter activate attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -131,7 +131,7 @@ def activate_recruiter(request, user_id):
 @login_required
 def invite_page(request):
 
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized invite page access by {request.user.email}")
         messages.error(request, "You are not authorized to access the invite page.")
         return redirect("login")
@@ -206,7 +206,7 @@ def invite_page(request):
 # =================================================================
 @login_required
 def admin_job_list(request):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -227,7 +227,7 @@ def admin_job_list(request):
 
 @login_required
 def admin_job_detail(request, id):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
         raise PermissionDenied()
 
@@ -240,7 +240,7 @@ def admin_job_detail(request, id):
 # =================================================================
 @login_required
 def admin_application_list(request):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized application list access by {request.user.email}")
         raise PermissionDenied()
 
@@ -281,7 +281,7 @@ def admin_application_list(request):
 
 @login_required
 def admin_application_detail(request, pk):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         raise PermissionDenied()
 
     app = get_object_or_404(Application, pk=pk)
@@ -290,7 +290,7 @@ def admin_application_detail(request, pk):
 
 @login_required
 def admin_job_applications(request, id):
-    if request.user.role not in ["ADMIN", "SUPERUSER"]:
+    if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized job applications access by {request.user.email}")
         raise PermissionDenied()
 
