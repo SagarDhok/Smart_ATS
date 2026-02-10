@@ -4,7 +4,6 @@ import re
 # NORMALIZER (SAFE + CONSISTENT)
 # =====================================================================
 
-
 def normalize(text):
     if not text:
         return []
@@ -66,7 +65,6 @@ def compute_keyword_score(parsed_keywords, jd_keywords):
     p = set(normalize(parsed_keywords))
     j = set(normalize(jd_keywords))
 
-    # If JD has no keywords, don't kill the score
     if not j:
         return 100
 

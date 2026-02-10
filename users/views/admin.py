@@ -11,10 +11,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse
 import logging
-import os
-from django.conf import settings
 from core.utils.email import send_brevo_email
 
 
@@ -93,7 +91,7 @@ def recruiter_management(request):
 
 
 # =================================================================
-#                ACTIVATE / SUSPEND RECRUITER (AJAX JSON API)
+#                ACTIVATE / SUSPEND RECRUITER 
 # =================================================================
 @login_required
 @require_POST
@@ -143,7 +141,7 @@ def invite_page(request):
 
         if not email:
             messages.error(request, "Email is required.")
-            return redirect("invite") #ye html me handle kar sakte ya kiya hai dekh
+            return redirect("invite") 
 
         # Prevent duplicate active invites
         if Invite.objects.filter(
@@ -161,8 +159,7 @@ def invite_page(request):
         token = uuid.uuid4()
         signup_link = request.build_absolute_uri(f"/signup/?token={token}")
 
-        # 1️⃣ SEND EMAIL FIRST (RESEND)
-
+        # SEND EMAIL FIRST 
         email_sent = send_brevo_email(
             to_email=email,
             subject="Your Smart ATS Signup Link",
@@ -188,7 +185,7 @@ def invite_page(request):
             messages.error(request, "Email could not be sent. Please try again later.")
             return redirect("invite")
 
-        # 2️⃣ SAVE INVITE ONLY IF EMAIL SUCCESS
+        # SAVE INVITE ONLY IF EMAIL SUCCESS
         Invite.objects.create(
             email=email,
             token=token,

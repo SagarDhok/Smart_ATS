@@ -18,12 +18,10 @@ logger = logging.getLogger(__name__)
 # =====================================================
 # LOGIN
 # =====================================================
-
 def login_page(request):
     """
     Login with rate-limiting enabled ONLY in production.
     """
-
     if settings.ENVIRONMENT == "production":
         from django_ratelimit.decorators import ratelimit
 
@@ -53,7 +51,7 @@ def _login_logic(request):
             user_obj = User.objects.get(email=email)
         except User.DoesNotExist:
             logger.warning(
-                f"Failed login attempt: email={email}, IP={request.META.get('REMOTE_ADDR')}"
+                f"Failed login attempt: IP={request.META.get('REMOTE_ADDR')}"
             )
             return render(request, "auth/login.html", {"error": "Invalid credentials"})
 

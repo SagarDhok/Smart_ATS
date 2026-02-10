@@ -13,9 +13,9 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("Email is required")
-        email = self.normalize_email(email) #lowercase and strip etc
+        email = self.normalize_email(email) 
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)   # HASH PASSWORD
+        user.set_password(password)   
         user.save(using=self._db)
         return user
     
@@ -42,7 +42,6 @@ class User(AbstractUser):
         ("RECRUITER", "Recruiter"),
         ("CANDIDATE", "Candidate"),
     ]
-
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -97,7 +96,7 @@ class PasswordReset(models.Model):
         return f"Reset token for {self.user.email}"
     
 
-
+#sagar dhok
 
 
 

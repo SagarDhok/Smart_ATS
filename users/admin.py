@@ -50,13 +50,13 @@ class ATSUserAdmin(UserAdmin):
     search_fields = ("email",)
 
     # -----------------------------------------
-    # ❌ 1) Stop Delete (even superuser can't delete users)
+    # 1) Stop Delete (even superuser can't delete users)
     # -----------------------------------------
     def has_delete_permission(self, request, obj=None):
         return False
 
     # -----------------------------------------
-    # ❌ 2) Remove bulk delete action
+    # 2) Remove bulk delete action
     # -----------------------------------------
     def get_actions(self, request):
         actions = super().get_actions(request)

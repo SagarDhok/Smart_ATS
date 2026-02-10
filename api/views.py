@@ -93,17 +93,21 @@ class RecruiterJobCreateAPI(CreateAPIView):
 
 
 class RecruiterJobUpdateAPI(UpdateAPIView):
-    queryset = Job.objects.filter(is_deleted=False)
     serializer_class = JobSerializer
     permission_classes = [IsRecruiter]
     lookup_field = "id"
+
+    def get_queryset(self):
+        return Job.objects.filter(is_deleted=False, created_by=self.request.user)
 
 
 class RecruiterJobDeleteAPI(DestroyAPIView):
-    queryset = Job.objects.filter(is_deleted=False)
     serializer_class = JobSerializer
     permission_classes = [IsRecruiter]
     lookup_field = "id"
+
+    def get_queryset(self):
+        return Job.objects.filter(is_deleted=False, created_by=self.request.user)
 
     def perform_destroy(self, instance):
         instance.is_deleted = True
