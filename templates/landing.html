@@ -13,100 +13,89 @@
         <h2 class="hero-title">Smart Application Tracking System</h2>
 
         <p class="hero-subtitle">
-            A modern, production-ready Applicant Tracking System featuring resume parsing,
-            smart match scoring, secure Recruiter workflows, REST APIs, advanced logging,
-            and real ATS architecture used in enterprise hiring.
+            A backend-focused recruitment platform built with Django and Django REST Framework,
+            featuring resume parsing, match scoring, secure role-based workflows,
+            and production-ready API architecture.
         </p>
 
         <div class="hero-buttons">
-            <a href="/jobs/" class="btn btn-primary">⭐ Browse Jobs</a>
+            <a href="/jobs/" class="btn btn-primary">Browse Jobs</a>
+
             {% if user.is_authenticated %}
-                {% if user.role == "SUPERUSER" or user.role == "ADMIN" %}
-                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">📊 Go to Dashboard</a>
+                {% if user.role == "ADMIN" %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Go to Admin Dashboard</a>
                 {% elif user.role == "RECRUITER" %}
-                    <a href="{% url 'recruiter_dashboard' %}" class="btn btn-outline">📊 Go to Dashboard</a>
+                    <a href="{% url 'recruiter_dashboard' %}" class="btn btn-outline">Go to Recruiter Dashboard</a>
                 {% endif %}
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline">👤 Recruiter / Admin Login</a>
+                <a href="{% url 'login' %}" class="btn btn-outline">Admin / Recruiter Login</a>
             {% endif %}
         </div>
     </section>
 
     <section class="section-block">
-        <h2 class="section-heading">Powerful Recruitment Features</h2>
+        <h2 class="section-heading">Core Features</h2>
 
         <div class="feature-grid-modern">
 
             <div class="feature-card-modern">
-                <h3>🔍 Resume Parsing Engine</h3>
-                <p>Extracts skills, experience, projects & contact details using a custom parser.</p>
+                <h3>Resume Parsing</h3>
+                <p>Extracts candidate details and computes weighted match scores against job descriptions.</p>
             </div>
 
             <div class="feature-card-modern">
-                <h3>📊 Intelligent Match Scoring</h3>
-                <p>Weights skills, experience & JD keywords to compute a smart match score.</p>
+                <h3>Role-Based Access Control</h3>
+                <p>Admin and Recruiter roles with strict ownership-based data isolation.</p>
             </div>
 
             <div class="feature-card-modern">
-                <h3>📝 Job Management</h3>
-                <p>Full CRUD + filters, salary ranges, modes & applicant counts.</p>
+                <h3>Secure Public Apply Flow</h3>
+                <p>PDF validation, duplicate prevention, and controlled file handling.</p>
             </div>
 
             <div class="feature-card-modern">
-                <h3>👥 Recruiter Dashboard</h3>
-                <p>Track applicants, change status, preview resumes, analyze matches.</p>
+                <h3>Recruiter Dashboard</h3>
+                <p>Create jobs, review applications, update candidate status.</p>
             </div>
 
             <div class="feature-card-modern">
-                <h3>🔐 Role-Based Access</h3>
-                <p>Superadmin → Admin → Recruiter permission tree with secure workflows.</p>
+                <h3>REST API Layer</h3>
+                <p>Token-authenticated APIs for recruiter workflows and integrations.</p>
             </div>
 
             <div class="feature-card-modern">
-                <h3>⚙ REST API Layer</h3>
-                <p>Token Authentication for jobs, applications & Recruiter automation.</p>
-            </div>
-
-            <div class="feature-card-modern">
-                <h3>🛡 Rotating Log System</h3>
-                <p>Enterprise-grade logs (5MB rotation) for tracing & debugging.</p>
-            </div>
-
-            <div class="feature-card-modern">
-                <h3>📂 Secure File Handling</h3>
-                <p>PDF-only uploads, 5MB limit, corruption checks & safe extraction.</p>
+                <h3>Relational Data Integrity</h3>
+                <p>Soft-delete patterns, unique constraints, and model-level validation.</p>
             </div>
 
         </div>
     </section>
 
     <section class="section-block role-section">
-        <h2 class="section-heading">Role-Based Access Control</h2>
+        <h2 class="section-heading">System Roles</h2>
 
         <div class="role-grid-modern">
 
             <div class="role-card-modern">
-                <h3>👑 Superadmin</h3>
-                <p>Controls Admin accounts & high-level access.</p>
+                <h3>Admin</h3>
+                <p>Manages recruiters and monitors platform activity.</p>
             </div>
 
             <div class="role-card-modern">
-                <h3>💼 Admin</h3>
-                <p>Manages Recruiters and monitors all job activity.</p>
+                <h3>Recruiter</h3>
+                <p>Creates jobs, screens candidates, and manages application status.</p>
             </div>
 
             <div class="role-card-modern">
-                <h3>🧑‍💻 Recruiter</h3>
-                <p>Creates jobs, screens candidates, updates statuses.</p>
-            </div>
-
-            <div class="role-card-modern">
-                <h3>✅ Candidate</h3>
-                <p>Applies without login; parsing happens automatically.</p>
+                <h3>Candidate (Public)</h3>
+                <p>Applies to jobs without login through a secure submission endpoint.</p>
             </div>
 
         </div>
     </section>
+
+</div>
+
 
     <section class="section-block">
         <h2 class="section-heading">Demo Login Credentials</h2>
@@ -128,6 +117,7 @@
         </div>
     </section>
 
-</div>
 
 {% endblock %}
+
+    
