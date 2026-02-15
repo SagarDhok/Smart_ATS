@@ -74,7 +74,7 @@
                 <tr>
                     <td>{{ recruiter.first_name }} {{ recruiter.last_name }}</td>
                     <td>{{ recruiter.email }}</td>
-                   <td>{{ recruiter.created_at|date:"d M Y, h:i A" }}</td>
+                   <td>{{ recruiter.date_joined|date:"d M Y, h:i A" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

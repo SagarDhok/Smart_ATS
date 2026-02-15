@@ -31,7 +31,7 @@ def admin_dashboard(request):
         return redirect("login")
 
     # RECRUITER USERS PAGINATION
-    recruiter_qs = User.objects.filter(role="RECRUITER", is_active=True).order_by("-created_at")
+    recruiter_qs = User.objects.filter(role="RECRUITER", is_active=True).order_by("-date_joined")
     recruiter_paginator = Paginator(recruiter_qs, 10)  #10 pages 1 , 2 3 
     recruiter_page = recruiter_paginator.get_page(request.GET.get("recruiter_page"))
 
@@ -76,7 +76,7 @@ def recruiter_management(request):
         return redirect("login")
 
     search = request.GET.get("search", "").strip()
-    recruiter_users = User.objects.filter(role="RECRUITER").order_by("-created_at")
+    recruiter_users = User.objects.filter(role="RECRUITER").order_by("-date_joined")
 
     if search:
         recruiter_users = recruiter_users.filter(Q(first_name__icontains=search) |Q(last_name__icontains=search) |Q(email__icontains=search)) #or
@@ -147,7 +147,7 @@ def invite_page(request):
         if Invite.objects.filter(
             email=email,
             used=False,
-            expires_at__gt=timezone.now()
+            expires_at__gt=timezone.now() #which are active 6>5
         ).exists():
             logger.warning(f"Duplicate invite attempt for {email}")
             messages.warning(

@@ -50,14 +50,7 @@ INSTALLED_APPS = [
     "applications.apps.ApplicationsConfig",
 
     "api",
-
 ]
-
-#  ratelimit ONLY in production
-if ENVIRONMENT == "production":
-    INSTALLED_APPS += ["django_ratelimit"]
-
-
 
 # -------------------------------------------------------------------
 # MIDDLEWARE
@@ -74,13 +67,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-# ratelimit middleware ONLY in production
-if ENVIRONMENT == "production":
-    MIDDLEWARE += ["django_ratelimit.middleware.RatelimitMiddleware"]
-    RATELIMIT_ENABLE = True
-else:
-    RATELIMIT_ENABLE = False
 
 ROOT_URLCONF = "core.urls"
 
@@ -124,24 +110,13 @@ DATABASES = {
 
 
 # -------------------------------------------------------------------
-# CACHE (Required for django-ratelimit)
+# CACHE
 # -------------------------------------------------------------------
-if ENVIRONMENT == "production":
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.getenv("REDIS_URL"),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
-        }
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        }
-    }
+}
 
 
 # -------------------------------------------------------------------

@@ -14,6 +14,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("Email is required")
         email = self.normalize_email(email) 
+        extra_fields.setdefault("role", "RECRUITER")
         user = self.model(email=email, **extra_fields)
         user.set_password(password)   
         user.save(using=self._db)
@@ -22,10 +23,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("role", "ADMIN")
         extra_fields.setdefault("must_change_password", False)
         return self.create_user(email, password, **extra_fields)
-
 
 
 # --------------------------
@@ -40,12 +39,11 @@ class User(AbstractUser):
         ("ADMIN", "Admin"),
         ("RECRUITER", "Recruiter"),
     ]
+
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="RECRUITER")
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=20,choices=ROLE_CHOICES,null=True,blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     must_change_password = models.BooleanField(default=True)
     objects = UserManager()
@@ -62,7 +60,7 @@ class Invite(models.Model):
     token = models.UUIDField(default=uuid.uuid4, unique=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True,on_delete=models.SET_NULL)
     created_by_email = models.CharField(max_length=255, null=True, blank=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField()  #2026-02-16 18:30:00
     used = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -94,7 +92,7 @@ class PasswordReset(models.Model):
         return f"Reset token for {self.user.email}"
     
 
-#sahil 
+
 
 
 

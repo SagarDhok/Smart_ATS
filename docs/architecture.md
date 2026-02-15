@@ -1,10 +1,26 @@
 # System Architecture
 
-This document covers the detailed technical implementation of Smart ATS's backend architecture, including the RBAC system, invite flow, and database schema.
+This document covers the detailed technical implementation of Smart ATS's backend architecture, including the simplified RBAC system, secure invite flow, and database schema.
 
 ---
 
 ## Role-Based Access Control (RBAC) Implementation
+
+### 2-Role Business Model
+
+Smart ATS implements a streamlined **2-role RBAC system** for recruitment operations, separate from the Django Superuser.
+
+1.  **ADMIN**:
+    *   **Scope**: Organizational Manager.
+    *   **Capabilities**: Invite Recruiters, view all jobs/applications, manage team access.
+    *   **Access**: Full read/write on recruitment data.
+
+2.  **RECRUITER**:
+    *   **Scope**: Individual Contributor.
+    *   **Capabilities**: Create jobs, review applications for *their* jobs.
+    *   **Access**: Strict data isolation (cannot see other recruiters' data).
+
+*Note: **SUPERUSER** is an administrative account for system maintenance (Django Admin Panel access) and is not involved in the day-to-day recruitment workflow.*
 
 ### Custom User Model
 
@@ -23,27 +39,21 @@ class User(AbstractUser):
     objects = UserManager()
 ```
 
-**Key Design Decisions**:
-- **Email-only auth**: Recruitment systems use email as primary identifier
-- **`must_change_password`**: Forces password reset on first login (security best practice)
-- **Custom manager**: Implements `create_user()` and `create_superuser()` with proper password hashing
+### Authorization Enforcement Strategy
 
-### Role Hierarchy
+Security is enforced at multiple layers to prevent privilege escalation or data leakage:
 
-```python
-ROLE_CHOICES = [
-    ("SUPERUSER", "SuperUser"),
-    ("ADMIN", "Admin"),
-    ("RECRUITER", "Recruiter"),
-    ("CANDIDATE", "Candidate"),
-]
-```
+1.  **API Permissions (DRF)**:
+    *   `permission_classes = [IsAuthenticated, IsRecruiter]`
+    *   `permission_classes = [IsAuthenticated, IsAdmin]`
+    
+2.  **View-Level Checks**:
+    *   Explicit checks on `request.user.role` before performing sensitive actions.
+    *   Returns `403 Forbidden` for unauthorized attempts.
 
-**Enforcement Strategy**:
-1. **DRF Permissions**: Custom permission classes (`IsRecruiter`, `IsAdmin`)
-2. **Queryset Filtering**: Applications filtered by `job__created_by=request.user`
-3. **Template Guards**: `{% if user.role == 'RECRUITER' %}`
-4. **Decorator-Based**: `@login_required` + role checks
+3.  **Data Isolation (QuerySet Filtering)**:
+    *   Recruiters interact with data *only* through filtered QuerySets.
+    *   `Application.objects.filter(job__created_by=request.user)` ensures they physically cannot retrieve another recruiter's candidates.
 
 ---
 
@@ -65,206 +75,62 @@ class Invite(models.Model):
         return timezone.now() > self.expires_at
 ```
 
-**Field Rationale**:
-- **`token` (UUID)**: Cryptographically random, prevents enumeration attacks
-- **`created_by_email`**: Audit trail preserved even if admin user is deleted (`SET_NULL`)
-- **`expires_at`**: Explicit expiry (48 hours), compared via `timezone.now()`
-- **`used` flag**: Prevents token reuse
+### Synchronous Invite Flow
 
-### Invite Flow
+Emails are sent synchronously to simplify the architecture (no Redis/Celery required for this scale).
 
-1. **Admin creates invite**:
-   ```python
-   invite = Invite.objects.create(
-       email=recruiter_email,
-       created_by=admin_user,
-       created_by_email=admin_user.email,
-       expires_at=timezone.now() + timedelta(hours=48)
-   )
-   ```
+1.  **Admin triggers invite**:
+    *   Admin POSTs to `/api/invite/`.
+    *   Server generates `Invite` record with 48-hour matching `expires_at`.
 
-2. **Email sent via Brevo HTTP API**:
-   ```python
-   requests.post(
-       "https://api.brevo.com/v3/smtp/email",
-       headers={"api-key": BREVO_API_KEY},
-       json={
-           "to": [{"email": invite.email}],
-           "subject": "Recruiter Invitation",
-           "htmlContent": f"<a href='{signup_url}'>Join</a>"
-       }
-   )
-   ```
-   **Why HTTP API over SMTP**: Cloud platforms often block SMTP ports; HTTP APIs are more reliable.
+2.  **Direct Email Delivery (Brevo HTTP API)**:
+    *   Python `requests` module calls Brevo API immediately.
+    *   **Why HTTP API?**: Avoids SMTP port blocking common in cloud environments (Render, AWS, DigitalOcean).
+    *   **Reliability**: API response confirms delivery handoff immediately.
 
-3. **Recruiter clicks link**:
-   - URL format: `/signup/{token}/`
-   - Validates: `is_expired()`, `used == False`, token exists
-   - On success: Create user, mark `invite.used = True`
+3.  **Recruiter Activation**:
+    *   Recruiter clicks link: `/signup/{token}/`.
+    *   Server validates: `is_expired()`, `used == False`.
+    *   On success: Account created, `Invite` marked `used = True`.
 
 ---
 
-## Password Reset Flow
+## Application Model & Scoring
 
 ### Schema
-
-```python
-class PasswordReset(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.UUIDField(default=uuid.uuid4, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
-    used = models.BooleanField(default=False)
-    consumed_at = models.DateTimeField(null=True, blank=True)
-    request_ip = models.CharField(max_length=50, null=True, blank=True)
-    user_agent = models.CharField(max_length=255, null=True, blank=True)
-```
-
-**Audit Fields**:
-- **`request_ip`**: Tracks which IP initiated reset (security monitoring)
-- **`user_agent`**: Browser/OS info for anomaly detection
-- **`consumed_at`**: Timestamp of actual password change (vs. token creation)
-
-**Expiry**: 15 minutes (tighter than invite tokens, as reset is security-sensitive)
-
----
-
-## Application Model Schema
 
 ```python
 class Application(models.Model):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
     
-    # Candidate-provided data
+    # Candidate Data
     full_name = models.CharField(max_length=255)
     email = models.EmailField()
-    phone = models.CharField(max_length=20)
     resume_url = models.URLField(blank=True, null=True)  # Supabase public URL
     
-    # Parsed data (from resume)
-    parsed_name = models.CharField(max_length=255, blank=True, null=True)
-    parsed_email = models.EmailField(blank=True, null=True)
-    parsed_phone = models.CharField(max_length=20, blank=True, null=True)
+    # Parsed Resume Data (JSON)
     parsed_skills = models.JSONField(blank=True, null=True)
-    parsed_experience = models.FloatField(blank=True, null=True)
-    parsed_projects = models.TextField(blank=True, null=True)
-    parsed_education = models.TextField(blank=True, null=True)
-    parsed_certifications = models.TextField(blank=True, null=True)
     
-    # Scoring results
-    match_score = models.FloatField(default=0)
+    # Scoring Metrics
+    match_score = models.FloatField(default=0)  # 0-100 Aggregate
     matched_skills = models.JSONField(default=list)
     missing_skills = models.JSONField(default=list)
-    experience_score = models.FloatField(default=0)
-    skill_score = models.FloatField(default=0)
-    keyword_score = models.FloatField(default=0)
-    
-    # Metadata
-    summary = models.TextField(blank=True, null=True)
-    evaluation = models.TextField(blank=True, null=True)
-    fit_category = models.CharField(max_length=20, blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="screening")
-    applied_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         unique_together = ("job", "email")  # Prevents duplicate applications
 ```
 
-**Why JSONField for Skills**:
-- Flexible schema (no migrations needed for new skills)
-- PostgreSQL has native JSONB support (indexable, queryable)
-- Stores both parsed list and matched/missing arrays
+### Scoring Logic
 
-**Duplicate Prevention**:
-- Database constraint: `unique_together = ("job", "email")`
-- Django raises `IntegrityError`, caught and displayed to user
+1.  **Skill Intersection**: Compares `parsed_skills` against `job.required_skills`.
+2.  **Experience Weighting**: Logarithmic scale to value experience years up to a threshold.
+3.  **Data Persistence**: All scores are calculated at application time and stored in the database for instant retrieval (no re-calculation on read).
 
 ---
 
-## Job Model Schema
+## Infrastructure & Configuration
 
-```python
-class Job(models.Model):
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
-    description = models.TextField()
-    
-    required_skills = models.JSONField(default=list)
-    jd_keywords = models.JSONField(default=list, blank=True)
-    
-    min_experience = models.FloatField(null=True, blank=True)
-    max_experience = models.FloatField(null=True, blank=True)
-    
-    salary_type = models.CharField(max_length=20, choices=SALARY_TYPES)
-    min_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True)
-    max_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True)
-    
-    location = models.CharField(max_length=255)
-    work_mode = models.CharField(max_length=20, choices=WORK_MODES)
-    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPES)
-    
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_deleted = models.BooleanField(default=False)  # Soft delete
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            # Auto-generate slug with collision handling
-            base_slug = slugify(self.title)
-            slug = base_slug
-            counter = 1
-            while Job.objects.filter(slug=slug).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-            self.slug = slug
-        super().save(*args, **kwargs)
-```
-
-**Soft Delete Pattern**:
-- `is_deleted = True` instead of `.delete()`
-- Preserves referential integrity (applications remain linked)
-- Audit trail preserved
-- Querysets filter: `Job.objects.filter(is_deleted=False)`
-
----
-
-## REST API Permissions
-
-### Custom Permission Classes
-
-```python
-class IsRecruiter(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "RECRUITER"
-
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == "ADMIN"
-```
-
-### Data Isolation via Querysets
-
-```python
-class RecruiterApplicationListAPI(ListAPIView):
-    serializer_class = ApplicationSerializer
-    permission_classes = [IsRecruiter]
-    
-    def get_queryset(self):
-        # Recruiter sees ONLY applications for jobs they created
-        return Application.objects.filter(
-            job__created_by=self.request.user,
-            job__is_deleted=False
-        ).order_by("-applied_at")
-```
-
-**Security Benefits**:
-- No URL manipulation can access other recruiters' data
-- Database-level filtering (not template-level hiding)
-- Prevents enumeration attacks
-
----
-
-## Environment-Aware Configuration
+### Environment Awareness
 
 ```python
 # settings.py
@@ -272,33 +138,19 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 if ENVIRONMENT == "production":
     DEBUG = False
-    INSTALLED_APPS += ["django_ratelimit"]
-    MIDDLEWARE += ["django_ratelimit.middleware.RatelimitMiddleware"]
-    
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.getenv("REDIS_URL"),
-        }
-    }
-    
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 else:
     DEBUG = True
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        }
-    }
 ```
 
-**Production-Only Features**:
-- Rate limiting (5 login attempts/minute per IP)
-- Redis caching (required for django-ratelimit)
-- SSL database connections
-- Compressed static files (WhiteNoise)
+### Storage Strategy (Supabase)
 
-**Development Convenience**:
-- No rate limiting (faster testing)
-- In-memory cache (no Redis dependency)
-- Permissive CORS (if needed)
+*   **Ephemeral Filesystems**: Render/Heroku wipes disk on redeploy.
+*   **Solution**: Direct cloud upload.
+*   **Flow**: File -> Supabase -> Public URL -> DB.
+
+### Future Scalability
+
+While the current architecture is synchronous for simplicity:
+*   **Async Tasks**: Redis + Celery can be introduced to handle email sending and resume parsing if load increases significantly.
+*   **Caching**: `LocMemCache` can be replaced with Redis Cache for distributed caching.

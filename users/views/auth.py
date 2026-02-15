@@ -12,6 +12,8 @@ from core.utils.email import send_brevo_email
 from datetime import timedelta
 import uuid
 import logging
+from django.http import HttpResponseForbidden
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,49 +21,17 @@ logger = logging.getLogger(__name__)
 # LOGIN
 # =====================================================
 def login_page(request):
-    """
-    Login with rate-limiting enabled ONLY in production.
-    """
-    if settings.ENVIRONMENT == "production":
-        from django_ratelimit.decorators import ratelimit
-
-        @ratelimit(key="ip", rate="5/m", method="POST")
-        def _wrapped(request):
-            return _login_logic(request)
-
-        return _wrapped(request)
-
-    #local
-    return _login_logic(request)
-
-
-def _login_logic(request):
-
     if request.user.is_authenticated:
         if request.user.role == "ADMIN":
             return redirect("admin_dashboard")
+        
         if request.user.role == "RECRUITER":
             return redirect("recruiter_dashboard")
+     
 
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-
-        try:
-            user_obj = User.objects.get(email=email)
-        except User.DoesNotExist:
-            logger.warning(
-                f"Failed login attempt: IP={request.META.get('REMOTE_ADDR')}"
-            )
-            return render(request, "auth/login.html", {"error": "Invalid credentials"})
-
-        if not user_obj.is_active:
-            logger.warning(f"Inactive user login attempt: {email}")
-            return render(
-                request,
-                "auth/login.html",
-                {"error": "Your account is suspended"},
-            )
 
         user = authenticate(request, email=email, password=password)
 
@@ -71,12 +41,18 @@ def _login_logic(request):
             )
             return render(request, "auth/login.html", {"error": "Invalid credentials"})
 
+        if not user.is_active:
+            logger.warning(f"Inactive user login attempt: {email}")
+            return render(
+                request,
+                "auth/login.html",
+                {"error": "Your account is suspended"},
+            )
+        
         login(request, user)
         logger.info(f"User logged in: {user.email}, Role: '{user.role}'")
 
-        # Django superuser → Django admin panel (not business dashboard)
-        if user.is_superuser:
-            return redirect("/admin/")
+ 
 
         # FORCE PASSWORD RESET (for ADMIN users on first login)
         if user.must_change_password and user.role == "ADMIN":
@@ -97,8 +73,8 @@ def _login_logic(request):
                 if user.first_name else f"Welcome {user.email}",
             )
             return redirect("recruiter_dashboard")
-
-        return redirect("/")
+        
+        return HttpResponseForbidden("Unauthorized access.")
 
     return render(request, "auth/login.html")
 
@@ -182,7 +158,6 @@ def signup_page(request):
                 password=password,
                 first_name=request.POST.get("first_name"),
                 last_name=request.POST.get("last_name"),
-                role="RECRUITER",
                 is_active=True,
                 must_change_password=False,
             )
