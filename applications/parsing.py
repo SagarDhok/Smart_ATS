@@ -1,5 +1,4 @@
 import re
-import os
 import logging
 import PyPDF2
 from applications.utils import normalize
@@ -119,54 +118,62 @@ SKILL_DB = {
     "swagger": ["openapi"],
     "jira": [],
     "confluence": [],
+
+    # =========================
+# Salesforce Ecosystem
+# =========================
+"salesforce": ["sf"],
+"apex": [],
+"lightning web components": ["lwc", "lightning components"],
+"soql": [],
+"sosl": [],
+"visualforce": [],
+"salesforce integration": ["sf integration"],
+"sales cloud": [],
+"service cloud": [],
+"platform events": [],
+"trigger": ["triggers"],
+"batch apex": [],
+"workflow rules": [],
+"process builder": [],
+"flows": ["salesforce flow"],
 }
 
 
 # ================================================================
 # PDF Extraction (LOGGING REQUIRED HERE)
 # ================================================================
-def extract_text_from_pdf(file_path):
-    if not os.path.exists(file_path):
-        logger.error(f"PDF extraction failed — file not found: {file_path}")
-        return ""
-
+def extract_text_from_pdf(file_input):
     text = ""
+
     try:
-        with open(file_path, "rb") as f:
-            reader = PyPDF2.PdfReader(f, strict=False)
+        file_input.seek(0)
+        reader = PyPDF2.PdfReader(file_input, strict=False)
 
-            if reader.is_encrypted:
-                try:
-                    reader.decrypt("")
-                except Exception as e:
-                    logger.error(
-                        f"Encrypted PDF could not be decrypted: {file_path} | error={e}"
-                    )
-                    return ""
+        if reader.is_encrypted:
+          raise ValueError("Password-protected PDFs are not allowed. Please upload an unlocked resume.")
 
-            for i in range(min(20, len(reader.pages))):
-                try:
-                    page_text = reader.pages[i].extract_text()
-                    if page_text:
-                        text += page_text + "\n"
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to extract page {i} from {file_path} | error={e}"
-                    )
-                    continue
+        for i in range(min(5, len(reader.pages))):
+            try:
+                page_text = reader.pages[i].extract_text()  #built in funtion 
+                if page_text:
+                    text += page_text + "\n"
+            except Exception as e:
+                logger.warning(f"Failed to extract page {i} from {file_input} | error={e}")
+                continue
 
     except Exception as e:
-        logger.error(f"PDF extraction crashed for {file_path} | error={e}")
+        logger.error(f"PDF extraction crashed for {file_input} | error={e}")
         return ""
 
     if not text.strip():
-        logger.warning(f"No extractable text found in PDF: {file_path}")
+        logger.warning(f"No extractable text found in PDF: {file_input}")
 
     return text.lower().strip()
 
 
 # ================================================================
-# EXTRACTION FUNCTIONS (NO LOGGING REQUIRED)
+# EXTRACTION FUNCTIONS 
 # ================================================================
 def extract_name(text):
     lines = text.split("\n")
@@ -189,9 +196,22 @@ def extract_email(text):
 
 
 def extract_phone(text):
-    m = re.search(r"(\+?\d{1,3})?[\s\-]?\d{10}", text)
-    return m.group(0) if m else None
+    m = re.search(r"\+?\d[\d\s\-]{6,15}", text)
+    if not m:
+        return None
+    raw = m.group(0)
 
+    if raw.startswith("+"):
+        cleaned = "+" + re.sub(r"\D", "", raw[1:])
+    else:
+        cleaned = re.sub(r"\D", "", raw)
+
+    digits_only = re.sub(r"\D", "", cleaned)
+
+    if 7 <= len(digits_only) <= 15:
+        return cleaned
+
+    return None
 
 def extract_experience(text):
     patterns = [
@@ -201,6 +221,7 @@ def extract_experience(text):
     ]
 
     for p in patterns:
+        print(p)
         m = re.search(p, text)
         if m:
             try:
@@ -232,12 +253,11 @@ def extract_skills(text):
 
 def extract_keywords(text, jd_keywords):
     jd = normalize(jd_keywords)
-    found = []
+    found = set()
     for w in jd:
         if re.search(rf"\b{re.escape(w)}\b", text):
-            found.append(w)
-    return list(set(found))
-
+            found.add(w)
+    return list(found)
 
 def extract_projects(text):
     lines = text.split("\n")
@@ -255,11 +275,12 @@ def extract_projects(text):
         if capturing:
             if any(s in lower for s in STOP):
                 break
-            cleaned = line.strip("•*-⭐ ").strip()
+            cleaned = line.strip("•*- ").strip()
             if cleaned:
                 block.append(cleaned)
 
     return "\n".join(block) if block else None
+
 
 
 def extract_education(text):
@@ -313,13 +334,11 @@ def extract_certifications(text):
 # ================================================================
 # MASTER PARSER (LOGGING REQUIRED ONLY FOR CRASH)
 # ================================================================
-def parse_resume(file_path, job=None):
-    text = extract_text_from_pdf(file_path)
+def parse_resume(file_input, job=None):
+    text = extract_text_from_pdf(file_input)
 
-    # ❗ DO NOT CRASH FOR EMPTY TEXT
-    if not text:
-        logger.warning(f"Resume text empty but file uploaded: {file_path}")
-        text = ""  # fallback, not exception
+    # DO NOT CRASH FOR EMPTY TEXT
+
 
     return {
         "name": extract_name(text),
@@ -333,3 +352,4 @@ def parse_resume(file_path, job=None):
         "certifications": extract_certifications(text),
         "raw_text": text,
     }
+

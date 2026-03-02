@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.conf import settings
 from core.utils.email import send_brevo_email
 from datetime import timedelta
 import uuid
@@ -74,7 +73,6 @@ def login_page(request):
             )
             return redirect("recruiter_dashboard")
         
-        return HttpResponseForbidden("Unauthorized access.")
 
     return render(request, "auth/login.html")
 
@@ -102,7 +100,8 @@ def profile_view(request):
         messages.success(request, "Profile updated successfully!")
         return redirect("profile")
 
-    return render(request, "auth/profile.html")
+    return render(request, "auth/profile.html", {"user": user})
+
 
 
 # =====================================================
@@ -113,7 +112,7 @@ def signup_page(request):
 
     if not token:
         return render(request, "auth/signup.html", {"invalid_invite": "Invalid signup link"})
-
+    
     try:
         invite = Invite.objects.get(token=token, used=False)
     except Invite.DoesNotExist:
@@ -131,13 +130,7 @@ def signup_page(request):
             "auth/signup.html",
             {"invalid_invite": "This invite has expired"},
         )
-
-    if User.objects.filter(email=invite.email).exists():
-        invite.used = True
-        invite.save()
-        messages.info(request, "Account already exists. Please login.")
-        return redirect("login")
-
+    
     if request.method == "POST":
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
@@ -234,7 +227,6 @@ def forgot_password_request(request):
 # =====================================================
 # RESET PASSWORD
 # =====================================================
-
 def reset_password_page(request):
     token = request.GET.get("token")
 
@@ -243,27 +235,17 @@ def reset_password_page(request):
     except PasswordReset.DoesNotExist:
         return render(
             request,
-            "auth/reset_password.html",
-            {"error": "Invalid or expired token"},
-        )
+         "auth/reset_password.html",{"error": "Invalid or expired token"},)
 
     if reset_obj.is_expired():
         return render(
             request,
-            "auth/reset_password.html",
-            {"error": "Token expired"},
+            "auth/reset_password.html", {"error": "Token expired"},
         )
 
     if request.method == "POST":
         p1 = request.POST.get("password")
         p2 = request.POST.get("confirm_password")
-
-        if p1 != p2:
-            return render(
-                request,
-                "auth/reset_password.html",
-                {"error": "Passwords do not match", "token": token},
-            )
 
         try:
             validate_password(p1)
@@ -273,6 +255,14 @@ def reset_password_page(request):
                 "auth/reset_password.html",
                 {"error": " ".join(e.messages), "token": token},
             )
+        
+        if p1 != p2:
+            return render(
+                request,
+                "auth/reset_password.html",
+                {"error": "Passwords do not match", "token": token},
+            )
+
 
         user = reset_obj.user
         user.set_password(p1)

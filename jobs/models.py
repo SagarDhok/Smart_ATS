@@ -33,31 +33,21 @@ class Job(models.Model):
 
     description = models.TextField()
 
-    required_skills = models.JSONField(default=list)
-    jd_keywords = models.JSONField(default=list, blank=True)
-
     min_experience = models.FloatField(null=True, blank=True)
     max_experience = models.FloatField(null=True, blank=True)
-
     salary_type = models.CharField(max_length=20, choices=SALARY_TYPES, default="yearly")
 
-    # 🔥 Decimal salary fields (NO ERROR, full precision)
     min_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     max_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
+    # Decimal salary fields (NO ERROR, full precision)
     location = models.CharField(max_length=255)
     work_mode = models.CharField(max_length=20, choices=WORK_MODES)
     employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPES, default="full_time")
 
-    required_education = models.CharField(
-    max_length=255,
-    blank=True,
-    null=True,
-    help_text="Example: B.Tech CS, MCA, Any Graduate"
-)
+    required_education = models.CharField(max_length=255, blank=True, null=True, help_text="Example: B.Tech CS, MCA, Any Graduate")
 
     vacancies = models.PositiveIntegerField(default=1)
-
 
     deadline = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="jobs", on_delete=models.SET_NULL, null=True)
@@ -65,6 +55,8 @@ class Job(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
+    required_skills = models.JSONField(default=list)
+    jd_keywords = models.JSONField(default=list, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -80,11 +72,11 @@ class Job(models.Model):
 
 
     def clean(self):
-        if self.min_experience and self.max_experience:
+        if self.min_experience is not None and self.max_experience is not None:
             if self.min_experience > self.max_experience:
                 raise ValidationError("Minimum experience cannot be greater than maximum experience.")
 
-        if self.min_salary and self.max_salary:
+        if self.min_experience is not None and self.max_experience is not None:
             if self.min_salary > self.max_salary:
                 raise ValidationError("Minimum salary cannot be greater than maximum salary.")
 
@@ -97,6 +89,7 @@ class Job(models.Model):
 
         if self.salary_type == "negotiable":
             return "Negotiable"
+
 
         # Convert INR → LPA string
         def format_lpa(amount):

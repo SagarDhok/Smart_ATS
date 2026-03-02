@@ -15,6 +15,7 @@ class UserManager(BaseUserManager):
             raise ValueError("Email is required")
         email = self.normalize_email(email) 
         extra_fields.setdefault("role", "RECRUITER")
+        extra_fields.setdefault("must_change_password", False)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)   
         user.save(using=self._db)

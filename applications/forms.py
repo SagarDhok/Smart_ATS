@@ -7,11 +7,7 @@ from django.core.validators import validate_email
 
 
 class ApplicationForm(forms.ModelForm):
-
-    resume = forms.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
-        widget=forms.FileInput(attrs={"accept": ".pdf"})
-    )
+    resume = forms.FileField(validators=[FileExtensionValidator(allowed_extensions=['pdf'])],widget=forms.FileInput(attrs={"accept": ".pdf"}))
 
     class Meta:
         model = Application

@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+
 import logging
 from core.utils.email import send_brevo_email
 
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def admin_dashboard(request):
     if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized admin dashboard access attempt by {request.user.email}")
-        return redirect("login")
+        raise PermissionDenied()
 
     # RECRUITER USERS PAGINATION
     recruiter_qs = User.objects.filter(role="RECRUITER", is_active=True).order_by("-date_joined")
@@ -73,7 +73,7 @@ def admin_dashboard(request):
 def recruiter_management(request):
     if request.user.role != "ADMIN":
         logger.warning(f"Unauthorized Recruiter management access attempt by {request.user.email}")
-        return redirect("login")
+        raise PermissionDenied()
 
     search = request.GET.get("search", "").strip()
     recruiter_users = User.objects.filter(role="RECRUITER").order_by("-date_joined")
@@ -84,10 +84,7 @@ def recruiter_management(request):
     paginator = Paginator(recruiter_users, 10)
     recruiter_page = paginator.get_page(request.GET.get("page"))
 
-    return render(request, "admin/recruiter_management.html", {
-        "recruiter_page": recruiter_page,
-        "search": search,
-    })
+    return render(request, "admin/recruiter_management.html", {"recruiter_page": recruiter_page,"search": search,})
 
 
 # =================================================================
@@ -100,13 +97,14 @@ def suspend_recruiter(request, user_id):
         logger.warning(f"Unauthorized Recruiter suspend attempt by {request.user.email}")
         raise PermissionDenied()
 
-    recruiter = get_object_or_404(User, id=user_id, role="RECRUITER")
+    recruiter = get_object_or_404(User, id=user_id, role="RECRUITER") #User Model 
     recruiter.is_active = False
     recruiter.save()
 
     logger.info(f"Recruiter suspended: id={recruiter.id}, email={recruiter.email}, by={request.user.email}")
+    messages.success(request, f"Recruiter {recruiter.email} has been suspended.")
 
-    return JsonResponse({"status": "suspended"})
+    return redirect("recruiter_management")
 
 
 @login_required
@@ -121,8 +119,9 @@ def activate_recruiter(request, user_id):
     recruiter.save()
 
     logger.info(f"Recruiter activated: id={recruiter.id}, email={recruiter.email}, by={request.user.email}")
+    messages.success(request, f"Recruiter {recruiter.email} has been activated.")
 
-    return JsonResponse({"status": "activated"})
+    return redirect("recruiter_management")
 
 
 # =================================================================
@@ -198,107 +197,4 @@ def invite_page(request):
         messages.success(request, f"Invite sent successfully to {email}")
         return redirect("invite")
 
-    return render(request, "recruiter/invite.html")
-
-
-# =================================================================
-#                       JOB MANAGEMENT
-# =================================================================
-@login_required
-def admin_job_list(request):
-    if request.user.role != "ADMIN":
-        logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
-        raise PermissionDenied()
-
-    search = request.GET.get("search", "").strip()
-    jobs_qs = Job.objects.filter(is_deleted=False).order_by("-created_at")
-
-    if search:
-        jobs_qs = jobs_qs.filter(title__icontains=search)
-
-    paginator = Paginator(jobs_qs, 10)
-    jobs_page = paginator.get_page(request.GET.get("page"))
-
-    return render(request, "admin/jobs_list.html", {
-        "jobs_page": jobs_page,
-        "search": search,
-    })
-
-
-@login_required
-def admin_job_detail(request, id):
-    if request.user.role != "ADMIN":
-        logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
-        raise PermissionDenied()
-
-    job = get_object_or_404(Job, id=id, is_deleted=False)
-    return render(request, "admin/job_detail.html", {"job": job})
-
-
-# =================================================================
-#                    APPLICATION MANAGEMENT
-# =================================================================
-@login_required
-def admin_application_list(request):
-    if request.user.role != "ADMIN":
-        logger.warning(f"Unauthorized application list access by {request.user.email}")
-        raise PermissionDenied()
-
-    search = request.GET.get("search", "")
-    status_filter = request.GET.get("status", "")
-
-    applications = Application.objects.select_related("job").filter(job__is_deleted=False)
-
-    if search:
-        applications = applications.filter(
-            Q(full_name__icontains=search) |
-            Q(email__icontains=search)
-        )
-
-    if status_filter:
-        applications = applications.filter(status=status_filter)
-
-    # COUNTS
-    all_counts = Application.objects.filter(job__is_deleted=False)
-    counts = {
-        "screening": all_counts.filter(status="screening").count(),
-        "review": all_counts.filter(status="review").count(),
-        "interview": all_counts.filter(status="interview").count(),
-        "hired": all_counts.filter(status="hired").count(),
-        "rejected": all_counts.filter(status="rejected").count(),
-    }
-
-    paginator = Paginator(applications.order_by("-applied_at"), 10)
-    apps_page = paginator.get_page(request.GET.get("page", 1))
-
-    return render(request, "admin/apps_list.html", {
-        "apps_page": apps_page,
-        "search": search,
-        "status_filter": status_filter,
-        "counts": counts,
-    })
-
-
-@login_required
-def admin_application_detail(request, pk):
-    if request.user.role != "ADMIN":
-        raise PermissionDenied()
-
-    app = get_object_or_404(Application, pk=pk)
-    return render(request, "admin/app_detail.html", {"app": app})
-
-
-@login_required
-def admin_job_applications(request, id):
-    if request.user.role != "ADMIN":
-        logger.warning(f"Unauthorized job applications access by {request.user.email}")
-        raise PermissionDenied()
-
-    job = get_object_or_404(Job, id=id, is_deleted=False)
-    applications = Application.objects.filter(job=job).order_by("-applied_at")
-
-    return render(request, "admin/job_applications.html", {
-        "job": job,
-        "applications": applications
-    })
-
+    return render(request, "admin/invite.html")

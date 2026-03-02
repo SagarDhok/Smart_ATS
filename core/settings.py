@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
     "users",
     "jobs",
-    "applications.apps.ApplicationsConfig",
+    "applications",
 
     "api",
 ]
@@ -166,9 +166,6 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/day",
-    },
 }
 
 # -------------------------------------------------------------------
@@ -190,3 +187,13 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+
+
+import sys
+
+if "test" in sys.argv:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "test_db.sqlite3",
+    }

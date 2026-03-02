@@ -1,140 +1,142 @@
-# jobs/views/hr.py
-from django.views.generic import ListView, CreateView, UpdateView, DetailView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.http import HttpResponseForbidden
-from jobs.models import Job
-from jobs.forms import JobForm
 from django.contrib import messages
 from django.db.models import Count
+from jobs.models import Job
+from jobs.forms import JobForm
+from django.views.decorators.http import require_POST
+
 import logging
 
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
 # ============================
-# ADMIN SEES ALL JOBS / RECRUITER sees their own
+# QUERYSET HELPER
 # ============================
-
 def job_queryset_for(user):
     if user.role == "ADMIN":
         return Job.objects.filter(is_deleted=False)
     return Job.objects.filter(created_by=user, is_deleted=False)
 
 
-class RecruiterJobListView(LoginRequiredMixin, ListView):
-    template_name = "recruiter/jobs/list.html"
-    context_object_name = "jobs"
-    paginate_by = 10
+# =================================================================
+#                       RECRUITER JOB LIST
+# =================================================================
+@login_required
+def recruiter_job_list(request):
+    if request.user.role not in ["RECRUITER", "ADMIN"]:
+        logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
+        raise PermissionDenied()
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.role not in ["RECRUITER", "ADMIN"]:
-            logger.warning(f"Unauthorized job list access attempt by {request.user.email}")
-            return redirect("login")
-        return super().dispatch(request, *args, **kwargs)
+    qs = job_queryset_for(request.user).annotate(
+        application_count=Count('applications')
+    ).order_by("-created_at")
 
-    def get_queryset(self):
-        qs = job_queryset_for(self.request.user).annotate(
-            app_count=Count('applications')
-        ).order_by("-created_at")
+    search = request.GET.get("search")
+    location = request.GET.get("location")
+    work_mode = request.GET.get("work_mode")
 
-        search = self.request.GET.get("search")
-        location = self.request.GET.get("location")
-        work_mode = self.request.GET.get("work_mode")
+    if search:
+        qs = qs.filter(title__icontains=search)
+    if location:
+        qs = qs.filter(location__icontains=location)
+    if work_mode:
+        qs = qs.filter(work_mode=work_mode)
 
-        if search:
-            qs = qs.filter(title__icontains=search)
-        if location:
-            qs = qs.filter(location__icontains=location)
-        if work_mode:
-            qs = qs.filter(work_mode=work_mode)
+    paginator = Paginator(qs, 10)
+    page = paginator.get_page(request.GET.get("page"))
 
-        return qs
-
-
-class RecruiterJobCreateView(LoginRequiredMixin, CreateView):
-    form_class = JobForm
-    template_name = "recruiter/jobs/create.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.role != "RECRUITER":
-            logger.warning(f"Unauthorized job creation attempt by {request.user.email}")
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        job = form.save(commit=False)
-        job.created_by = self.request.user
-        job.save()
-        form.save()
-
-        logger.info(f"Job created: id={job.id} by {self.request.user.email}")
-        messages.success(self.request, "Job created successfully!")
-        return redirect("recruiter_job_list")
+    return render(request, "recruiter/jobs/list.html", {
+        "jobs": page,
+        "page_obj": page,
+    })
 
 
-class RecruiterJobDetailView(LoginRequiredMixin, DetailView):
-    template_name = "recruiter/jobs/detail.html"
-    context_object_name = "job"
-    pk_url_kwarg = "id"
+# =================================================================
+#                       RECRUITER JOB CREATE
+# =================================================================
+@login_required
+def recruiter_job_create(request):
+    if request.user.role != "RECRUITER":
+        logger.warning(f"Unauthorized job creation attempt by {request.user.email}")
+        return HttpResponseForbidden()
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.role not in ["RECRUITER", "ADMIN"]:
-            logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
-            return redirect("login")
-        return super().dispatch(request, *args, **kwargs)
+    if request.method == "POST":
+        form = JobForm(request.POST)
+        if form.is_valid():
+            job = form.save(commit=False)
+            job.created_by = request.user
+            job.save()
 
-    def get_queryset(self):
-        return job_queryset_for(self.request.user)
-
-
-class RecruiterJobUpdateView(LoginRequiredMixin, UpdateView):
-    model = Job
-    form_class = JobForm
-    template_name = "recruiter/jobs/edit.html"
-    pk_url_kwarg = "id"
-
-    def dispatch(self, request, *args, **kwargs):
-        job = get_object_or_404(Job, id=kwargs["id"])
-
-        if request.user.role == "ADMIN":
-            logger.warning(f"Admin attempted to edit Recruiter job {job.id}")
-            return HttpResponseForbidden("Admins cannot edit recruiter-created jobs.")
-
-        if job.created_by != request.user:
-            logger.warning(f"Unauthorized job edit attempt by {request.user.email} on job {job.id}")
-            return HttpResponseForbidden("Not allowed.")
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        job = form.save()
-        logger.info(f"Job updated: id={job.id} by {self.request.user.email}")
-        messages.success(self.request, "Job updated successfully!")
-
-        action = self.request.POST.get("action")
-
-        if action == "save_list":
+            logger.info(f"Job created: id={job.id} by {request.user.email}")
+            messages.success(request, "Job created successfully!")
             return redirect("recruiter_job_list")
-        if action == "save_detail":
-            return redirect("recruiter_job_detail", id=job.id)
-        return redirect("recruiter_job_list")
+    else:
+        form = JobForm()
+
+    return render(request, "recruiter/jobs/create.html", {"form": form})
 
 
-class RecruiterJobDeleteView(LoginRequiredMixin, View):
-    def post(self, request, id):
-        job = get_object_or_404(Job, id=id)
+# =================================================================
+#                       RECRUITER JOB DETAIL
+# =================================================================
+@login_required
+def recruiter_job_detail(request, id):
+    if request.user.role not in ["RECRUITER", "ADMIN"]:
+        logger.warning(f"Unauthorized job detail access attempt by {request.user.email}")
+        raise PermissionDenied()
 
-        if request.user.role != "RECRUITER" or job.created_by != request.user:
-            logger.warning(f"Unauthorized job delete attempt by {request.user.email} on job {job.id}")
-            return HttpResponseForbidden("You cannot delete this job.")
+    job = get_object_or_404(job_queryset_for(request.user), id=id)
+    return render(request, "recruiter/jobs/detail.html", {"job": job})
 
-        job.is_deleted = True
-        job.save()
 
-        logger.info(f"Job soft-deleted: id={job.id} by {request.user.email}")
-        messages.success(request, "Job deleted successfully!")
-        return redirect("recruiter_job_list")
+# =================================================================
+#                       RECRUITER JOB UPDATE
+# =================================================================
+@login_required
+def recruiter_job_edit(request, id):
+    if request.user.role != "RECRUITER":
+        return HttpResponseForbidden("Admins cannot edit recruiter-created jobs.")
+
+    job = get_object_or_404(job_queryset_for(request.user), id=id)
+
+    if request.method == "POST":
+        form = JobForm(request.POST, instance=job)
+        if form.is_valid():
+            job = form.save()
+
+            messages.success(request, "Job updated successfully!")
+
+            action = request.POST.get("action")
+
+            if action == "save_list":
+                return redirect("recruiter_job_list")
+
+            if action == "save_detail":
+                return redirect("recruiter_job_detail", id=job.id)
+
+            return redirect("recruiter_job_list")
+    else:
+        form = JobForm(instance=job)
+
+    return render(request, "recruiter/jobs/edit.html", {"form": form, "job": job})
+
+
+# =================================================================
+#                       RECRUITER JOB DELETE
+# =================================================================
+@login_required
+@require_POST
+def recruiter_job_delete(request, id):
+    queryset = job_queryset_for(request.user)
+    job = get_object_or_404(queryset, id=id)
+
+    job.is_deleted = True
+    job.save()
+
+    messages.success(request, "Job deleted successfully!")
+    return redirect("recruiter_job_list")

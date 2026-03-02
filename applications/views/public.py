@@ -11,14 +11,12 @@ from applications.utils import (
 )
 from applications.supabase_client import upload_resume
 import logging
-import os
-import tempfile
 
 logger = logging.getLogger(__name__)
 
 
 def apply_job(request, slug):
-    job = get_object_or_404(Job, slug=slug)
+    job = get_object_or_404(Job, slug=slug,is_deleted=False)
 
     if request.method == "POST":
         form = ApplicationForm(request.POST, request.FILES)
@@ -31,73 +29,65 @@ def apply_job(request, slug):
                 form.add_error("email", "You have already applied for this job.")
                 return render(request, "applications/apply.html", {"form": form, "job": job})
 
-            app = form.save(commit=False)
-            app.job = job
+            application = form.save(commit=False)
+            application.job = job
 
             resume_file = request.FILES.get("resume")
             if not resume_file:
                 form.add_error("resume", "Resume is required.")
                 return render(request, "applications/apply.html", {"form": form, "job": job})
 
-            # TEMP FILE FOR PARSING
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                for chunk in resume_file.chunks():
-                    tmp.write(chunk)
-                tmp_path = tmp.name
-
+            # PARSING RESUME 
             try:
-                parsed = parse_resume(tmp_path, job)
+                resume_file.seek(0)
+                parsed = parse_resume(resume_file, job)
+
+            except ValueError as e:
+                form.add_error("resume", str(e))
+                return render(request, "applications/apply.html", {"form": form, "job": job})
+
             except Exception as e:
-                logger.warning(f"Resume parsing failed: {e}")
-                parsed = {}
-            finally:
-                os.remove(tmp_path)
+                logger.exception("Unexpected parsing error")
+                form.add_error("resume", "Resume processing failed. Please try again.")
+                return render(request, "applications/apply.html", {"form": form, "job": job})
 
             # SCORING
             scoring = compute_match_score(parsed, job)
 
-            app.match_score = scoring["final_score"]
-            app.skill_score = scoring["skill_score"]
-            app.experience_score = scoring["experience_score"]
-            app.keyword_score = scoring["keyword_score"]
-            app.matched_skills = scoring["matched_skills"]
-            app.missing_skills = scoring["missing_skills"]
+            application.match_score = scoring["final_score"]
+            application.skill_score = scoring["skill_score"]
+            application.experience_score = scoring["experience_score"]
+            application.keyword_score = scoring["keyword_score"]
+            application.matched_skills = scoring["matched_skills"]
+            application.missing_skills = scoring["missing_skills"]
 
-            app.summary = generate_summary(parsed, scoring["final_score"])
-            app.evaluation = evaluate_candidate(scoring["final_score"])
-            app.fit_category = fit_category(scoring["final_score"])
+            application.summary = generate_summary(parsed, scoring["final_score"])
+            application.evaluation = evaluate_candidate(scoring["final_score"])
+            application.fit_category = fit_category(scoring["final_score"])
 
-            app.parsed_name = parsed.get("name")
-            app.parsed_email = parsed.get("email")
-            app.parsed_phone = parsed.get("phone")
-            app.parsed_experience = parsed.get("experience_years")
-            app.parsed_skills = parsed.get("skills")
-            app.parsed_projects = parsed.get("projects")
-            app.parsed_education = parsed.get("education")
-            app.parsed_certifications = parsed.get("certifications")
+            application.parsed_name = parsed.get("name")
+            application.parsed_email = parsed.get("email")
+            application.parsed_phone = parsed.get("phone")
+            application.parsed_experience = parsed.get("experience_years")
+            application.parsed_skills = parsed.get("skills")
+            application.parsed_projects = parsed.get("projects")
+            application.parsed_education = parsed.get("education")
+            application.parsed_certifications = parsed.get("certifications")
 
-
-
-            # SUPABASE UPLOAD
+            # SUPABASE UPLOAD (seek(0) is handled inside upload_resume too)
             try:
-                resume_file.seek(0)
-                app.resume_url = upload_resume(resume_file, job.slug)
+                application.resume_url = upload_resume(resume_file, job.slug)
             except Exception as e:
                 logger.exception(e)
-                form.add_error("resume", str(e))
-
+                form.add_error("resume", f"Upload failed: {str(e)}")
                 return render(request, "applications/apply.html", {"form": form, "job": job})
 
             # FINAL SAVE
-            print("FILES:", request.FILES)
-            print("FILE OBJ:", resume_file, type(resume_file))
-
             try:
-                app.save()
+                application.save()
             except Exception as e:
                 logger.exception(e)
-                form.add_error(None, str(e))
-
+                form.add_error(None, f"Persistence error: {str(e)}")
                 return render(request, "applications/apply.html", {"form": form, "job": job})
 
             return redirect("application_success")

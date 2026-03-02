@@ -1,5 +1,4 @@
 import re
-
 # =====================================================================
 # NORMALIZER (SAFE + CONSISTENT)
 # =====================================================================
@@ -12,7 +11,8 @@ def normalize(text):
         return [" ".join(t.lower().split()) for t in text if t.strip()]
 
     if isinstance(text, str):
-        return [" ".join(p.lower().split()) for p in text.split(",") if p.strip()]
+        parts = re.split(r"[,\n]", text)
+        return [" ".join(p.lower().split()) for p in parts if p.strip()]
 
     return []
 
@@ -34,29 +34,26 @@ def compute_skill_score(parsed_skills, job_required_skills):
     return score, matched, missing
 
 # =====================================================================
-# EXPERIENCE SCORE (STABLE)
+# EXPERIENCE SCORE 
 # =====================================================================
 
 def compute_experience_score(parsed_exp, job_min, job_max):
     try:
         parsed_exp = float(parsed_exp)
     except:
-        return 40  # safe fallback
+        return 0
 
     if job_min is None and job_max is None:
         return 100
 
-    # Under minimum
     if job_min and parsed_exp < job_min:
-        return max(30, (parsed_exp / job_min) * 100)
+        return (parsed_exp / job_min) * 100
 
-    # Over maximum
     if job_max and parsed_exp > job_max:
         over = parsed_exp - job_max
-        return max(70, 100 - (over * 5))
+        return max(0, 100 - (over * 5))
 
     return 100
-
 # =====================================================================
 # KEYWORD SCORE (REAL JD-BASED)
 # =====================================================================
@@ -129,6 +126,7 @@ def generate_summary(parsed, score):
 # =====================================================================
 # CANDIDATE EVALUATION (KEPT AS YOU WANTED)
 # =====================================================================
+
 def evaluate_candidate(score):
     if score >= 80:
         return "Strong technical alignment with the job requirements."
@@ -138,14 +136,15 @@ def evaluate_candidate(score):
         return "Partial alignment. Candidate meets some requirements."
     return "Weak alignment with the job requirements."
 
+
 # =====================================================================
 # FIT CATEGORY (REAL HR BUCKETS)
 # =====================================================================
 
 def fit_category(score):
-    if score >= 85:
+    if score >= 80:
         return "Strong Fit"
-    if score >= 65:
+    if score >= 60:
         return "Good Fit"
     if score >= 45:
         return "Average Fit"

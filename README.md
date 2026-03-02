@@ -1,205 +1,219 @@
-# Smart ATS
+# Smart ATS Backend
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![Django](https://img.shields.io/badge/Django-5.2-green.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)
-![DRF](https://img.shields.io/badge/DRF-3.14-red.svg)
+Production-style Applicant Tracking System backend built with Django and DRF for internal hiring teams.
 
-**Production Deployment**: [smart-ats-v0yf.onrender.com](https://smart-ats-v0yf.onrender.com)
+This project demonstrates secure multi-role workflows, resume parsing, automated candidate scoring, and clean API + server-rendered architecture.
 
----
-
-## Overview
-
-Smart ATS is an **internal recruitment management system** demonstrating production-grade Django backend patterns. Built for single-organization hiring workflows, it handles the complete pipeline from job posting through candidate evaluation.
-
-**Core Focus**: Strict RBAC enforcement, secure invite-based onboarding, intelligent resume processing with error recovery, and cloud-native storage architecture.
+![Python](https://img.shields.io/badge/Python-3.11+-blue)
+![Django](https://img.shields.io/badge/Django-5.2.8-green)
+![DRF](https://img.shields.io/badge/DRF-3.16.1-red)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
 
 ---
 
-## Screenshots
+## Why This Project Stands Out
 
-### Recruiter Dashboard
-![Recruiter Dashboard](screenshots/recruiter_dashboard.png)
-
-### Recruiter Jobs
-![Recruiter Jobs](screenshots/recruiter_jobs.png)
-
-### Resume Parsing & Match Scoring
-![Application Score Summary](screenshots/application_score_summary.png)
-*Top-level match scores derived from skills, experience, and job description analysis*
-
-![Skill Breakdown](screenshots/application_skill_breakdown.png)
-*Parsed resume data showing extracted skills, projects, and education*
-
-### Admin Overview
-![Admin Overview](screenshots/admin_overview.png)
-*Admin view showing visibility across recruiters, jobs, and applications*
+- Built a complete ATS workflow end-to-end: recruiter onboarding, job posting, candidate applications, resume intelligence, and hiring-stage tracking.
+- Enforced strict role boundaries with custom RBAC (`ADMIN`, `RECRUITER`) at authentication, view-authorization, API, and queryset layers.
+- Implemented resilient candidate ingestion with PDF parsing, cloud resume storage (Supabase), and weighted fit scoring.
+- Added invite-only recruiter onboarding and secure password reset flows with expiring UUID tokens.
+- Covered critical paths with automated tests for auth, permissions, application flow, and data isolation.
 
 ---
 
-## System Architecture
+## Core Product Workflow
 
-### 2-Tier Business Role Hierarchy
-
-This system implements a strict permission model with two primary business roles.
-
-```
-ADMIN (Manager)
-  │
-  └── RECRUITER (Hiring Staff)
-```
-
-**Role Breakdown:**
-1. **ADMIN**: Manages the recruitment team. Invites Recruiters via secure UUID tokens (48h expiry). Can view all jobs and applications across the organization.
-2. **RECRUITER**: Operational role. Can create jobs and review applications. Limited to viewing only *their own* jobs and applicants (`job__created_by=request.user`) for strict data isolation.
-
-*Note: **SUPERUSER** is a Django built-in role reserved solely for system owner tasks (like accessing the Django Admin Panel) and is not part of the recruitment workflow.*
-
-**Authorization Enforcement**:
-- **API Level**: Uses strict `permission_classes` (`IsRecruiter`, `IsAdmin`).
-- **View Level**: `request.user.role` checks prevent unauthorized actions.
-- **ORM Level**: Custom QuerySets enforce data isolation (`Application.objects.filter(job__created_by=request.user)`).
-- **Security**: Unauthorized access attempts return `403 Forbidden`.
-
-**Candidate Interaction**: Candidates do **not** have accounts. They interact with public job listings and apply purely via email/resume submission, receiving application tracking IDs via email.
-
-📖 **Details**: [docs/architecture.md](docs/architecture.md)
+1. Admin invites recruiter using a secure expiring link.
+2. Recruiter signs up and creates jobs.
+3. Candidate applies with contact info + PDF resume (no candidate account required).
+4. System parses resume, computes weighted match score, and stores recruiter-facing evaluation.
+5. Recruiter moves candidate through pipeline: `screening -> review -> interview -> hired/rejected`.
 
 ---
 
-## Key Backend Engineering Highlights
+## Key Engineering Highlights
 
-### 1. **Secure Invite System**
-- **UUID Tokens**: Cryptographically random application invites with 48-hour expiry.
-- **Audit Trail**: Tracks IP address and User-Agent during improved security monitoring.
-- **Token State**: `consumed_at` timestamp ensures one-time use policy, preventing replay attacks.
-- **Email Delivery**: Uses Brevo HTTP API (Synchronous) to bypass common cloud SMTP blocks.
+### 1) Role-Based Access Control and Data Isolation
+- Built layered backend access control, not frontend-only checks.
+- Authentication is enforced with Django `@login_required` on protected routes.
+- Authorization is enforced with role checks (`request.user.role`) before executing business logic.
+- Fail-closed behavior is applied using `PermissionDenied` / forbidden responses for unauthorized access attempts.
+- Data isolation is enforced via ownership-based querysets so recruiters cannot access other recruiters' jobs/applications.
+- DRF permission classes (`IsAdmin`, `IsRecruiter`) additionally secure API endpoints.
 
-### 2. **Production-Safe Resume Parser**
-- **Encrypted PDF Handling**: Attempts standard decryption and gracefully fails if password-protected.
-- **Per-Page Error Recovery**: Parsing continues even if individual pages are corrupted.
-- **Resource Protection**: Enforces 20-page limit to prevent server memory exhaustion.
-- **Skill Extraction**: Maps 100+ raw skill terms to canonical forms (e.g., `"drf"`, `"django rest framework"` → `"Django REST Framework"`).
+### 2) Invite-Only Team Onboarding
+- Recruiter signup is restricted to admin-issued UUID invite tokens.
+- Invite links expire (48 hours) and are marked as used after successful signup.
+- Duplicate active invites are blocked.
 
-### 3. **Weighted Scoring Algorithm**
-- **50% Skills Match**: Set intersection of candidate skills vs. job requirements.
-- **30% Experience**: Evaluation of years of experience with penalties for over/under-qualification.
-- **20% Keyword Relevance**: Contextual matching against the full job description.
-- **Detailed Feedback**: Returns specific matched vs. missing skills to aid recruiter decision-making.
+### 3) Secure Authentication and Recovery
+- Token-based API authentication (`rest_framework.authtoken`).
+- Forgot/reset password flow with expiring reset tokens (15 minutes).
+- `must_change_password` workflow for forced first-login resets.
+- Inactive users are blocked from login.
 
-📖 **Details**: [docs/scoring.md](docs/scoring.md)
+### 4) Resume Parsing + Automated Evaluation
+- PDF-only application uploads with validation (extension + size limits).
+- Resume parser extracts:
+  - name, email, phone
+  - skills
+  - experience
+  - projects, education, certifications
+- Weighted scoring engine:
+  - 50% skill match
+  - 30% experience fit
+  - 20% job-description keyword relevance
+- Stores final score + matched/missing skills + fit category + summary/evaluation text.
 
-### 4. **Cloud-Native Storage (Supabase)**
-- **Problem**: Host platforms like Render use ephemeral filesystems where uploads vanish on redeploy.
-- **Solution**: Integrated Supabase Object Storage.
-- **Implementation**: Files are uploaded directly to cloud buckets; database stores permanent URL references. This ensures 100% data persistence across deployments.
+### 5) Cloud Storage and Transactional Email Integration
+- Resume uploads persisted to Supabase object storage, URL stored in DB.
+- Invite and password-reset emails sent through Brevo HTTP API with explicit timeout and failure handling.
 
-📖 **Details**: [docs/storage.md](docs/storage.md)
-
-### 5. **Security & Integrity**
-- **Soft Delete**: `is_deleted` flags preserve data referential integrity and audit history.
-- **Environment-Aware Config**: auto-switches between Local/Production settings (SSL, Debug mode, Allowed Hosts).
-- **Custom Permissions**: `IsRecruiter` and `IsAdmin` DRF permission classes enforce strict role boundaries.
-
----
-
-## API Structure
-
-The application exposes a structured REST API via **Django Rest Framework (DRF)**.
-
-### **Authentication**
-- `POST /api/auth/login/` - Token-based login
-- `POST /api/auth/logout/` - Invalidate token
-- `GET /api/auth/me/` - User profile & role info
-
-### **Public (Candidates)**
-- `GET /api/jobs/` - List open positions
-- `GET /api/jobs/<slug>/` - Job details
-- `POST /api/apply/<slug>/` - Submit application (Resume Parsing + Scoring trigger)
-
-### **Recruiter Management**
-- `POST /api/jobs/create/` - Post new job
-- `PUT /api/jobs/<id>/update/` - Edit job details
-- `DELETE /api/jobs/<id>/delete/` - Soft delete job
-- `GET /api/applications/` - List applicants (Filtered by owned jobs)
-- `PATCH /api/applications/<id>/status/` - Update applicant status (e.g., "Interview", "Rejected")
+### 6) Operational Safety
+- Soft-delete strategy for jobs (`is_deleted`) to preserve historical application data.
+- Cache-control middleware to prevent sensitive authenticated pages from being cached.
+- Structured logging for login failures, permission violations, and external integration failures.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Rationale |
-|-------|------------|-----------|
-| **Backend** | Django 5.2 | Robust ORM, built-in admin, security defaults |
-| **API** | DRF 3.14 | Token auth, serializers, permissions |
-| **Database** | PostgreSQL (Neon) | JSONB support, production reliability |
-| **Dev DB** | SQLite / MySQL | Lightweight local development |
-| **Parsing** | PyPDF2 + Regex | Efficient, local resume text extraction |
-| **Storage** | Supabase | Ephemeral filesystem resilience |
-| **Email** | Brevo HTTP API | Reliable transactional emails (Synchronous) |
-| **Deployment** | Render | Managed cloud hosting with CI/CD |
+- **Backend**: Django 5.2.8, Django REST Framework 3.16.1
+- **Database**: PostgreSQL (SQLite test DB fallback during test runs)
+- **Resume Parsing**: PyPDF2 + regex extractors
+- **File Storage**: Supabase Storage
+- **Email**: Brevo API
+- **Static Serving**: WhiteNoise
+- **Deployment**: Gunicorn + Render
+- **Testing**: Django TestCase + DRF APIClient
 
 ---
 
-## Live Demo Credentials
+## API Surface (Representative)
 
-**Admin**:
-```
-Email: admin@demo.com
-Password: admin@123
-```
+### Auth
+- `POST /api/auth/login/`
+- `POST /api/auth/logout/`
+- `GET /api/auth/me/`
 
-**Recruiter**:
-```
-Email: dhokved7@gmail.com
-Password: ved@1234
-```
+### Public
+- `GET /api/jobs/`
+- `GET /api/jobs/<slug>/`
+- `POST /api/apply/<slug>/`
 
-**Test Flow**: Admin → Invite New Recruiter → Login as Recruiter → Create Job → (Logout/Incognito) Apply as Candidate → Login as Recruiter → Review Application Score.
+### Recruiter
+- `GET /api/recruiter/jobs/`
+- `POST /api/recruiter/jobs/create/`
+- `PUT /api/recruiter/jobs/<id>/update/`
+- `DELETE /api/recruiter/jobs/<id>/delete/`
+- `GET /api/recruiter/applications/`
+- `PATCH /api/recruiter/applications/<id>/status/`
+
+### Admin
+- `GET /api/admin/jobs/`
+- `GET /api/admin/jobs/<id>/`
+- `GET /api/admin/applications/`
+- `GET /api/admin/applications/<id>/`
+
+---
+
+## Project Structure
+
+```text
+backend/
+├── api/               # DRF endpoints, serializers, role permissions
+├── users/             # custom user model, auth, invite, password reset flows
+├── jobs/              # job model, forms, recruiter/admin/public job views
+├── applications/      # application model, parsing, scoring, storage integration
+├── core/              # settings, URL router, Brevo utility, CSRF view
+├── middleware/        # no-cache middleware for sensitive pages
+└── templates/         # recruiter/admin/public server-rendered UI templates
+```
 
 ---
 
 ## Local Setup
 
 ```bash
-git clone https://github.com/SagarDhok/Smart_ATS.git
+git clone <your-repo-url>
 cd Smart_ATS/backend
-
-# Create virtual environment
 python -m venv env
 source env/bin/activate  # Windows: env\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
+```
 
-# Configure .env file (see .env.example)
-# Run migrations
+Create `.env` with required values:
+
+```env
+ENVIRONMENT=development
+SECRET_KEY=your-secret
+
+DB_NAME=your_db
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_HOST=your_host
+DB_PORT=5432
+
+BREVO_API_KEY=your_brevo_key
+DEFAULT_FROM_EMAIL=your_sender_email
+
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+SUPABASE_BUCKET=resumes
+```
+
+Run:
+
+```bash
 python manage.py migrate
-
-# Create owner account
 python manage.py createsuperuser
-
-# Start server
 python manage.py runserver
 ```
 
-Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+---
+
+## Tests
+
+Run all tests:
+
+```bash
+python manage.py test
+```
+
+Targeted suites:
+
+```bash
+python manage.py test users.tests
+python manage.py test jobs.tests
+python manage.py test applications.tests
+python manage.py test api.tests
+```
 
 ---
 
-## Developer
+## Deployment Notes
 
-**Sagar Dhok**  
-Backend Developer | Python • Django • REST APIs • SQL
-
-- **GitHub**: [github.com/SagarDhok](https://github.com/SagarDhok/Smart_ATS)
-- **LinkedIn**: [linkedin.com/in/sagardhok](https://www.linkedin.com/in/sagardhok/)
-- **X**: [x.com/SagarDh0k](https://x.com/SagarDh0k)
-- **Email**: sdhok041@gmail.com
+- `render.yaml` includes a Gunicorn start command and static collection step.
+- App uses environment-driven settings for host/security/database configuration.
+- PostgreSQL with SSL mode is enabled in settings for secure DB connections.
 
 ---
 
-## License
+## Screenshots
 
-Open-source for educational purposes. Portfolio project demonstrating backend engineering—not intended for commercial deployment without additional hardening.
+![Recruiter Dashboard](screenshots/recruiter_dashboard.png)
+![Recruiter Jobs](screenshots/recruiter_jobs.png)
+![Application Score Summary](screenshots/application_score_summary.png)
+![Skill Breakdown](screenshots/application_skill_breakdown.png)
+
+---
+
+## About the Developer
+
+I built this project to demonstrate practical backend engineering for real hiring workflows:
+- API design with strict authorization
+- data modeling and workflow integrity
+- third-party service integration
+- test-driven reliability for critical flows
+
+If you are hiring for Python/Django backend roles, this repository is meant to show production-minded implementation quality rather than tutorial-level CRUD.

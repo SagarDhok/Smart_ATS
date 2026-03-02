@@ -5,9 +5,6 @@ from decimal import Decimal
 
 class JobForm(forms.ModelForm):
 
-    # Allow up to 5 decimal places, browser won't complain
-    min_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=2)
-    max_salary = forms.DecimalField(required=False, max_digits=12, decimal_places=2)
 
     required_skills = forms.CharField(
         required=False,
@@ -31,43 +28,29 @@ class JobForm(forms.ModelForm):
             "jd_keywords",
         ]
         widgets = {
-            "deadline": forms.DateInput(attrs={"type": "date"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # fix browser decimal block
-        self.fields["min_salary"].widget.attrs.update({"step": "0.01"})
-        self.fields["max_salary"].widget.attrs.update({"step": "0.01"})
-
-
+                "deadline": forms.DateInput(attrs={"type": "date"}),
+                "min_salary": forms.NumberInput(attrs={"step": "0.01"}),
+                "max_salary": forms.NumberInput(attrs={"step": "0.01"}),
+            }
         
 
         # ----------------------------
         # EDIT MODE INITIAL DATA
         # ----------------------------
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         if self.instance.pk:
+            self.initial["required_skills"] = ", ".join(self.instance.required_skills or [])
+            self.initial["jd_keywords"] = ", ".join(self.instance.jd_keywords or [])
 
-            # Skills
-            if isinstance(self.instance.required_skills, list):
-                self.fields["required_skills"].initial = ", ".join(self.instance.required_skills)
-
-            if isinstance(self.instance.jd_keywords, list):
-                self.fields["jd_keywords"].initial = ", ".join(self.instance.jd_keywords)
-
-            # Show INR → LPA rounded properly
             if self.instance.salary_type == "yearly":
                 if self.instance.min_salary:
-                    self.initial["min_salary"] = (
-                        Decimal(self.instance.min_salary) / Decimal("100000")
-                    ).quantize(Decimal("0.01"))
+                    self.initial["min_salary"] = self.instance.min_salary / 100000
 
                 if self.instance.max_salary:
-                    self.initial["max_salary"] = (
-                        Decimal(self.instance.max_salary) / Decimal("100000")
-                    ).quantize(Decimal("0.01"))
-
+                    self.initial["max_salary"] = self.instance.max_salary / 100000
+                    
     # Clean comma list fields
     def clean_required_skills(self):
         return [x.strip().lower() for x in self.cleaned_data.get("required_skills", "").split(",") if x.strip()]

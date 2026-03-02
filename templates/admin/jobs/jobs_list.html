@@ -16,7 +16,7 @@
     <form method="GET">
         <input type="text" name="search" class="job-input"
                placeholder="Search job title..."
-               value="{{ search }}">
+               value="{{ request.GET.search }}">
         <button type="submit" class="btn btn-primary job-btn">Search</button>
     </form>
 </div>
@@ -80,7 +80,7 @@
     <!-- PAGINATION -->
     <div class="pagination-controls">
         {% if jobs_page.has_previous %}
-            <a href="?page={{ jobs_page.previous_page_number }}&search={{ search }}" class="btn btn-outline">Previous</a>
+            <a href="?page={{ jobs_page.previous_page_number }}&search={{ request.GET.search }}" class="btn btn-outline">Previous</a>
         {% endif %}
 
         <span class="page-info">
@@ -88,7 +88,7 @@
         </span>
 
         {% if jobs_page.has_next %}
-            <a href="?page={{ jobs_page.next_page_number }}&search={{ search }}" class="btn btn-outline">Next</a>
+            <a href="?page={{ jobs_page.next_page_number }}&search={{ request.GET.search }}" class="btn btn-outline">Next</a>
         {% endif %}
     </div>
 

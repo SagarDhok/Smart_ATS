@@ -18,7 +18,7 @@
         <input type="text"
                name="search"
                placeholder="Search candidate name or email..."
-               value="{{ search }}"
+               value="{{ request.GET.search }}"
                class="apps-input">
         
             
@@ -28,21 +28,27 @@
         <!-- Status -->
         <select name="status" class="apps-select" onchange="this.form.submit()">
             <option value="">All Status</option>
-            <option value="screening" {% if status_filter == "screening" %}selected{% endif %}>
+
+            <option value="screening" {% if request.GET.status == "screening" %}selected{% endif %}>
                 Screening ({{ counts.screening }})
             </option>
-            <option value="review" {% if status_filter == "review" %}selected{% endif %}>
+
+            <option value="review" {% if request.GET.status == "review" %}selected{% endif %}>
                 Review ({{ counts.review }})
             </option>
-            <option value="interview" {% if status_filter == "interview" %}selected{% endif %}>
+
+            <option value="interview" {% if request.GET.status == "interview" %}selected{% endif %}>
                 Interview ({{ counts.interview }})
             </option>
-            <option value="hired" {% if status_filter == "hired" %}selected{% endif %}>
+
+            <option value="hired" {% if request.GET.status == "hired" %}selected{% endif %}>
                 Hired ({{ counts.hired }})
             </option>
-            <option value="rejected" {% if status_filter == "rejected" %}selected{% endif %}>
+
+            <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>
                 Rejected ({{ counts.rejected }})
             </option>
+            
         </select>
 
     </form>
@@ -62,35 +68,35 @@
     </thead>
 
 <tbody>
-{% for app in apps_page %}
+{% for application in applications_page %}
 <tr>
 
     <td data-label="Candidate">
-        <a href="{% url 'admin_application_detail' app.id %}" class="table-link">
-            {{ app.full_name }}
+        <a href="{% url 'admin_application_detail' application.id %}" class="table-link">
+            {{ application.full_name }}
         </a>
     </td>
 
     <td data-label="Email">
-        {{ app.email }}
+        {{ application.email }}
     </td>
 
     <td data-label="Job">
-        <a href="{% url 'admin_job_detail' app.job.id %}" class="table-link">
-            {{ app.job.title }}
+        <a href="{% url 'admin_job_detail' application.job.id %}" class="table-link">
+            {{ application.job.title }}
         </a>
     </td>
 
     <td data-label="Score">
-        <span class="count-pill">{{ app.match_score }}%</span>
+        <span class="count-pill">{{ application.match_score }}%</span>
     </td>
 
     <td data-label="Status">
-        {{ app.status|title }}
+        {{ application.status|title }}
     </td>
 
     <td data-label="Applied On">
-        {{ app.applied_at|date:"d M Y, h:i A" }}
+        {{ application.applied_at|date:"d M Y, h:i A" }}
     </td>
 
 </tr>
@@ -107,15 +113,15 @@
 
 <!-- PAGINATION -->
 <div class="pagination-controls mt-3">
-    {% if apps_page.has_previous %}
-    <a href="?page={{ apps_page.previous_page_number }}&search={{ search }}&status={{ status_filter }}"
+    {% if applications_page.has_previous %}
+    <a href="?page={{ applications_page.previous_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
        class="btn btn-outline">Previous</a>
     {% endif %}
 
-    <span class="page-info">Page {{ apps_page.number }} of {{ apps_page.paginator.num_pages }}</span>
+    <span class="page-info">Page {{ applications_page.number }} of {{ applications_page.paginator.num_pages }}</span>
 
-    {% if apps_page.has_next %}
-    <a href="?page={{ apps_page.next_page_number }}&search={{ search }}&status={{ status_filter }}"
+    {% if applications_page.has_next %}
+    <a href="?page={{ applications_page.next_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
        class="btn btn-outline">Next</a>
     {% endif %}
 </div>

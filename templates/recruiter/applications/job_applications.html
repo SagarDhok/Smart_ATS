@@ -23,31 +23,31 @@
         </thead>
 
         <tbody>
-            {% for app in applications %}
+            {% for application in applications %}
             <tr>
 
                 <td data-label="Candidate">
-                    <a href="{% url 'recruiter_application_detail' app.id %}" class="table-link">
-                        {{ app.full_name }}
+                    <a href="{% url 'recruiter_application_detail' application.id %}" class="table-link">
+                        {{ application.full_name }}
                     </a>
                 </td>
 
                 <td data-label="Email">
-                    {{ app.email }}
+                    {{ application.email }}
                 </td>
 
                 <td data-label="Score">
                     <span class="count-pill">
-                        {{ app.match_score }}%
+                        {{ application.match_score }}%
                     </span>
                 </td>
 
                 <td data-label="Status">
-                    {{ app.status|title }}
+                    {{ application.status|title }}
                 </td>
 
                 <td data-label="Applied On">
-                    {{ app.applied_at|date:"d M Y, h:i A" }}
+                    {{ application.applied_at|date:"d M Y, h:i A" }}
                 </td>
 
             </tr>

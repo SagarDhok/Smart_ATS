@@ -17,12 +17,8 @@ class Application(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20)
 
-    # ✅ Supabase public URL ONLY
+    #  Supabase public URL ONLY
     resume_url = models.URLField(blank=True, null=True)
-
-    parsed_name = models.CharField(max_length=255, blank=True, null=True)
-    parsed_email = models.EmailField(blank=True, null=True)
-    parsed_phone = models.CharField(max_length=20, blank=True, null=True)
 
     parsed_skills = models.JSONField(blank=True, null=True)
     parsed_experience = models.FloatField(blank=True, null=True)
@@ -37,6 +33,7 @@ class Application(models.Model):
     skill_score = models.FloatField(default=0)
     keyword_score = models.FloatField(default=0)
 
+
     summary = models.TextField(blank=True, null=True)
     evaluation = models.TextField(blank=True, null=True)
     fit_category = models.CharField(max_length=20, blank=True, null=True)
@@ -47,4 +44,4 @@ class Application(models.Model):
 
 
     class Meta:
-        unique_together = ("job", "email")
+        unique_together = ("job", "email")  

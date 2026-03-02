@@ -34,6 +34,7 @@ def send_brevo_email(to_email: str, subject: str, html_content: str) -> bool:
             json=payload,
             headers=headers,
             timeout=10  # IMPORTANT: prevents hanging
+
         )
 
         if response.status_code in (200, 201, 202):

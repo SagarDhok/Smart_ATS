@@ -17,7 +17,7 @@
             <input type="text"
                    name="search"
                    placeholder="Search candidate or email..."
-                   value="{{ search }}"
+                   value="{{ request.GET.search }}"
                    class="apps-input">
 
             <button type="submit" class="btn btn-primary apps-btn">
@@ -28,19 +28,19 @@
                     class="apps-select"
                     onchange="this.form.submit()">
                 <option value="">All Status</option>
-                <option value="screening" {% if status_filter == "screening" %}selected{% endif %}>
+                <option value="screening" {% if request.GET.status == "screening" %}selected{% endif %}>
                     Screening ({{ counts.screening }})
                 </option>
-                <option value="review" {% if status_filter == "review" %}selected{% endif %}>
+                <option value="review" {% if request.GET.status == "review" %}selected{% endif %}>
                     Review ({{ counts.review }})
                 </option>
-                <option value="interview" {% if status_filter == "interview" %}selected{% endif %}>
+                <option value="interview" {% if request.GET.status == "interview" %}selected{% endif %}>
                     Interview ({{ counts.interview }})
                 </option>
-                <option value="hired" {% if status_filter == "hired" %}selected{% endif %}>
+                <option value="hired" {% if request.GET.status == "hired" %}selected{% endif %}>
                     Hired ({{ counts.hired }})
                 </option>
-                <option value="rejected" {% if status_filter == "rejected" %}selected{% endif %}>
+                <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>
                     Rejected ({{ counts.rejected }})
                 </option>
             </select>
@@ -62,39 +62,39 @@
         </thead>
 
         <tbody>
-        {% for app in apps_page %}
+        {% for application in applications_page %}
             <tr>
 
                 <td data-label="Candidate">
-                    <a href="{% url 'recruiter_application_detail' app.id %}"
+                    <a href="{% url 'recruiter_application_detail' application.id %}"
                        class="table-link">
-                        {{ app.full_name }}
+                        {{ application.full_name }}
                     </a>
                 </td>
 
                 <td data-label="Email">
-                    {{ app.email }}
+                    {{ application.email }}
                 </td>
 
                 <td data-label="Job">
-                    <a href="{% url 'recruiter_job_detail' app.job.id %}"
+                    <a href="{% url 'recruiter_job_detail' application.job.id %}"
                        class="table-link">
-                        {{ app.job.title }}
+                        {{ application.job.title }}
                     </a>
                 </td>
 
                 <td data-label="Score">
                     <span class="count-pill">
-                        {{ app.match_score }}%
+                        {{ application.match_score }}%
                     </span>
                 </td>
 
                 <td data-label="Status">
-                    {{ app.status|title }}
+                    {{ application.status|title }}
                 </td>
 
                 <td data-label="Applied On">
-                    {{ app.applied_at|date:"d M Y, h:i A" }}
+                    {{ application.applied_at|date:"d M Y, h:i A" }}
                 </td>
 
             </tr>
@@ -111,7 +111,7 @@
     <!-- PAGINATION -->
     <div class="pagination-controls mt-3">
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ status_filter }}"
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
                class="btn btn-outline">
                 Previous
             </a>
@@ -122,7 +122,7 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ status_filter }}"
+            <a href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
                class="btn btn-outline">
                 Next
             </a>

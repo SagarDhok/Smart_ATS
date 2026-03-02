@@ -13,16 +13,16 @@
     <aside class="ats-sidebar">
         <div class="profile-card">
             <div class="avatar-placeholder">
-                {{ app.full_name|make_list|first|upper }}
+                {{ application.full_name|make_list|first|upper }}
             </div>
-            <h1 class="candidate-name">{{ app.full_name }}</h1>
-            <p class="job-role">{{ app.job.title }}</p>
+            <h1 class="candidate-name">{{ application.full_name }}</h1>
+            <p class="job-role">{{ application.job.title }}</p>
 
             <!-- ✅ ADMIN VIEW ONLY (NO STATUS DROPDOWN) -->
             <div class="status-workflow">
                 <label class="section-label">Admin Mode</label>
  <div class="admin-view-note">
-    Current Stage: <strong>{{ app.status|title }}</strong>
+    Current Stage: <strong>{{ application.status|title }}</strong>
 </div>
 
             </div>
@@ -30,20 +30,20 @@
             <div class="contact-info">
                 <div class="info-row">
                     <i class="fas fa-envelope"></i>
-                    <span>{{ app.email }}</span>
+                    <span>{{ application.email }}</span>
                 </div>
                 <div class="info-row">
                     <i class="fas fa-phone"></i>
-                    <span>{{ app.phone }}</span>
+                    <span>{{ application.phone }}</span>
                 </div>
                 <div class="info-row">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>{{ app.applied_at|date:"d M Y, h:i A" }}</span>
+                    <span>{{ application.applied_at|date:"d M Y, h:i A" }}</span>
                 </div>
             </div>
 
             <div class="action-buttons">
-   <a href="{{ app.resume_url }}" target="_blank" class="btn btn-primary">
+   <a href="{{ application.resume_url }}" target="_blank" class="btn btn-primary">
     <i class="fas fa-eye"></i> View Resume
 </a>
 
@@ -58,29 +58,29 @@
             <div>
                 <h2>Application Analysis</h2>
             </div>
-            <div class="fit-badge badge-{{ app.fit_category|lower }} {{ app.match_score|score_color }}">
-                {{ app.fit_category }}
+            <div class="fit-badge badge-{{ application.fit_category|lower }} {{ application.match_score|score_color }}">
+                {{ application.fit_category }}
             </div>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card highlight">
                 <div class="stat-title">Total Match</div>
-                <div class="stat-value {{ app.match_score|score_color }}">
-                    {{ app.match_score }}%
+                <div class="stat-value {{ application.match_score|score_color }}">
+                    {{ application.match_score }}%
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">Skills Match</div>
-                <div class="stat-value">{{ app.skill_score }}%</div>
+                <div class="stat-value">{{ application.skill_score }}%</div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">Exp. Match</div>
-                <div class="stat-value">{{ app.experience_score }}%</div>
+                <div class="stat-value">{{ application.experience_score }}%</div>
             </div>
             <div class="stat-card">
                 <div class="stat-title">Keywords</div>
-                <div class="stat-value">{{ app.keyword_score }}%</div>
+                <div class="stat-value">{{ application.keyword_score }}%</div>
             </div>
         </div>
 
@@ -91,12 +91,12 @@
 
             <div class="insight-box">
                 <h4>Executive Summary</h4>
-                <p>{{ app.summary }}</p>
+                <p>{{ application.summary }}</p>
             </div>
 
             <div class="insight-box mt-3">
                 <h4>Detailed Evaluation</h4>
-                <p>{{ app.evaluation }}</p>
+                <p>{{ application.evaluation }}</p>
             </div>
         </div>
 
@@ -112,11 +112,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for skill in app.job.required_skills %}
+                        {% for skill in application.job.required_skills %}
                         <tr>
                             <td class="fw-bold">{{ skill }}</td>
                             <td>
-                                {% if skill in app.matched_skills %}
+                                {% if skill in application.matched_skills %}
                                     <span class="status-pill success">
                                         <i class="fas fa-check"></i> Found
                                     </span>
@@ -127,7 +127,7 @@
                                 {% endif %}
                             </td>
                             <td class="muted-text">
-                                {% if skill in app.matched_skills %}
+                                {% if skill in application.matched_skills %}
                                     Detected in resume/projects
                                 {% else %}
                                     Not explicitly mentioned
@@ -143,8 +143,8 @@
 <div class="content-section">
     <h3>Education</h3>
     <div class="projects-block">
-        {% if app.parsed_education %}
-            {{ app.parsed_education|linebreaks }}
+        {% if application.parsed_education %}
+            {{ application.parsed_education|linebreaks }}
         {% else %}
             <p class="muted-text">No education details were detected in the resume.</p>
         {% endif %}
@@ -154,8 +154,8 @@
 <div class="content-section">
     <h3>Certifications</h3>
     <div class="projects-block">
-        {% if app.parsed_certifications %}
-            {{ app.parsed_certifications|linebreaks }}
+        {% if application.parsed_certifications %}
+            {{ application.parsed_certifications|linebreaks }}
         {% else %}
             <p class="muted-text">No certifications found in the resume.</p>
         {% endif %}
@@ -166,8 +166,8 @@
 <div class="content-section">
     <h3>Projects & Portfolio</h3>
     <div class="projects-block">
-        {% if app.parsed_projects %}
-            {{ app.parsed_projects|linebreaks }}
+        {% if application.parsed_projects %}
+            {{ application.parsed_projects|linebreaks }}
         {% else %}
             <p class="muted-text">No projects were identified in the resume.</p>
         {% endif %}
