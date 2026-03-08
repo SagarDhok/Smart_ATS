@@ -35,10 +35,8 @@ def admin_dashboard(request):
     recruiter_paginator = Paginator(recruiter_qs, 10)  #10 pages 1 , 2 3 
     recruiter_page = recruiter_paginator.get_page(request.GET.get("recruiter_page"))
 
-    # PENDING INVITES PAGINATION
-    pending_invites_qs = Invite.objects.filter(
-        used=False, expires_at__gt=timezone.now()
-    ).order_by("-created_at")
+    # PENDING INVITES PAGINATION  
+    pending_invites_qs = Invite.objects.filter(used=False, expires_at__gt=timezone.now()).order_by("-created_at")
     pending_invites_paginator = Paginator(pending_invites_qs, 10)
     pending_invites_page = pending_invites_paginator.get_page(request.GET.get("pending_page"))
 
@@ -83,7 +81,7 @@ def recruiter_management(request):
 
     paginator = Paginator(recruiter_users, 10)
     recruiter_page = paginator.get_page(request.GET.get("page"))
-
+    
     return render(request, "admin/recruiter_management.html", {"recruiter_page": recruiter_page,"search": search,})
 
 

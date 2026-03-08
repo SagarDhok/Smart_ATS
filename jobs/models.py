@@ -76,7 +76,7 @@ class Job(models.Model):
             if self.min_experience > self.max_experience:
                 raise ValidationError("Minimum experience cannot be greater than maximum experience.")
 
-        if self.min_experience is not None and self.max_experience is not None:
+        if self.min_salary is not None and self.max_salary is not None:
             if self.min_salary > self.max_salary:
                 raise ValidationError("Minimum salary cannot be greater than maximum salary.")
 

@@ -46,7 +46,7 @@ def compute_experience_score(parsed_exp, job_min, job_max):
     if job_min is None and job_max is None:
         return 100
 
-    if job_min and parsed_exp < job_min:
+    if job_min and parsed_exp <= job_min:
         return (parsed_exp / job_min) * 100
 
     if job_max and parsed_exp > job_max:

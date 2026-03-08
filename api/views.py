@@ -180,7 +180,7 @@ class RecruiterApplicationListAPI(ListAPIView):
     permission_classes = [IsRecruiter]
 
     def get_queryset(self):
-        return Application.objects.filter(
+        return Application.objects.select_related("job").filter(
             job__created_by=self.request.user,
             job__is_deleted=False
         ).order_by("-applied_at")
@@ -192,7 +192,7 @@ class RecruiterApplicationDetailAPI(RetrieveAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return Application.objects.filter(
+        return Application.objects.select_related("job").filter(
             job__created_by=self.request.user
         )
 
@@ -226,7 +226,7 @@ class AdminApplicationListAPI(ListAPIView):
     permission_classes = [IsAdmin]
 
     def get_queryset(self):
-        return Application.objects.all().order_by("-applied_at")
+        return Application.objects.select_related("job").all().order_by("-applied_at")
 
 
 class AdminApplicationDetailAPI(RetrieveAPIView):
@@ -235,7 +235,7 @@ class AdminApplicationDetailAPI(RetrieveAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return Application.objects.all()
+        return Application.objects.select_related("job").all()
 
 # ============================================================
 # APPLY JOB API (PUBLIC)

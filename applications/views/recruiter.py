@@ -40,14 +40,24 @@ def recruiter_application_list(request):
     if status_filter:
         qs = qs.filter(status=status_filter)
 
+    # counts
+    all_apps = application_queryset_for(request.user)
+    counts = {
+        "screening": all_apps.filter(status="screening").count(),
+        "review": all_apps.filter(status="review").count(),
+        "interview": all_apps.filter(status="interview").count(),
+        "hired": all_apps.filter(status="hired").count(),
+        "rejected": all_apps.filter(status="rejected").count(),
+    }
+
     paginator = Paginator(qs, 10)
     page = paginator.get_page(request.GET.get("page"))
 
     return render(request, "recruiter/applications/list.html", {
         "applications_page": page,
         "page_obj": page,
+        "counts": counts,
     })
-
 
 # =================================================================
 #                    RECRUITER APPLICATION DETAIL

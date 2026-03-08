@@ -27,6 +27,6 @@ def upload_resume(file, job_slug):
             },
         )
     except Exception as e:
-        raise Exception(f"Supabase upload failed: {e}")
+        raise Exception(f" upload failed: {e}")
 
     return supabase.storage.from_(BUCKET).get_public_url(filename)

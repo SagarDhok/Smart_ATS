@@ -181,12 +181,12 @@ def extract_name(text):
 
     for raw in lines[:10]:
         line = raw.strip()
+        if re.match(r"^[A-Za-z ]+$", line) and 2 <= len(line.split()) <= 4:
+            return line.title()
         if not line or "@" in line or re.search(r"\d", line):
             continue
         if any(w in line.lower() for w in BLOCK):
             continue
-        if re.match(r"^[A-Za-z ]+$", line) and 2 <= len(line.split()) <= 4:
-            return line.title()
     return None
 
 

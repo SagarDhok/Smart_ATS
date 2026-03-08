@@ -132,8 +132,7 @@ def recruiter_job_edit(request, id):
 @login_required
 @require_POST
 def recruiter_job_delete(request, id):
-    queryset = job_queryset_for(request.user)
-    job = get_object_or_404(queryset, id=id)
+    job = get_object_or_404(job_queryset_for(request.user), id=id)
 
     job.is_deleted = True
     job.save()

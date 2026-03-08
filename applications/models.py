@@ -11,7 +11,7 @@ STATUS_CHOICES = [
 
 
 class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
+    job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True, related_name="applications")
 
     full_name = models.CharField(max_length=255)
     email = models.EmailField()

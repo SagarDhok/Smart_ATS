@@ -17,6 +17,12 @@ class JobForm(forms.ModelForm):
     )
 
 
+    def clean_required_skills(self):
+        return [x.strip().lower() for x in self.cleaned_data.get("required_skills", "").split(",") if x.strip()]
+
+    def clean_jd_keywords(self):
+        return [x.strip().lower() for x in self.cleaned_data.get("jd_keywords", "").split(",") if x.strip()]
+    
     class Meta:
         model = Job
         exclude = [
@@ -51,12 +57,6 @@ class JobForm(forms.ModelForm):
                 if self.instance.max_salary:
                     self.initial["max_salary"] = self.instance.max_salary / 100000
                     
-    # Clean comma list fields
-    def clean_required_skills(self):
-        return [x.strip().lower() for x in self.cleaned_data.get("required_skills", "").split(",") if x.strip()]
-
-    def clean_jd_keywords(self):
-        return [x.strip().lower() for x in self.cleaned_data.get("jd_keywords", "").split(",") if x.strip()]
 
     # ----------------------------
     # SAVE LOGIC
@@ -95,7 +95,6 @@ class JobForm(forms.ModelForm):
             job.save()
 
         return job
-
     # ----------------------------
     # FINAL VALIDATION
     # ----------------------------
@@ -116,3 +115,4 @@ class JobForm(forms.ModelForm):
 
 
         return cleaned
+

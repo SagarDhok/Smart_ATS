@@ -34,7 +34,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["first_name","last_name"]
 
     ROLE_CHOICES = [
         ("ADMIN", "Admin"),
